@@ -1,0 +1,1455 @@
+<!-- biome-ignore-all lint: preserve prototype markup while migrating architecture to modular Vite project -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>大成工程 PMIS — 工地管理資訊系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" id="ic-sprite">
+  <symbol id="ic-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>
+  <symbol id="ic-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></symbol>
+  <symbol id="ic-chksq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="ic-alert-t" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ic-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+  <symbol id="ic-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22V12h6v10"/><line x1="9" y1="7" x2="9.01" y2="7" stroke-width="3"/><line x1="15" y1="7" x2="15.01" y2="7" stroke-width="3"/><line x1="9" y1="11" x2="9.01" y2="11" stroke-width="3"/><line x1="15" y1="11" x2="15.01" y2="11" stroke-width="3"/></symbol>
+  <symbol id="ic-hat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18a1 1 0 0 0 0 2h20a1 1 0 0 0 0-2"/><path d="M4 18V11a8 8 0 1 1 16 0v7"/><path d="M12 3v5"/><path d="M8 7.5A4 4 0 0 1 4 11"/><path d="M16 7.5A4 4 0 0 0 20 11"/></symbol>
+  <symbol id="ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="ic-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" fill="currentColor"/><path d="M2 10h20"/></symbol>
+  <symbol id="ic-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></symbol>
+  <symbol id="ic-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></symbol>
+  <symbol id="ic-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="ic-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ic-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="ic-chevr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="ic-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="ic-dots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="ic-chk-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="ic-x-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></symbol>
+  <symbol id="ic-alert-c" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+  <symbol id="ic-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="ic-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="ic-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="ic-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></symbol>
+  <symbol id="ic-cam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+  <symbol id="ic-dl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+  <symbol id="ic-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="ic-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+  <symbol id="ic-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+  <symbol id="ic-tool" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+  <symbol id="ic-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></symbol>
+  <symbol id="ic-tup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+  <symbol id="ic-tdn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></symbol>
+  <symbol id="ic-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="ic-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="ic-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="ic-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+</svg>
+
+<div class="app">
+
+<!-- ══════════════════════════════
+     SIDEBAR
+══════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-row">
+      <div class="sb-logo">大</div>
+      <div class="sb-brand-text">
+        <div class="sb-company">大成工程</div>
+        <div class="sb-sys">Project Mgmt IS · v2.1</div>
+      </div>
+    </div>
+    <div class="sb-toggle" id="sb-toggle" onclick="toggleSB()" title="收折側欄">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+  </div>
+
+  <div class="sb-proj">
+    <div class="sb-proj-text">
+      <div class="sb-proj-top">
+        <span class="sb-proj-label">當前工地</span>
+        <span class="sb-proj-chevron">▾</span>
+      </div>
+      <div class="sb-proj-name">台北 W Hotel 改建工程</div>
+      <div class="sb-proj-code">TC-2024-018</div>
+    </div>
+    <span class="ic s14 sb-proj-ic" style="color:var(--tx3)"><svg><use href="#ic-building"/></svg></span>
+  </div>
+
+  <div class="sb-online">
+    <div class="sb-dot"></div>
+    <span class="sb-online-txt">SITE ONLINE · 今日正常施工</span>
+  </div>
+
+  <nav class="sb-nav">
+    <div class="sb-section">管理核心</div>
+    <div class="nav-item active" onclick="gv('dashboard',this,'工地總覽儀表板')">
+      <span class="ni ic s18"><svg><use href="#ic-gauge"/></svg></span><span class="nav-txt">工地總覽</span>
+    </div>
+    <div class="nav-item" onclick="gv('morning',this,'工地晨會記錄')">
+      <span class="ni ic s18"><svg><use href="#ic-sun"/></svg></span><span class="nav-txt">晨會記錄</span>
+      <span class="nb nb-amber">今</span>
+    </div>
+    <div class="nav-item" onclick="gv('daily',this,'施工日報')">
+      <span class="ni ic s18"><svg><use href="#ic-clipboard"/></svg></span><span class="nav-txt">施工日報</span>
+    </div>
+
+    <div class="sb-section">品質管理</div>
+    <div class="nav-item" onclick="gv('ir',this,'查驗資料 (IR)')">
+      <span class="ni ic s18"><svg><use href="#ic-chksq"/></svg></span><span class="nav-txt">查驗資料 (IR)</span>
+      <span class="nb nb-red">3</span>
+    </div>
+    <div class="nav-item" onclick="gv('ncr',this,'缺失追蹤 (NCR)')">
+      <span class="ni ic s18"><svg><use href="#ic-alert-t"/></svg></span><span class="nav-txt">缺失追蹤 (NCR)</span>
+      <span class="nb nb-red">7</span>
+    </div>
+    <div class="nav-item" onclick="gv('material',this,'材料進場驗收')">
+      <span class="ni ic s18"><svg><use href="#ic-box"/></svg></span><span class="nav-txt">材料進場驗收</span>
+    </div>
+
+    <div class="sb-section">職業安全</div>
+    <div class="nav-item" onclick="gv('safety',this,'工安巡檢')">
+      <span class="ni ic s18"><svg><use href="#ic-hat"/></svg></span><span class="nav-txt">工安巡檢</span>
+    </div>
+
+    <div class="sb-section">工務財務</div>
+    <div class="nav-item" onclick="gv('sub',this,'分包商管理')">
+      <span class="ni ic s18"><svg><use href="#ic-users"/></svg></span><span class="nav-txt">分包商管理</span>
+    </div>
+    <div class="nav-item" onclick="gv('billing',this,'估驗請款')">
+      <span class="ni ic s18"><svg><use href="#ic-wallet"/></svg></span><span class="nav-txt">估驗請款</span>
+    </div>
+    <div class="nav-item" onclick="gv('docs',this,'文件管理')">
+      <span class="ni ic s18"><svg><use href="#ic-file"/></svg></span><span class="nav-txt">文件管理</span>
+    </div>
+  </nav>
+
+  <div class="sb-user">
+    <div class="sb-avatar">王</div>
+    <div class="sb-user-info">
+      <div class="sb-uname">王建明</div>
+      <div class="sb-urole">Site Manager</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══════════════════════════════
+     MAIN
+══════════════════════════════ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-hamburger" onclick="openDr()"><span class="ic s18"><svg><use href="#ic-menu"/></svg></span></div>
+    <div class="ib tb-home" id="tb-home" onclick="goHome()" title="回主頁" style="display:none"><span class="ic s18"><svg><use href="#ic-home"/></svg></span></div>
+    <div class="tb-left">
+      <div class="tb-title" id="tb-title">工地總覽儀表板</div>
+      <div class="tb-crumb" id="tb-crumb">TC-2024-018  ›  工地總覽</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-date" id="tb-date"></div>
+      <div class="ib" onclick="om('mo-alerts')"><span class="ic s18"><svg><use href="#ic-bell"/></svg></span><span class="dot">5</span></div>
+      <div class="ib" onclick="om('mo-quick')"><span class="ic s18"><svg><use href="#ic-bolt"/></svg></span></div>
+      <button class="btn bp btn-sm" onclick="om('mo-quick')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 新增</button>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+<!-- ══════ DASHBOARD ══════ -->
+<div id="v-dashboard" class="view active">
+
+  <div class="g5">
+    <div class="kpi clickable" style="--kc:var(--gold)" onclick="gvDash('daily','施工日報')" title="查看施工日報">
+      <div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-chart"/></svg></span></div>
+      <div class="kpi-val">68.3<span style="font-size:15px">%</span></div>
+      <div class="kpi-label">工程總體進度</div>
+      <div class="kpi-sub"><span class="up">超前計劃 3.2%</span></div>
+      <div class="kpi-hint"><span class="ic s10"><svg><use href="#ic-chev-r"/></svg></span>施工日報</div>
+    </div>
+    <div class="kpi clickable" style="--kc:var(--green)" onclick="gvDash('ir','查驗資料 (IR)')" title="查看查驗資料">
+      <div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-chksq"/></svg></span></div>
+      <div class="kpi-val">143</div>
+      <div class="kpi-label">本月查驗（件）</div>
+      <div class="kpi-sub"><span class="up">合格率 94.4%</span></div>
+      <div class="kpi-hint"><span class="ic s10"><svg><use href="#ic-chev-r"/></svg></span>查驗資料</div>
+    </div>
+    <div class="kpi clickable" style="--kc:var(--red)" onclick="gvDash('ncr','缺失追蹤 (NCR)')" title="查看缺失追蹤">
+      <div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-alert-t"/></svg></span></div>
+      <div class="kpi-val">7</div>
+      <div class="kpi-label">待處理 NCR</div>
+      <div class="kpi-sub"><span class="dn"><span class="ic s10"><svg><use href="#ic-tdn"/></svg></span> 2 件即將逾期</span></div>
+      <div class="kpi-hint"><span class="ic s10"><svg><use href="#ic-chev-r"/></svg></span>缺失追蹤</div>
+    </div>
+    <div class="kpi clickable" style="--kc:var(--amber)" onclick="gvDash('morning','工地晨會記錄')" title="查看晨會記錄">
+      <div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-users"/></svg></span></div>
+      <div class="kpi-val">127</div>
+      <div class="kpi-label">今日出工人數</div>
+      <div class="kpi-sub"><span class="nt">計劃 135 人</span></div>
+      <div class="kpi-hint"><span class="ic s10"><svg><use href="#ic-chev-r"/></svg></span>晨會記錄</div>
+    </div>
+    <div class="kpi clickable" style="--kc:var(--blue)" onclick="gvDash('billing','估驗請款')" title="查看估驗請款">
+      <div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-cal"/></svg></span></div>
+      <div class="kpi-val">286</div>
+      <div class="kpi-label">剩餘工期（天）</div>
+      <div class="kpi-sub"><span class="nt">完工 2026/03/15</span></div>
+      <div class="kpi-hint"><span class="ic s10"><svg><use href="#ic-chev-r"/></svg></span>估驗請款</div>
+    </div>
+  </div>
+
+  <!-- Main panels -->
+  <div class="g73">
+    <!-- Left: Progress + Subcontractors -->
+    <div>
+      <div class="card mb0">
+        <div class="ct"><span class="bar"></span>S-CURVE 工程進度曲線</div>
+        <div class="sc-wrap">
+          <svg viewBox="0 0 520 150" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="gb" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4A7BAA" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="#4A7BAA" stop-opacity="0"/>
+              </linearGradient>
+              <linearGradient id="go" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#C8911A" stop-opacity=".3"/>
+                <stop offset="100%" stop-color="#C8911A" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid -->
+            <line x1="0" y1="30" x2="520" y2="30" stroke="#3A3322" stroke-width="1"/>
+            <line x1="0" y1="60" x2="520" y2="60" stroke="#3A3322" stroke-width="1"/>
+            <line x1="0" y1="90" x2="520" y2="90" stroke="#3A3322" stroke-width="1"/>
+            <line x1="0" y1="120" x2="520" y2="120" stroke="#3A3322" stroke-width="1"/>
+            <!-- Y labels -->
+            <text x="3" y="29" fill="#5C5445" font-size="8" font-family="IBM Plex Mono">100%</text>
+            <text x="3" y="59" fill="#5C5445" font-size="8" font-family="IBM Plex Mono"> 75%</text>
+            <text x="3" y="89" fill="#5C5445" font-size="8" font-family="IBM Plex Mono"> 50%</text>
+            <text x="3" y="119" fill="#5C5445" font-size="8" font-family="IBM Plex Mono"> 25%</text>
+            <!-- Plan -->
+            <path d="M38,144 C75,141 115,130 170,114 C225,96 265,75 318,55 C372,38 420,30 510,28" fill="url(#gb)" stroke="#4A7BAA" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <!-- Actual (to today ~68%) -->
+            <path d="M38,144 C75,142 115,133 170,118 C218,104 255,86 296,68" fill="url(#go)" stroke="#C8911A" stroke-width="2"/>
+            <circle cx="296" cy="68" r="4" fill="#C8911A" stroke="#DDA828" stroke-width="1.5"/>
+            <line x1="296" y1="18" x2="296" y2="144" stroke="#C8911A" stroke-width="1" stroke-dasharray="3,3" opacity=".6"/>
+            <text x="299" y="17" fill="#C8911A" font-size="8" font-family="IBM Plex Mono">今日</text>
+          </svg>
+        </div>
+        <div class="sc-leg">
+          <div class="sc-l"><span style="background:#4A7BAA"></span>計劃進度</div>
+          <div class="sc-l"><span style="background:#C8911A"></span>實際進度</div>
+        </div>
+        <hr class="div">
+        <!-- 各工程分項進度（可點擊查看詳情）-->
+        <div style="display:flex;flex-direction:column;gap:9px">
+          <div onclick="setWorkDetail('地下結構工程','wc1',82,80,'$245,000,000','2024/03','2025/06','B1F~B3F全區結構體施工，含地下連續壁、基礎底板、地下樓板及柱牆。','B3F底板鋼筋綁紮完成，混凝土澆置作業進行中。2F柱牆模板組立中。','<li>B3F底板澆置 — 進行中</li><li>2F柱牆模板組立 — 進行中</li><li>B2F天花板模板拆除 — 完成</li>','超前計劃 2%，品質良好');om('mo-work-detail')" style="cursor:pointer;padding:6px 8px;margin:-6px -8px;border-radius:var(--r-sm);transition:.12s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='transparent'">
+            <div class="flex fxc mb8 gap8">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--wc1);flex-shrink:0"></span>
+              <span style="font-size:11px;flex:1">地下結構工程</span>
+              <span class="fm-font" style="font-size:10px;color:var(--wc1);font-weight:600">82%</span>
+              <span class="ic s12" style="color:var(--tx3)"><svg><use href="#ic-chev-r"/></svg></span>
+            </div>
+            <div class="pb"><div class="pf" style="width:82%;background:var(--wc1)"></div></div>
+          </div>
+          <div onclick="setWorkDetail('地上結構工程','wc2',51,55,'$180,000,000','2024/08','2025/09','1F~15F地上樓層結構體施工，含樓板、柱牆、剪力牆及樓梯。','目前施工至4F樓層，2F~3F結構體已完成，4F柱牆施工中。','<li>4F 柱牆模板組立 — 進行中</li><li>3F 結構體 — 完成</li><li>5F 放樣作業 — 待施工</li>','落後計劃 4%，王子水電人力不足為主因');om('mo-work-detail')" style="cursor:pointer;padding:6px 8px;margin:-6px -8px;border-radius:var(--r-sm);transition:.12s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='transparent'">
+            <div class="flex fxc mb8 gap8">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--wc2);flex-shrink:0"></span>
+              <span style="font-size:11px;flex:1">地上結構工程</span>
+              <span class="fm-font" style="font-size:10px;color:var(--wc2);font-weight:600">51%</span>
+              <span class="ic s12" style="color:var(--tx3)"><svg><use href="#ic-chev-r"/></svg></span>
+            </div>
+            <div class="pb"><div class="pf" style="width:51%;background:var(--wc2)"></div></div>
+          </div>
+          <div onclick="setWorkDetail('機電管路工程','wc3',38,42,'$95,000,000','2024/06','2025/10','消防灑水、空調冷媒管路、電氣幹管、給排水管路全棟配置。','B2F~B3F天花板配管進行中，消防主管已完成佈設。','<li>B2F天花板消防管路 — 進行中</li><li>B3F空調管路 — 完成</li><li>1F~2F 電氣幹管 — 待施工</li>','落後計劃 4%，需補足人力');om('mo-work-detail')" style="cursor:pointer;padding:6px 8px;margin:-6px -8px;border-radius:var(--r-sm);transition:.12s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='transparent'">
+            <div class="flex fxc mb8 gap8">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--wc3);flex-shrink:0"></span>
+              <span style="font-size:11px;flex:1">機電管路工程</span>
+              <span class="fm-font" style="font-size:10px;color:var(--wc3);font-weight:600">38%</span>
+              <span class="ic s12" style="color:var(--tx3)"><svg><use href="#ic-chev-r"/></svg></span>
+            </div>
+            <div class="pb"><div class="pf" style="width:38%;background:var(--wc3)"></div></div>
+          </div>
+          <div onclick="setWorkDetail('外牆帷幕工程','wc4',15,8,'$128,000,000','2025/01','2025/12','建築外牆全幕牆玻璃帷幕系統，含鋁型材框架、隔熱玻璃及收邊。','施工計畫書審查中，材料已陸續進場，預計下週正式施工。','<li>施工計畫書審查 — 進行中（Rev.0）</li><li>鋁型材進場驗收 — 完成</li><li>玻璃進場 — 待進場</li>','超前計劃 7%，材料提早到場');om('mo-work-detail')" style="cursor:pointer;padding:6px 8px;margin:-6px -8px;border-radius:var(--r-sm);transition:.12s" onmouseover="this.style.background='var(--s3)'" onmouseout="this.style.background='transparent'">
+            <div class="flex fxc mb8 gap8">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--wc4);flex-shrink:0"></span>
+              <span style="font-size:11px;flex:1">外牆帷幕工程</span>
+              <span class="fm-font" style="font-size:10px;color:var(--wc4);font-weight:600">15%</span>
+              <span class="ic s12" style="color:var(--tx3)"><svg><use href="#ic-chev-r"/></svg></span>
+            </div>
+            <div class="pb"><div class="pf" style="width:15%;background:var(--wc4)"></div></div>
+          </div>
+          <!-- 整體計畫 vs 實際 + 請款% -->
+          <hr class="div" style="margin:2px 0">
+          <!-- 計畫進度 -->
+          <div>
+            <div class="flex fxc mb8 gap8">
+              <span style="display:inline-block;width:8px;height:2px;border-radius:1px;background:#4A7BAA;margin-top:3px;flex-shrink:0"></span>
+              <span style="font-size:11px;flex:1">計畫進度（整體）</span>
+              <span class="fm-font" style="font-size:10px;color:#4A7BAA;font-weight:600">65.1%</span>
+            </div>
+            <div class="pb"><div class="pf pbl" style="width:65.1%;opacity:.7"></div></div>
+          </div>
+          <!-- 實際進度 -->
+          <div>
+            <div class="flex fxc mb8 gap8">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0"></span>
+              <span style="font-size:11px;flex:1">實際進度（整體）</span>
+              <span class="fm-font" style="font-size:10px;color:var(--gold-txt);font-weight:600">68.3% <span style="color:var(--green);font-size:9px">▲ +3.2%</span></span>
+            </div>
+            <div class="pb"><div class="pf pg" style="width:68.3%"></div></div>
+          </div>
+          <!-- 請款% -->
+          <hr class="div" style="margin:2px 0">
+          <div>
+            <div class="flex fxc mb8 gap8">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--wc5);flex-shrink:0"></span>
+              <span style="font-size:11px;flex:1">請款進度</span>
+              <span class="fm-font" style="font-size:10px;color:var(--wc5);font-weight:600">61.7%</span>
+            </div>
+            <div class="pb"><div class="pf pwc5" style="width:61.7%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subcontractor today -->
+      <div class="card mb0" style="margin-top:14px">
+        <div class="ct"><span class="bar"></span>分包商今日出勤</div>
+        <div class="tw">
+          <table>
+            <thead><tr><th>分包商</th><th>工項</th><th>出工</th><th>計劃</th><th>狀態</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="tc1">誠實營造</td><td>結構鋼筋</td><td class="tcm">45 人</td><td class="tcm">45 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('誠實營造','結構鋼筋工程',68,'施工中');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+              <tr><td class="tc1">王子水電</td><td>機電管路</td><td class="tcm">12 人</td><td class="tcm">18 人</td><td><span class="tag ta">人力不足</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('王子水電','機電管路工程',38,'進度落後');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+              <tr><td class="tc1">大地模板</td><td>模板工程</td><td class="tcm">31 人</td><td class="tcm">30 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('大地模板','模板工程',78,'施工中');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+              <tr><td class="tc1">永達混凝土</td><td>混凝土供料</td><td class="tcm">15 人</td><td class="tcm">15 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('永達預拌混凝土','混凝土供料',65,'施工中');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+              <tr><td class="tc1">建新帷幕</td><td>外牆帷幕</td><td class="tcm">0 人</td><td class="tcm">0 人</td><td><span class="tag tx">未進場</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('建新帷幕','外牆帷幕工程',5,'進場準備');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Activity + Todo -->
+    <div>
+      <div class="card">
+        <div class="ct"><span class="bar"></span>財務快覽</div>
+
+
+        <div class="g2" style="gap:8px;margin-bottom:8px">
+          <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:10px;text-align:center">
+            <div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:4px">合約總額</div>
+            <div style="font-family:var(--fn);font-size:20px;font-weight:600;color:var(--tx2)">6.8億</div>
+          </div>
+          <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:10px;text-align:center">
+            <div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:4px">已向業主請款</div>
+            <div style="font-family:var(--fn);font-size:20px;font-weight:600;color:var(--wc5)">4.2億</div>
+          </div>
+        </div>
+        <div class="pb" style="height:6px;border-radius:3px;margin-bottom:4px">
+          <div class="pf pwc5" style="width:61.7%;border-radius:3px"></div>
+        </div>
+        <div class="flex fxc gap8">
+          <span style="font-size:10px;color:var(--tx3);font-family:var(--fm)">對業主請款進度</span>
+          <span style="font-size:10px;color:var(--wc5);font-family:var(--fm);margin-left:auto;font-weight:600">61.7%</span>
+        </div>
+
+
+      </div>
+
+      <div class="card">
+        <div class="ct"><span class="bar"></span>今日動態</div>
+        <div class="alert al-w" style="font-size:11px">北側外牆施工今日強制安全帶作業</div>
+        <div class="tl">
+          <div class="tli"><div class="tld"></div><div class="tlt">08:00 工地晨會完成</div><div class="tlm">工地主任 王建明</div><div class="tls">127人出工，B3F底板澆置作業</div></div>
+          <div class="tli"><div class="tld" style="border-color:var(--green)"></div><div class="tlt">09:15 IR-0318 查驗通過</div><div class="tlm">品管工程師 李家豪</div><div class="tls">B3F柱C-12鋼筋綁紮，准予澆置</div></div>
+          <div class="tli"><div class="tld" style="border-color:var(--red)"></div><div class="tlt">10:40 開立 NCR-087</div><div class="tlm">監造工程師 陳大維</div><div class="tls">2F樓板鋼筋保護層不足，需補強</div></div>
+          <div class="tli" style="margin-bottom:0"><div class="tld" style="border-color:var(--amber)"></div><div class="tlt">14:30 鋼筋進場待驗收</div><div class="tlm">品管 李家豪</div><div class="tls">SD420 #8 鋼筋18噸，待取樣</div></div>
+        </div>
+      </div>
+
+      <div class="card mb0">
+        <div class="ct"><span class="bar"></span>本週待辦</div>
+        <div class="cl-item" onclick="tCl(this)"><div class="cl-box ck"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span class="cl-txt">B3F 底板混凝土澆置（今日）</span></div>
+        <div class="cl-item" onclick="tCl(this)"><div class="cl-box"></div><span class="cl-txt">2F 鋼筋綁紮 IR 送審</span><span class="tag ta" style="margin-left:auto">待辦</span></div>
+        <div class="cl-item" onclick="tCl(this)"><div class="cl-box"></div><span class="cl-txt">第五期估驗請款準備</span><span class="tag to" style="margin-left:auto">本週</span></div>
+        <div class="cl-item" onclick="tCl(this)"><div class="cl-box"></div><span class="cl-txt">NCR-085 改善逾期——立即處理</span><span class="tag tr" style="margin-left:auto">逾期</span></div>
+        <div class="cl-item" onclick="tCl(this)"><div class="cl-box"></div><span class="cl-txt">帷幕廠商施工計畫書審查</span></div>
+        <div class="cl-item" onclick="tCl(this)"><div class="cl-box"></div><span class="cl-txt">新進人員工安教育訓練</span></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /dashboard -->
+
+<!-- ══════ MORNING MEETING ══════ -->
+<div id="v-morning" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-sun"/></svg></span> 工地晨會記錄</h2><button class="btn bp btn-sm" onclick="om('mo-morning')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 新增晨會</button></div>
+  <div class="alert al-w">今日 (2025/03/21) 晨會記錄尚未建立，請填寫後送出。</div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct"><span class="bar"></span>今日晨會快速填寫</div>
+      <div class="fr fr2"><div class="fg"><label class="fl">晨會日期</label><input type="date" class="fi" value="2025-03-21"></div><div class="fg"><label class="fl">晨會時間</label><input type="time" class="fi" value="07:30"></div></div>
+      <div class="fr fr3"><div class="fg"><label class="fl">計劃出工</label><input type="number" class="fi" value="135"></div><div class="fg"><label class="fl">實際出工</label><input type="number" class="fi" value="127"></div><div class="fg"><label class="fl">天氣</label><select class="fe"><option>晴天</option><option>多雲</option><option>雨天</option><option>雷雨（停工）</option></select></div></div>
+      <div class="fg mb12"><label class="fl">今日主要施工項目</label><textarea class="fta">B3F 底板混凝土澆置（面積約 1,200 m²）
+2F 鋼筋綁紮繼續進行（預計完成北側區域）
+B2F 機電管路配管作業</textarea></div>
+      <div class="fg mb12"><label class="fl">工安宣導重點</label><textarea class="fta">1. 混凝土澆置：注意模板穩定性，禁止在模板上堆放重物
+2. 北側外牆施工人員強制配戴安全帶（距地面超過2米）
+3. 機電管路施工注意線路整理，避免絆倒</textarea></div>
+      <div class="fg" style="margin-bottom:16px"><label class="fl">協議事項 / 指示</label><textarea class="fta" placeholder="主任指示、各廠商協調事項..."></textarea></div>
+      <div class="flex gap8"><button class="btn bp" onclick="toast('晨會記錄儲存成功','ts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 儲存晨會記錄</button><button class="btn bg"><span class="ic s14"><svg><use href="#ic-print"/></svg></span> 預覽 PDF</button></div>
+    </div>
+    <div class="card">
+      <div class="ct"><span class="bar"></span>歷史晨會紀錄</div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>日期</th><th>天氣</th><th>出工</th><th>主要工項</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="tc1 tcm">03/20</td><td>晴天</td><td class="tcm">132</td><td>B3F底板綁筋</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/20','晴天','132','135','B3F底板鋼筋綁紮（完成北側）\n2F模板組立繼續施工','1.高空作業確認安全帶配戴<br>2.起重機作業管制區落實','確認明日底板澆置前完成查驗申請');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/19</td><td>多雲</td><td class="tcm">128</td><td>2F模板組立</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/19','多雲','128','130','2F樓板模板組立（完成南側）\nB3F柱模板拆除作業','1. 模板堆放整齊，通道保持暢通\n2. 拆除廢棄模板及時清運','確認2F模板工程進度符合計劃，明日繼續推進北側作業');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/18</td><td>雨天</td><td class="tcm">89</td><td>室內施工（部分停工）</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/18','雨天（全日雨量38mm）','89','130','室內機電配管（B2F~B3F）\nB2F防水層室內側施工\n（外部作業全面停工）','1. 注意積水地點滑倒風險\n2. 電氣設備防潮、漏電保護確認\n3. 雨具及雨衣配備齊全','外部施工因強降雨全面停工，僅進行室內作業。預計明日天氣轉晴後恢復正常施工。');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/17</td><td>晴天</td><td class="tcm">135</td><td>B2F機電配管</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/17','晴天 26°C','135','135','B2F機電管路配管（天花板區域）\nB3F底板模板組立（A軸區）\n鋼筋進場驗收（SD420 #8）','1. 高空配管作業強制安全帶配戴\n2. 管路材料整齊堆放，不影響通道\n3. 進場鋼筋先辦理驗收再卸料','王子水電今日人力充足（18人），要求維持此水平。下週一前需完成B2F天花板配管。');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/16</td><td>晴天</td><td class="tcm">130</td><td>地下連續壁監測</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/16','晴天 25°C','130','130','地下連續壁施工監測（各測點量測）\nB3F底板模板準備\n臨時設施整理','1. 地下連續壁監測人員須持證作業\n2. 地錨拆除區域設置安全警示\n3. 監測資料當日回報','地下連續壁各測點監測數據正常，無異常位移，業主已知悉。');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ DAILY LOG ══════ -->
+<div id="v-daily" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-clipboard"/></svg></span> 施工日報</h2><button class="btn bp btn-sm" onclick="om('mo-daily')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 新增日報</button></div>
+  <div class="g73">
+    <div class="card">
+      <div class="ct"><span class="bar"></span>2025/03/20 施工日報（最新）</div>
+      <div class="g4" style="margin-bottom:14px">
+        <div class="ip"><span class="ip-k">日期</span><span class="ip-v"><strong>2025/03/20</strong></span></div>
+        <div class="ip"><span class="ip-k">天氣</span><span class="ip-v">晴天 28°C</span></div>
+        <div class="ip"><span class="ip-k">出工人數</span><span class="ip-v"><strong>132人</strong></span></div>
+        <div class="ip"><span class="ip-k">工地主任</span><span class="ip-v">王建明</span></div>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr><th>工項</th><th>工區</th><th>單位</th><th>計劃量</th><th>完成量</th><th>累計</th><th>進度</th></tr></thead>
+          <tbody>
+            <tr><td class="tc1">鋼筋綁紮</td><td>B3F底板</td><td>噸</td><td>8.0</td><td>7.5</td><td>234.5</td><td><span class="tag tg">93.8%</span></td></tr>
+            <tr><td class="tc1">模板組立</td><td>2F樓板</td><td>m²</td><td>200</td><td>185</td><td>3,240</td><td><span class="tag ta">92.5%</span></td></tr>
+            <tr><td class="tc1">混凝土澆置</td><td>B3F柱</td><td>m³</td><td>45</td><td>45</td><td>890</td><td><span class="tag tg">100%</span></td></tr>
+            <tr><td class="tc1">機電配管</td><td>B2F天花</td><td>m</td><td>120</td><td>98</td><td>1,456</td><td><span class="tag ta">81.7%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert al-w" style="font-size:11px">注意：王子水電人數不足（實到12人，計劃18人），明日需補足，否則啟動延誤通知程序。</div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="ct"><span class="bar"></span>人力配置</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div class="flex fxc gap8"><span class="f1">鋼筋工（誠實）</span><span class="fm-font goldc">45人</span></div>
+          <div class="flex fxc gap8"><span class="f1">模板工（大地）</span><span class="fm-font goldc">31人</span></div>
+          <div class="flex fxc gap8"><span class="f1">機電工（王子）</span><span class="fm-font" style="color:var(--amber)">12人</span></div>
+          <div class="flex fxc gap8"><span class="f1">混凝土工（永達）</span><span class="fm-font goldc">15人</span></div>
+          <div class="flex fxc gap8"><span class="f1">工地管理</span><span class="fm-font goldc">14人</span></div>
+          <hr class="div">
+          <div class="flex fxc gap8 bold"><span class="f1">合計</span><span class="fm-font goldc">132人</span></div>
+        </div>
+      </div>
+      <div class="card mb0">
+        <div class="ct"><span class="bar"></span>施工照片</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);height:62px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--tx3)">B3F底板綁筋.jpg</div>
+          <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);height:62px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--tx3)">2F模板組立.jpg</div>
+          <div style="background:var(--s3);border:1px dashed var(--bd2);border-radius:var(--r-sm);height:62px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--tx3);cursor:pointer;grid-column:span 2"><span class="ic s18"><svg><use href="#ic-cam"/></svg></span> 點擊上傳</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ INSPECTION (IR) ══════ -->
+<div id="v-ir" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-chksq"/></svg></span> 查驗資料 (IR)</h2><button class="btn bp btn-sm" onclick="om('mo-ir')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 申請查驗</button></div>
+  <div class="fbar">
+    <button class="fb act">全部 (24)</button>
+    <button class="fb" onclick="filterIR(this,'wait')">待審查 (3)</button>
+    <button class="fb" onclick="filterIR(this,'pass')">已通過 (18)</button>
+    <button class="fb" onclick="filterIR(this,'fail')">不合格 (3)</button>
+  </div>
+  <div class="tw">
+    <table id="ir-tbl">
+      <thead><tr><th>IR 編號</th><th>查驗部位</th><th>查驗項目</th><th>申請日</th><th>一級 廠商</th><th>二級 監造</th><th>三級 請款附件</th><th>操作</th></tr></thead>
+      <tbody>
+        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0318</td><td>B3F底板 柱C-12</td><td>鋼筋綁紮</td><td class="tcm">03/21</td><td><span class="tag tg">合格</span></td><td><span class="tag ta">待審</span></td><td><span class="tag tx">待第 5 期請款</span></td><td><button class="btn bs btn-sm" onclick="om('mo-review')"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 審核</button></td></tr>
+        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0317</td><td>2F樓板 S-B2</td><td>模板組立</td><td class="tcm">03/21</td><td><span class="tag tg">合格</span></td><td><span class="tag ta">待審</span></td><td><span class="tag tx">待第 5 期請款</span></td><td><button class="btn bs btn-sm" onclick="om('mo-review')"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 審核</button></td></tr>
+        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0316</td><td>B2F天花 機電</td><td>管路隱蔽</td><td class="tcm">03/20</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag to">第 5 期 正請款</span></td><td><button class="btn bg btn-sm" onclick="setIRDetail('IR-2025-0316','B2F天花 機電','管路隱蔽查驗','03/20','進行中','pass','pass','pending');om('mo-ir-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr data-s="pass"><td class="tc1 tcm">IR-2025-0315</td><td>B3F底板 柱C-11</td><td>鋼筋綁紮</td><td class="tcm">03/19</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag tg">第 4 期已請款</span></td><td><button class="btn bg btn-sm" onclick="setIRDetail('IR-2025-0315','B3F底板 柱C-11','鋼筋綁紮查驗','03/19','通過','pass','pass','pass');om('mo-ir-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr data-s="fail"><td class="tc1 tcm">IR-2025-0309</td><td>2F樓板 S-A1</td><td>鋼筋保護層</td><td class="tcm">03/16</td><td><span class="tag tg">合格</span></td><td><span class="tag tr">不合格</span></td><td><span class="tag tr" style="white-space:nowrap">退件無法請款</span></td><td><button class="btn bd btn-sm" onclick="om('mo-ncr')"><span class="ic s12"><svg><use href="#ic-alert-t"/></svg></span> 開NCR</button></td></tr>
+        <tr data-s="pass"><td class="tc1 tcm">IR-2025-0305</td><td>B3F連續壁</td><td>接頭品質</td><td class="tcm">03/14</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag tg">第 4 期已請款</span></td><td><button class="btn bg btn-sm" onclick="setIRDetail('IR-2025-0305','B3F連續壁','接頭品質查驗','03/14','通過','pass','pass','pass');om('mo-ir-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="g2">
+    <div class="card mb0">
+      <div class="ct"><span class="bar"></span>本月查驗統計</div>
+      <div class="g3" style="gap:8px;margin-bottom:14px">
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div style="font-family:var(--fn);font-size:26px;font-weight:600;color:var(--gold-txt)">24</div><div class="fm-font" style="font-size:9px;color:var(--tx3)">總申請</div></div>
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div style="font-family:var(--fn);font-size:26px;font-weight:600;color:var(--green)">18</div><div class="fm-font" style="font-size:9px;color:var(--tx3)">通過</div></div>
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div style="font-family:var(--fn);font-size:26px;font-weight:600;color:var(--red)">3</div><div class="fm-font" style="font-size:9px;color:var(--tx3)">退件</div></div>
+      </div>
+      <div class="flex fxc gap8 mb8"><span style="font-size:11px;flex:1">合格率</span><span class="fm-font" style="font-size:10px;color:var(--green)">94.4%</span></div>
+      <div class="pb" style="height:8px;border-radius:4px"><div class="pf pgr" style="width:94.4%;border-radius:4px"></div></div>
+    </div>
+    <div class="card mb0">
+      <div class="ct"><span class="bar"></span>三級品管流程說明</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <!-- Level 1 -->
+        <div class="flex gap12">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--gold);color:#1A1200;font-family:var(--fn);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:2px">廠商自主查驗</div>
+            <div style="font-size:11px;color:var(--tx3)">承包商 App 填表 → 系統推播通知監造工程師</div>
+          </div>
+        </div>
+        <!-- Arrow -->
+        <div class="flex gap12" style="align-items:center">
+          <div style="width:24px;display:flex;justify-content:center;flex-shrink:0"><div style="width:1px;height:16px;background:var(--bd2)"></div></div>
+          <div style="font-size:10px;color:var(--green);font-family:var(--fm)">一級自主查驗完成</div>
+        </div>
+        <!-- Level 2 -->
+        <div class="flex gap12">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--gold);color:#1A1200;font-family:var(--fn);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:2px">監造工程師現場確認</div>
+            <div style="font-size:11px;color:var(--tx3)">到場查驗 → App 電子簽名 → GPS 時間戳記</div>
+          </div>
+        </div>
+        <!-- Arrow -->
+        <div class="flex gap12" style="align-items:center">
+          <div style="width:24px;display:flex;justify-content:center;flex-shrink:0"><div style="width:1px;height:16px;background:var(--bd2)"></div></div>
+          <div style="font-size:10px;color:var(--green);font-family:var(--fm)">二級監造確認完成 → 可施工</div>
+        </div>
+        <!-- Level 3 — billing only -->
+        <div class="flex gap12">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--wc5);color:white;font-family:var(--fn);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:2px">集中作為請款附件送業主</div>
+            <div style="font-size:11px;color:var(--tx3)">一、二級查驗完成的 IR 記錄，與同期其他資料（估驗單、施工日報等）一同彙整後送業主，作為請款作業佐證文件</div>
+          </div>
+        </div>
+        <!-- Note -->
+        <div style="background:var(--s3);border-left:3px solid var(--wc5);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:9px 12px;margin-top:2px">
+          <div style="font-size:11px;color:var(--tx2);line-height:1.6">
+            第三級<strong style="color:var(--tx1)">不是現場查驗</strong>，而是將已完成一、二級查驗的 IR 記錄，與估驗單、施工日報等同期文件一同彙整，送交業主作為請款依據。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ NCR ══════ -->
+<div id="v-ncr" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-alert-t"/></svg></span> 缺失追蹤 (NCR)</h2><button class="btn bp btn-sm" onclick="om('mo-ncr')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 開立缺失</button></div>
+  <div class="alert al-d"><span class="ic s14"><svg><use href="#ic-alert-c"/></svg></span> NCR-085、NCR-081 已逾期，請立即督促廠商處理並回報改善情形！</div>
+  <div class="kanban">
+    <div class="kc">
+      <div class="kch" style="color:var(--red)">開立中<span class="fm-font" style="font-size:9px;color:var(--tx3)">3 筆</span></div>
+      <div class="kcc" onclick="setNCRDetail('NCR-087','2F樓板鋼筋保護層不足','品質缺失','大地模板工程','2025/03/25','open','2F樓板主筋保護層實測值僅2.5cm，設計規範要求≥4cm，共發現8處不足點，需全面補強後重新申請IR複驗。');om('mo-ncr-view')"><div class="kcid">NCR-087</div><div class="kct">2F樓板鋼筋保護層不足</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/25 ／ 大地模板</div></div>
+      <div class="kcc" onclick="setNCRDetail('NCR-086','B2F混凝土蜂窩缺陷','品質缺失','永達混凝土','2025/03/28','open','B2F頂板混凝土澆置後發現多處蜂窩，面積約1.2m²，深度超過設計允許值。');om('mo-ncr-view')"><div class="kcid">NCR-086</div><div class="kct">B2F混凝土蜂窩缺陷</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/28 ／ 永達混凝土</div></div>
+      <div class="kcc" onclick="setNCRDetail('NCR-085','工地西側排水溝堵塞','環境缺失','大地模板工程','2025/03/18','overdue','工地西側排水溝因施工廢棄物堆積造成堵塞，雨天時積水影響施工及安全。');om('mo-ncr-view')"><div class="kcid">NCR-085</div><div class="kct">工地西側排水溝堵塞</div><div class="kcm"><span class="tag ta" style="font-size:8px">環境</span></div><div class="kcd ov">已逾期 3 天</div></div>
+    </div>
+    <div class="kc">
+      <div class="kch" style="color:var(--amber)">改善中<span class="fm-font" style="font-size:9px;color:var(--tx3)">2 筆</span></div>
+      <div class="kcc" onclick="setNCRDetail('NCR-084','B3F柱筋間距超差','品質缺失','誠實營造','2025/03/23','improving','B3F北區部分柱筋間距實測為28cm，超出設計值25cm±5mm允許範圍，需補強綁紮固定。');om('mo-ncr-view')"><div class="kcid">NCR-084</div><div class="kct">B3F柱筋間距超差</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/23 ／ 誠實營造</div></div>
+      <div class="kcc" onclick="setNCRDetail('NCR-083','消防管路坡度不足','機電缺失','王子水電','2025/03/24','improving','消防灑水主管坡度實測0.05%，規範要求≥0.1%，需重新調整管路坡度並固定支撐架。');om('mo-ncr-view')"><div class="kcid">NCR-083</div><div class="kct">消防管路坡度不足</div><div class="kcm"><span class="tag ta" style="font-size:8px">機電</span></div><div class="kcd">期限 03/24 ／ 王子水電</div></div>
+    </div>
+    <div class="kc">
+      <div class="kch" style="color:var(--blue)">待複驗<span class="fm-font" style="font-size:9px;color:var(--tx3)">2 筆</span></div>
+      <div class="kcc" onclick="setNCRDetail('NCR-082','地下室防水層施作','品質缺失','誠實營造','2025/03/22','pending_re','地下室外牆防水施工部分漏塗，廠商已回報重新施作完成，待監造工程師現場複驗確認。');om('mo-ncr-view')"><div class="kcid">NCR-082</div><div class="kct">地下室防水層施作</div><div class="kcm"><span class="tag tb" style="font-size:8px">複驗 03/22</span></div><div class="kcd">廠商已回報改善完成</div></div>
+      <div class="kcc" onclick="setNCRDetail('NCR-081','臨時施工電源漏電保護','工安缺失','誠實營造','2025/03/20','overdue_re','施工臨時電源漏電斷路器感應電流設定值超標，廠商已更換設備，但複驗日期已過，需儘速安排複驗。');om('mo-ncr-view')"><div class="kcid">NCR-081</div><div class="kct">臨時施工電源漏電保護</div><div class="kcm"><span class="tag tr" style="font-size:8px">工安</span></div><div class="kcd ov">複驗逾期</div></div>
+    </div>
+    <div class="kc">
+      <div class="kch" style="color:var(--green)">已關閉<span class="fm-font" style="font-size:9px;color:var(--tx3)">78 筆</span></div>
+      <div class="kcc" style="opacity:.5" onclick="setNCRDetail('NCR-080','外牆防水材料品牌不符','品質缺失','建新帷幕','2025/03/10','closed','廠商已更換符合設計規範之防水材料品牌，監造確認，NCR關閉。');om('mo-ncr-view')"><div class="kcid">NCR-080</div><div class="kct">外牆防水材料品牌不符</div><div class="kcm"><span class="tag tg" style="font-size:8px">已關閉</span></div><div class="kcd">—</div></div>
+      <div class="kcc" style="opacity:.5" onclick="setNCRDetail('NCR-079','牆面裂縫填補','品質缺失','誠實營造','2025/03/08','closed','裂縫已依規範填補，並完成防水處理，驗收合格，NCR關閉。');om('mo-ncr-view')"><div class="kcid">NCR-079</div><div class="kct">牆面裂縫填補</div><div class="kcm"><span class="tag tg" style="font-size:8px">已關閉</span></div><div class="kcd">—</div></div>
+      <div style="text-align:center;font-size:10px;color:var(--tx3);padding:8px;font-family:var(--fm)">另有 76 筆已關閉…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MATERIAL ══════ -->
+<div id="v-material" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-box"/></svg></span> 材料進場驗收</h2><button class="btn bp btn-sm" onclick="om('mo-material')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 進場登記</button></div>
+  <div class="tw" style="margin-bottom:16px">
+    <table>
+      <thead><tr><th>進場日期</th><th>材料名稱</th><th>規格</th><th>供應廠商</th><th>數量</th><th>單位</th><th>品管取樣</th><th>驗收結果</th><th>操作</th></tr></thead>
+      <tbody>
+        <tr><td class="tc1 tcm">03/21</td><td class="tc1">鋼筋 SD420</td><td>#8（Φ25mm）</td><td>中鋼公司</td><td class="tcm">18.0</td><td>噸</td><td><span class="tag ta">待送驗</span></td><td><span class="tag ta">待驗</span></td><td><button class="btn bg btn-sm" onclick="setMatQC('03/21','鋼筋 SD420 #8 Φ25mm','中鋼公司','18.0','噸','待');om('mo-mat-qc')"><span class="ic s12"><svg><use href="#ic-check"/></svg></span> 驗收</button></td></tr>
+        <tr><td class="tc1 tcm">03/20</td><td class="tc1">混凝土 RC</td><td>3000 psi</td><td>台北預拌</td><td class="tcm">45.0</td><td>m³</td><td><span class="tag tg">已取樣</span></td><td><span class="tag tg">合格</span></td><td><button class="btn bg btn-sm" onclick="setMatDetail('03/20','混凝土 RC 3000psi','台北預拌混凝土','45.0','m³','合格','T-RC-0320-01');om('mo-mat-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1 tcm">03/19</td><td class="tc1">鋼筋 SD420</td><td>#5（Φ16mm）</td><td>中鋼公司</td><td class="tcm">12.5</td><td>噸</td><td><span class="tag tg">已送驗</span></td><td><span class="tag tg">合格</span></td><td><button class="btn bg btn-sm" onclick="setMatDetail('03/19','鋼筋 SD420 #5 Φ16mm','中鋼公司','12.5','噸','合格','T-SD420-0319-01');om('mo-mat-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1 tcm">03/18</td><td class="tc1">防水材料</td><td>SBS改質瀝青</td><td>建安防水</td><td class="tcm">500</td><td>m²</td><td><span class="tag tx">免取樣</span></td><td><span class="tag tg">合格</span></td><td><button class="btn bg btn-sm" onclick="setMatDetail('03/18','防水材料 SBS改質瀝青','建安防水工程','500','m²','合格','免取樣（附廠商出廠證明）');om('mo-mat-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1 tcm">03/17</td><td class="tc1">電管 EMT</td><td>1"（25mm）</td><td>大同電線</td><td class="tcm">500</td><td>m</td><td><span class="tag tx">免取樣</span></td><td><span class="tag tr">不合格</span></td><td><button class="btn bd btn-sm"><span class="ic s12"><svg><use href="#ic-truck"/></svg></span> 退料</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="g2">
+    <div class="card mb0">
+      <div class="ct"><span class="bar"></span>快速驗收登記</div>
+      <div class="fr fr2"><div class="fg"><label class="fl">進場日期</label><input type="date" class="fi"></div><div class="fg"><label class="fl">材料名稱</label><input type="text" class="fi" placeholder="e.g. 鋼筋 SD420 #8"></div></div>
+      <div class="fr fr3"><div class="fg"><label class="fl">供應廠商</label><select class="fe"><option>中鋼公司</option><option>台北預拌</option><option>大同電線</option><option>其他</option></select></div><div class="fg"><label class="fl">數量</label><input type="number" class="fi"></div><div class="fg"><label class="fl">單位</label><select class="fe"><option>噸</option><option>m³</option><option>m²</option><option>m</option><option>套</option></select></div></div>
+      <div class="fr fr2" style="margin-bottom:14px"><div class="fg"><label class="fl">外觀初驗</label><select class="fe"><option>合格</option><option>不合格（退料）</option><option>條件接受</option></select></div><div class="fg"><label class="fl">是否取樣送驗</label><select class="fe"><option>是，需送驗</option><option>否（免取樣）</option></select></div></div>
+      <button class="btn bp" onclick="toast('材料進場登記完成','ts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 登記進場</button>
+    </div>
+    <div class="card mb0">
+      <div class="ct"><span class="bar"></span>本月材料統計</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+        <div class="flex fxc gap8"><span class="f1">進場批次</span><span class="fm-font goldc">18 批</span></div>
+        <div class="flex fxc gap8"><span class="f1">驗收合格</span><span class="fm-font" style="color:var(--green)">16 批</span></div>
+        <div class="flex fxc gap8"><span class="f1">退料批次</span><span class="fm-font" style="color:var(--red)">1 批</span></div>
+        <div class="flex fxc gap8"><span class="f1">待驗批次</span><span class="fm-font" style="color:var(--amber)">1 批</span></div>
+        <hr class="div">
+        <div class="flex fxc gap8"><span class="f1">鋼筋累計用量</span><span class="fm-font tx2c">38.5 噸</span></div>
+        <div class="flex fxc gap8"><span class="f1">混凝土累計用量</span><span class="fm-font tx2c">890 m³</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SAFETY ══════ -->
+<div id="v-safety" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-hat"/></svg></span> 工安巡檢</h2><button class="btn bp btn-sm" onclick="safetyStep(1)"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 新增巡檢日誌</button></div>
+
+  <!-- ── 三步驟巡檢流程 ─────────────────────────── -->
+  <div id="safety-wizard" style="display:none;margin-bottom:16px">
+    <!-- 步驟指示器 -->
+    <div style="display:flex;align-items:center;gap:0;margin-bottom:18px;background:var(--s2);border:1px solid var(--bd1);border-radius:var(--r);padding:14px 18px">
+      <div id="sw-s1" style="display:flex;align-items:center;gap:8px;flex:1">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--gold);color:#1A1200;font-family:var(--fn);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+        <span style="font-size:11px;font-weight:600">選擇巡檢位置與項目</span>
+      </div>
+      <div style="width:24px;height:1px;background:var(--bd2);flex-shrink:0"></div>
+      <div id="sw-s2" style="display:flex;align-items:center;gap:8px;flex:1;opacity:.4">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--bd2);color:var(--tx3);font-family:var(--fn);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+        <span style="font-size:11px;font-weight:600">巡檢查核</span>
+      </div>
+      <div style="width:24px;height:1px;background:var(--bd2);flex-shrink:0"></div>
+      <div id="sw-s3" style="display:flex;align-items:center;gap:8px;flex:1;opacity:.4">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--bd2);color:var(--tx3);font-family:var(--fn);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+        <span style="font-size:11px;font-weight:600">上傳照片 · 送出</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: 選擇巡檢位置與項目 -->
+    <div id="sw-step1" class="card mb0">
+      <div class="ct"><span class="bar"></span>第一步：選擇巡檢位置，勾選本次適用項目</div>
+      <div class="fr fr2" style="margin-bottom:14px">
+        <div class="fg"><label class="fl">巡檢日期</label><input type="date" class="fi" id="sf-date"></div>
+        <div class="fg"><label class="fl">巡檢人員</label><input type="text" class="fi" id="sf-inspector" value="陳志強"></div>
+      </div>
+      <div class="fg" style="margin-bottom:14px">
+        <label class="fl">巡檢位置（可多選）</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:5px 10px;font-size:11px"><input type="checkbox" style="accent-color:var(--gold)"> B3F 底板區</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:5px 10px;font-size:11px"><input type="checkbox" style="accent-color:var(--gold)"> 2F 樓板區</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:5px 10px;font-size:11px"><input type="checkbox" style="accent-color:var(--gold)"> B2F 機電層</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:5px 10px;font-size:11px"><input type="checkbox" style="accent-color:var(--gold)"> 北側外牆</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:5px 10px;font-size:11px"><input type="checkbox" style="accent-color:var(--gold)"> 工地出入口</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:5px 10px;font-size:11px"><input type="checkbox" style="accent-color:var(--gold)"> 臨時設施區</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:5px 10px;font-size:11px"><input type="checkbox" style="accent-color:var(--gold)"> 材料堆置區</label>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:16px">
+        <label class="fl">本次巡檢項目（依實際情況勾選，並非每次都需全選）</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)" checked> 高空作業安全帶</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)" checked> 圍籬及警示標示</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)"> 消防設備有效期</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)"> 起重機操作證照</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)"> 電氣漏電斷路器</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)"> 澆置區安全管制</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)"> 車輛管制及淨高</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)"> 個人防護具配備</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)"> 物料堆置整齊</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 0;font-size:12px"><input type="checkbox" style="accent-color:var(--gold)"> 機具設備狀況</label>
+        </div>
+      </div>
+      <div class="flex gap8">
+        <button class="btn bg" onclick="safetyCancel()">取消</button>
+        <button class="btn bp" onclick="safetyStep(2)"><span class="ic s14"><svg><use href="#ic-chev-r"/></svg></span> 下一步：開始查核</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: 巡檢查核 -->
+    <div id="sw-step2" class="card mb0" style="display:none">
+      <div class="ct"><span class="bar"></span>第二步：逐項查核，標記合格 / 不合格</div>
+      <!-- 動態清單，由 safetyBuildStep2() 根據步驟一勾選項目生成 -->
+      <div id="sf-checklist" style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px"></div>
+      <hr class="div">
+      <div class="fg" style="margin-bottom:12px">
+        <label class="fl">缺失備註（不合格項目說明）</label>
+        <textarea class="fta" id="sf-remarks" placeholder="記錄發現的缺失情形、位置及責任廠商..."></textarea>
+      </div>
+      <div class="flex gap8">
+        <button class="btn bg" onclick="safetyStep(1)"><span class="ic s14"><svg><use href="#ic-chev-r"/></svg></span> 上一步</button>
+        <button class="btn bp" onclick="safetyStep(3)"><span class="ic s14"><svg><use href="#ic-chev-r"/></svg></span> 下一步：上傳照片</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: 上傳照片 · 驗證安危 · 送出 -->
+    <div id="sw-step3" class="card mb0" style="display:none">
+      <div class="ct"><span class="bar"></span>第三步：上傳照片、驗證安危，送出巡檢日報</div>
+      <div onclick="toast('選擇巡檢照片','ts')" style="border:1.5px dashed var(--bd2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;color:var(--tx3);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:14px" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--bd2)'">
+        <span class="ic s28"><svg><use href="#ic-cam"/></svg></span>
+        <span>點擊上傳巡檢現場照片（最多 20 張）</span>
+        <span style="font-size:10px;color:var(--tx3)">支援 JPG / PNG / HEIC</span>
+      </div>
+      <div style="background:var(--s3);border-radius:var(--r-sm);padding:13px;margin-bottom:14px">
+        <div style="font-family:var(--fm);font-size:9px;color:var(--tx3);letter-spacing:1px;margin-bottom:9px;text-transform:uppercase">安危確認聲明</div>
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;color:var(--tx2);line-height:1.6"><input type="checkbox" id="sf-confirm" style="accent-color:var(--gold);margin-top:2px"> 本次巡檢結果已據實記錄，所有不合格項目已當場告知責任廠商，並確認工地目前安全狀態。</label>
+      </div>
+      <div class="fg" style="margin-bottom:14px"><label class="fl">工安師電子簽名</label>
+        <div id="sf-sign" onclick="signPad(this)" style="border:1.5px dashed var(--bd2);border-radius:var(--r-sm);padding:16px;text-align:center;cursor:pointer;color:var(--tx3);font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--bd2)'"><span class="ic s18"><svg><use href="#ic-pen"/></svg></span> 點擊完成電子簽名</div>
+      </div>
+      <div class="flex gap8">
+        <button class="btn bg" onclick="safetyStep(2)"><span class="ic s14"><svg><use href="#ic-chev-r"/></svg></span> 上一步</button>
+        <button class="btn bp" onclick="safetySend()"><span class="ic s14"><svg><use href="#ic-send"/></svg></span> 送出巡檢日報</button>
+      </div>
+    </div>
+
+  </div>
+
+
+</div><!-- /v-safety -->
+
+<!-- ══════ SUBCONTRACTORS ══════ -->
+<div id="v-sub" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-users"/></svg></span> 分包商管理</h2><button class="btn bp btn-sm" onclick="om('mo-sub-new')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 新增合約</button></div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>分包商</th><th>工項</th><th>合約金額</th><th>已請款</th><th>合約進度</th><th>合約期間</th><th>合約狀態</th><th>操作</th></tr></thead>
+      <tbody>
+        <tr><td class="tc1">誠實營造（股）</td><td>結構鋼筋工程</td><td class="tcm">$32,500,000</td><td class="tcm">$18,720,000</td><td><div class="flex fxc gap8" style="min-width:120px"><div class="pb f1"><div class="pf pg" style="width:68%"></div></div><span class="fm-font" style="font-size:10px;color:var(--gold-txt)">68%</span></div></td><td class="tcm">2024/03–2025/08</td><td><span class="tag tg">施工中</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('誠實營造','結構鋼筋工程',68,'施工中');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1">王子水電（股）</td><td>機電管路工程</td><td class="tcm">$45,800,000</td><td class="tcm">$14,250,000</td><td><div class="flex fxc gap8" style="min-width:120px"><div class="pb f1"><div class="pf par" style="width:38%"></div></div><span class="fm-font" style="font-size:10px;color:var(--amber)">38%</span></div></td><td class="tcm">2024/06–2025/10</td><td><span class="tag ta">略落後</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('王子水電','機電管路工程',38,'進度落後');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1">大地模板工程</td><td>模板工程</td><td class="tcm">$12,800,000</td><td class="tcm">$8,960,000</td><td><div class="flex fxc gap8" style="min-width:120px"><div class="pb f1"><div class="pf pgr" style="width:78%"></div></div><span class="fm-font" style="font-size:10px;color:var(--green)">78%</span></div></td><td class="tcm">2024/03–2025/06</td><td><span class="tag tg">施工中</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('大地模板','模板工程',78,'施工中');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1">永達預拌混凝土</td><td>混凝土供料</td><td class="tcm">$28,600,000</td><td class="tcm">$16,440,000</td><td><div class="flex fxc gap8" style="min-width:120px"><div class="pb f1"><div class="pf pg" style="width:65%"></div></div><span class="fm-font" style="font-size:10px;color:var(--gold-txt)">65%</span></div></td><td class="tcm">2024/03–2025/08</td><td><span class="tag tg">施工中</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('永達預拌混凝土','混凝土供料',65,'施工中');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1">建新帷幕工程</td><td>外牆帷幕工程</td><td class="tcm">$62,400,000</td><td class="tcm">$3,120,000</td><td><div class="flex fxc gap8" style="min-width:120px"><div class="pb f1"><div class="pf pbl" style="width:5%"></div></div><span class="fm-font" style="font-size:10px;color:var(--blue)">5%</span></div></td><td class="tcm">2025/01–2025/12</td><td><span class="tag to">進場準備</span></td><td><button class="btn bg btn-sm" onclick="setSubDetail('建新帷幕','外牆帷幕工程',5,'進場準備');om('mo-sub-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════ BILLING ══════ -->
+<div id="v-billing" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-wallet"/></svg></span> 估驗請款</h2><button class="btn bp btn-sm" onclick="om('mo-billing')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 新增估驗</button></div>
+  <div class="g4">
+    <div class="kpi" style="--kc:var(--gold)"><div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-clipboard"/></svg></span></div><div class="kpi-val">6.8<span style="font-size:14px">億</span></div><div class="kpi-label">合約總金額</div></div>
+    <div class="kpi" style="--kc:var(--green)"><div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-chksq"/></svg></span></div><div class="kpi-val">4.2<span style="font-size:14px">億</span></div><div class="kpi-label">已請款金額</div></div>
+    <div class="kpi" style="--kc:var(--blue)"><div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-clock"/></svg></span></div><div class="kpi-val">2.6<span style="font-size:14px">億</span></div><div class="kpi-label">未請款餘額</div></div>
+    <div class="kpi" style="--kc:var(--amber)"><div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-lock"/></svg></span></div><div class="kpi-val">3,400<span style="font-size:14px">萬</span></div><div class="kpi-label">保留款（5%）</div></div>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>期別</th><th>請款期間</th><th>工程進度</th><th>申請金額</th><th>核准金額</th><th>請款狀態</th><th>入帳日期</th><th>操作</th></tr></thead>
+      <tbody>
+        <tr><td class="tc1">第 5 期</td><td class="tcm">03/01–03/31</td><td class="tcm">68.3%</td><td>—</td><td>—</td><td><span class="tag ta">準備中</span></td><td>—</td><td><button class="btn bp btn-sm" onclick="om('mo-billing')"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 開始估驗</button></td></tr>
+        <tr><td class="tc1">第 4 期</td><td class="tcm">02/01–02/28</td><td class="tcm">58.5%</td><td class="tcm">$72,500,000</td><td class="tcm">$70,800,000</td><td><span class="tag tg">已入帳</span></td><td class="tcm">03/15</td><td><button class="btn bg btn-sm" onclick="setBillingDetail(4,'02/01–02/28','58.5%','$72,500,000','$70,800,000','03/15');om('mo-billing-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1">第 3 期</td><td class="tcm">01/01–01/31</td><td class="tcm">48.2%</td><td class="tcm">$65,800,000</td><td class="tcm">$64,200,000</td><td><span class="tag tg">已入帳</span></td><td class="tcm">02/18</td><td><button class="btn bg btn-sm" onclick="setBillingDetail(3,'01/01–01/31','48.2%','$65,800,000','$64,200,000','02/18');om('mo-billing-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1">第 2 期</td><td class="tcm">12/01–12/31</td><td class="tcm">35.0%</td><td class="tcm">$58,400,000</td><td class="tcm">$58,400,000</td><td><span class="tag tg">已入帳</span></td><td class="tcm">01/20</td><td><button class="btn bg btn-sm" onclick="setBillingDetail(2,'12/01–12/31','35.0%','$58,400,000','$58,400,000','01/20');om('mo-billing-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr><td class="tc1">第 1 期</td><td class="tcm">11/01–11/30</td><td class="tcm">18.5%</td><td class="tcm">$45,200,000</td><td class="tcm">$45,200,000</td><td><span class="tag tg">已入帳</span></td><td class="tcm">12/22</td><td><button class="btn bg btn-sm" onclick="setBillingDetail(1,'11/01–11/30','18.5%','$45,200,000','$45,200,000','12/22');om('mo-billing-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card mb0">
+    <div class="ct"><span class="bar"></span>現金流預測（本月）</div>
+    <div class="flex fxc gap12 mb12" style="flex-wrap:wrap;font-size:12px">
+      <span>本月預計請款：<strong class="goldc">$7,800 萬</strong></span>
+      <span style="color:var(--tx3)">|</span>
+      <span>本月預計支出：<strong style="color:var(--red)">$5,240 萬</strong></span>
+      <span style="color:var(--tx3)">|</span>
+      <span>預計淨現金流：<strong style="color:var(--green)">+$2,560 萬</strong></span>
+    </div>
+    <div class="flex fxc gap8 mb8"><span style="font-size:11px;flex:1">整體請款進度</span><span class="fm-font goldc" style="font-size:10px">61.7%</span></div>
+    <div class="pb" style="height:10px;border-radius:5px"><div class="pf pg" style="width:61.7%;border-radius:5px"></div></div>
+  </div>
+</div>
+
+<!-- ══════ DOCUMENTS ══════ -->
+<div id="v-docs" class="view">
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-file"/></svg></span> 文件管理</h2><button class="btn bp btn-sm" onclick="om('mo-doc-upload')"><span class="ic s14"><svg><use href="#ic-up"/></svg></span> 上傳文件</button></div>
+  <div class="fbar">
+    <button class="fb act">全部</button>
+    <button class="fb">施工計畫書</button>
+    <button class="fb">設計圖說</button>
+    <button class="fb">品管文件</button>
+    <button class="fb">工安文件</button>
+    <button class="fb">合約文件</button>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>文件名稱</th><th>類別</th><th>版次</th><th>上傳日期</th><th>上傳者</th><th>文件狀態</th><th>操作</th></tr></thead>
+      <tbody>
+        <tr><td class="tc1">綜合施工計畫書</td><td>施工計畫</td><td class="tcm">Rev.3</td><td class="tcm">2025/03/10</td><td>王建明</td><td><span class="tag tg">核准</span></td><td><button class="btn bg btn-sm" onclick="setDocView('綜合施工計畫書','Rev.3','施工計畫','2025/03/10','王建明','核准','綜合施工計畫書涵蓋工程全週期施工方法、工序安排、品質管理計畫及工安計畫。本版Rev.3修訂更新帷幕施工章節及機電管路施工方法。');om('mo-doc-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button><button class="btn bg btn-sm" onclick="toast('正在下載 綜合施工計畫書_Rev.3.pdf','ts')"><span class="ic s12"><svg><use href="#ic-dl"/></svg></span> 下載</button></td></tr>
+        <tr><td class="tc1">地下結構工程施工圖</td><td>設計圖說</td><td class="tcm">Rev.2</td><td class="tcm">2025/02/28</td><td>設計部</td><td><span class="tag tg">核准</span></td><td><button class="btn bg btn-sm" onclick="setDocView('地下結構工程施工圖','Rev.2','設計圖說','2025/02/28','設計部','核准','地下B1F~B3F結構平面圖、剖面圖及配筋圖。本版Rev.2修訂更新電梯坑配筋設計及B3F底板厚度修正。');om('mo-doc-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button><button class="btn bg btn-sm" onclick="toast('正在下載 地下結構工程施工圖_Rev.2.pdf','ts')"><span class="ic s12"><svg><use href="#ic-dl"/></svg></span> 下載</button></td></tr>
+        <tr><td class="tc1">品質計畫書</td><td>品管文件</td><td class="tcm">Rev.1</td><td class="tcm">2025/01/15</td><td>李家豪</td><td><span class="tag tg">核准</span></td><td><button class="btn bg btn-sm" onclick="setDocView('品質計畫書','Rev.1','品管文件','2025/01/15','李家豪','核准','工程三級品管計畫，包含材料管制、施工品管、查驗程序及不合格品管制辦法。本版依業主要求新增材料取樣送驗追蹤機制。');om('mo-doc-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button><button class="btn bg btn-sm" onclick="toast('正在下載 品質計畫書_Rev.1.pdf','ts')"><span class="ic s12"><svg><use href="#ic-dl"/></svg></span> 下載</button></td></tr>
+        <tr><td class="tc1">職業安全衛生管理計畫</td><td>工安文件</td><td class="tcm">Rev.2</td><td class="tcm">2025/03/01</td><td>陳志強</td><td><span class="tag tg">核准</span></td><td><button class="btn bg btn-sm" onclick="setDocView('職業安全衛生管理計畫','Rev.2','工安文件','2025/03/01','陳志強','核准','依職業安全衛生法規訂定，包含危害辨識、風險評估、安全教育訓練計畫及緊急應變程序。Rev.2新增高架作業及密閉空間管理章節。');om('mo-doc-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button><button class="btn bg btn-sm" onclick="toast('正在下載 職業安全衛生管理計畫_Rev.2.pdf','ts')"><span class="ic s12"><svg><use href="#ic-dl"/></svg></span> 下載</button></td></tr>
+        <tr><td class="tc1">帷幕施工計畫書</td><td>施工計畫</td><td class="tcm">Rev.0</td><td class="tcm">2025/03/18</td><td>建新帷幕</td><td><span class="tag ta">審查中</span></td><td><button class="btn bg btn-sm" onclick="setDocView('帷幕施工計畫書','Rev.0','施工計畫','2025/03/18','建新帷幕','審查中','外牆帷幕系統施工計畫，包含施工方法、品管計畫及施工時程。目前Rev.0首次送審，審查意見尚未回覆。');om('mo-doc-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button><button class="btn bs btn-sm" onclick="setDocReview('帷幕施工計畫書','Rev.0','建新帷幕','2025/03/18');om('mo-doc-review')"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 審查</button></td></tr>
+        <tr><td class="tc1">消防設備設計圖</td><td>設計圖說</td><td class="tcm">Rev.1</td><td class="tcm">2025/03/05</td><td>設計部</td><td><span class="tag ta">審查中</span></td><td><button class="btn bg btn-sm" onclick="setDocView('消防設備設計圖','Rev.1','設計圖說','2025/03/05','設計部','審查中','消防灑水系統、火警系統及緊急廣播系統設計圖說。Rev.1依消防主管機關審查意見修訂，目前重新送審中。');om('mo-doc-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button><button class="btn bs btn-sm" onclick="setDocReview('消防設備設計圖','Rev.1','設計部','2025/03/05');om('mo-doc-review')"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 審查</button></td></tr>
+        <tr><td class="tc1">主要工程承攬合約</td><td>合約文件</td><td>—</td><td class="tcm">2024/10/01</td><td>行政部</td><td><span class="tag tx">機密</span></td><td><button class="btn bg btn-sm"><span class="ic s12"><svg><use href="#ic-lock"/></svg></span> 申請調閱</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+</div><!-- /app -->
+
+<!-- ══════════════════════════════
+     BOTTOM NAV (mobile only)
+══════════════════════════════ -->
+<nav class="bn">
+  <div class="bn-items">
+    <div class="bn-btn act" id="bn0" onclick="gvMobile('dashboard',this,'工地總覽')">
+      <span class="bn-ic ic s26"><svg><use href="#ic-gauge"/></svg></span><span class="bn-lbl">總覽</span>
+    </div>
+    <div class="bn-btn" id="bn1" onclick="gvMobile('ir',this,'查驗資料')">
+      <span class="bn-ic ic s26"><svg><use href="#ic-chksq"/></svg></span><span class="bn-lbl">查驗</span>
+      <span class="bn-dot">3</span>
+    </div>
+    <div class="bn-btn" id="bn2" onclick="gvMobile('ncr',this,'缺失追蹤')">
+      <span class="bn-ic ic s26"><svg><use href="#ic-alert-t"/></svg></span><span class="bn-lbl">缺失</span>
+      <span class="bn-dot">7</span>
+    </div>
+    <div class="bn-btn" id="bn3" onclick="gvMobile('safety',this,'工安巡檢')">
+      <span class="bn-ic ic s26"><svg><use href="#ic-hat"/></svg></span><span class="bn-lbl">工安</span>
+    </div>
+    <div class="bn-btn" id="bn4" onclick="openDr()">
+      <span class="bn-ic ic s26"><svg><use href="#ic-dots"/></svg></span><span class="bn-lbl">更多</span>
+    </div>
+  </div>
+</nav>
+
+<!-- DRAWER (mobile) -->
+<div class="drawer-ov" id="dov" onclick="closeDr()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-head">所有功能</div>
+  <div class="drawer-grid">
+    <div class="di" onclick="gvMobile('dashboard',null,'工地總覽');document.getElementById('bn0').classList.add('act');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-gauge"/></svg></span></span><span class="di-label">工地總覽</span></div>
+    <div class="di" onclick="gvMobile('morning',null,'晨會記錄');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-sun"/></svg></span></span><span class="di-label">晨會記錄</span></div>
+    <div class="di" onclick="gvMobile('daily',null,'施工日報');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-clipboard"/></svg></span></span><span class="di-label">施工日報</span></div>
+    <div class="di" onclick="gvMobile('ir',null,'查驗資料');document.getElementById('bn1').classList.add('act');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-chksq"/></svg></span></span><span class="di-label">查驗資料</span></div>
+    <div class="di" onclick="gvMobile('ncr',null,'缺失追蹤');document.getElementById('bn2').classList.add('act');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-alert-t"/></svg></span></span><span class="di-label">缺失追蹤</span></div>
+    <div class="di" onclick="gvMobile('material',null,'材料驗收');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-box"/></svg></span></span><span class="di-label">材料驗收</span></div>
+    <div class="di" onclick="gvMobile('safety',null,'工安巡檢');document.getElementById('bn3').classList.add('act');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-hat"/></svg></span></span><span class="di-label">工安巡檢</span></div>
+    <div class="di" onclick="gvMobile('sub',null,'分包商');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-users"/></svg></span></span><span class="di-label">分包商</span></div>
+    <div class="di" onclick="gvMobile('billing',null,'估驗請款');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-wallet"/></svg></span></span><span class="di-label">估驗請款</span></div>
+    <div class="di" onclick="gvMobile('docs',null,'文件管理');closeDr()"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-file"/></svg></span></span><span class="di-label">文件管理</span></div>
+    <div class="di" style="visibility:hidden"></div>
+    <div class="di"><span class="di-icon"><span class="ic s24"><svg><use href="#ic-tool"/></svg></span></span><span class="di-label">系統設定</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     MODALS
+══════════════════════════════ -->
+
+<!-- IR 申請 -->
+<div class="mo" id="mo-ir">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-chksq"/></svg></span></div><div class="mtitle">查驗資料申請 (IR)</div><div class="mcl" onclick="cm('mo-ir')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">申請日期</label><input type="date" class="fi" value="2025-03-21"></div><div class="fg"><label class="fl">預計查驗時間</label><input type="time" class="fi" value="10:00"></div></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">查驗部位</label><input type="text" class="fi" placeholder="e.g. B3F 底板 柱C-15"></div><div class="fg"><label class="fl">查驗工項</label><select class="fe"><option>鋼筋綁紮查驗</option><option>模板組立查驗</option><option>混凝土澆置前查驗</option><option>管路隱蔽查驗</option><option>防水施工查驗</option><option>材料進場查驗</option></select></div></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">申請廠商</label><select class="fe"><option>誠實營造</option><option>王子水電</option><option>大地模板</option><option>永達混凝土</option></select></div><div class="fg"><label class="fl">施工數量/範圍</label><input type="text" class="fi" placeholder="e.g. 面積 240 m²"></div></div>
+      <div class="fg mb12"><label class="fl">申請說明</label><textarea class="fta" placeholder="施工情形說明、注意事項..."></textarea></div>
+      <div style="border:1.5px dashed var(--bd2);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;color:var(--tx3);font-size:12px"><span class="ic s18"><svg><use href="#ic-cam"/></svg></span> 點擊上傳第一級自主查驗照片（最多 10 張）</div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-ir')">取消</button><button class="btn bp" onclick="cm('mo-ir');toast('IR-2025-0319 已提交，已推播通知監造工程師','ts')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span> 提交查驗申請</button></div>
+  </div>
+</div>
+
+<!-- IR 審核 -->
+<div class="mo" id="mo-review">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-eye"/></svg></span></div><div class="mtitle">審核 IR-2025-0318</div><div class="mcl" onclick="cm('mo-review')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="alert al-i" style="font-size:11px"><span class="ic s14"><svg><use href="#ic-pin"/></svg></span> GPS: 25°0'44"N 121°32'35"E ｜ 時間戳: 2025/03/21 09:48:22</div>
+      <div class="fr fr2"><div class="fg"><label class="fl">查驗部位</label><input class="fi" value="B3F 底板 柱C-12" disabled></div><div class="fg"><label class="fl">查驗工程師</label><input class="fi" value="李家豪（品管工程師）" disabled></div></div>
+      <div class="sdl">第二級查驗項目</div>
+      <div class="cl-item"><div class="cl-box"></div><span class="cl-txt">鋼筋號數與圖說相符（SD420 #8）</span><div class="cl-acts"><button class="ck-y" onclick="event.stopPropagation();this.closest('.cl-acts').innerHTML='<span class=\'tag tg\' style=\'font-size:9px\'>合格</span>'">合格</button><button class="ck-n" onclick="event.stopPropagation()">不合格</button></div></div>
+      <div class="cl-item"><div class="cl-box"></div><span class="cl-txt">鋼筋間距符合設計圖（25cm ±5mm）</span><div class="cl-acts"><button class="ck-y" onclick="event.stopPropagation();this.closest('.cl-acts').innerHTML='<span class=\'tag tg\' style=\'font-size:9px\'>合格</span>'">合格</button><button class="ck-n" onclick="event.stopPropagation()">不合格</button></div></div>
+      <div class="cl-item"><div class="cl-box"></div><span class="cl-txt">保護層厚度符合規範（≥4cm）</span><div class="cl-acts"><button class="ck-y" onclick="event.stopPropagation();this.closest('.cl-acts').innerHTML='<span class=\'tag tg\' style=\'font-size:9px\'>合格</span>'">合格</button><button class="ck-n" onclick="event.stopPropagation()">不合格</button></div></div>
+      <div class="cl-item"><div class="cl-box"></div><span class="cl-txt">搭接長度符合規範（≥40d = 100cm）</span><div class="cl-acts"><button class="ck-y" onclick="event.stopPropagation();this.closest('.cl-acts').innerHTML='<span class=\'tag tg\' style=\'font-size:9px\'>合格</span>'">合格</button><button class="ck-n" onclick="event.stopPropagation()">不合格</button></div></div>
+      <div class="cl-item"><div class="cl-box"></div><span class="cl-txt">鋼筋綁紮牢固、無鬆動</span><div class="cl-acts"><button class="ck-y" onclick="event.stopPropagation();this.closest('.cl-acts').innerHTML='<span class=\'tag tg\' style=\'font-size:9px\'>合格</span>'">合格</button><button class="ck-n" onclick="event.stopPropagation()">不合格</button></div></div>
+      <div class="fg" style="margin:14px 0 12px"><label class="fl">查驗意見</label><textarea class="fta" placeholder="查驗意見、注意事項..."></textarea></div>
+      <div style="background:var(--s1);border:1px solid var(--bd2);border-radius:var(--r);height:76px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--tx3);font-size:12px" onclick="this.innerHTML='<span style=\'color:var(--green)\'>✅ 李家豪 已完成電子簽名（' + new Date().toLocaleTimeString('zh-TW') + '）</span>';this.style.borderColor='var(--green)'"><span class="ic s18"><svg><use href="#ic-pen"/></svg></span> 點擊電子簽名</div>
+    </div>
+    <div class="mf">
+      <button class="btn bd" onclick="cm('mo-review');om('mo-ncr')"><span class="ic s14"><svg><use href="#ic-x-c"/></svg></span> 不合格 → 開立 NCR</button>
+      <button class="btn bs" onclick="cm('mo-review');toast('IR-2025-0318 第二級查驗合格核簽完成','ts')"><span class="ic s14"><svg><use href="#ic-chk-c"/></svg></span> 查驗合格 → 核簽</button>
+    </div>
+  </div>
+</div>
+
+<!-- NCR 開立 -->
+<div class="mo" id="mo-ncr">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-alert-t"/></svg></span></div><div class="mtitle">開立不合格報告 (NCR)</div><div class="mcl" onclick="cm('mo-ncr')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">缺失類型</label><select class="fe"><option>品質缺失</option><option>工安缺失</option><option>環境缺失</option><option>進度缺失</option></select></div><div class="fg"><label class="fl">缺失部位</label><input type="text" class="fi" placeholder="e.g. 2F 樓板 S-A1"></div></div>
+      <div class="fg mb12"><label class="fl">缺失說明</label><textarea class="fta" placeholder="詳細描述缺失情形、發現位置、不符合規範之處..."></textarea></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">責任廠商</label><select class="fe"><option>誠實營造</option><option>王子水電</option><option>大地模板</option><option>永達混凝土</option></select></div><div class="fg"><label class="fl">改善期限</label><input type="date" class="fi"></div></div>
+      <div class="fg"><label class="fl">要求改善措施</label><textarea class="fta" placeholder="指定廠商應執行的改善方式..."></textarea></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-ncr')">取消</button><button class="btn bd" onclick="cm('mo-ncr');toast('NCR-088 已開立，責任廠商已收到通知','tw')"><span class="ic s14"><svg><use href="#ic-alert-c"/></svg></span> 開立 NCR</button></div>
+  </div>
+</div>
+
+<!-- Material 驗收 -->
+<div class="mo" id="mo-material">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-box"/></svg></span></div><div class="mtitle">材料進場登記</div><div class="mcl" onclick="cm('mo-material')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">進場日期</label><input type="date" class="fi"></div><div class="fg"><label class="fl">進場時間</label><input type="time" class="fi"></div></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">材料名稱</label><input type="text" class="fi" placeholder="e.g. 鋼筋 SD420 #8"></div><div class="fg"><label class="fl">供應廠商</label><select class="fe"><option>中鋼公司</option><option>台北預拌</option><option>大同電線</option><option>其他</option></select></div></div>
+      <div class="fr fr3"><div class="fg"><label class="fl">數量</label><input type="number" class="fi"></div><div class="fg"><label class="fl">單位</label><select class="fe"><option>噸</option><option>m³</option><option>m²</option><option>m</option><option>套</option><option>支</option></select></div><div class="fg"><label class="fl">是否取樣送驗</label><select class="fe"><option>是，需送驗</option><option>否（免取樣）</option></select></div></div>
+      <div class="fg mb12"><label class="fl">外觀初驗結果</label>
+        <div class="flex gap12" style="margin-top:4px">
+          <label class="fck"><input type="radio" name="matqc" checked>合格</label>
+          <label class="fck"><input type="radio" name="matqc">不合格（退料）</label>
+          <label class="fck"><input type="radio" name="matqc">條件接受</label>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">備註</label><textarea class="fta" placeholder="進場說明、附送試驗報告編號..."></textarea></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-material')">取消</button><button class="btn bp" onclick="cm('mo-material');toast('材料進場登記完成','ts')">登記進場</button></div>
+  </div>
+</div>
+
+<!-- Safety 巡檢 -->
+<div class="mo" id="mo-safety">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-hat"/></svg></span></div><div class="mtitle">新增工安巡檢記錄</div><div class="mcl" onclick="cm('mo-safety')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr3"><div class="fg"><label class="fl">巡檢日期</label><input type="date" class="fi"></div><div class="fg"><label class="fl">巡檢時間</label><input type="time" class="fi"></div><div class="fg"><label class="fl">巡檢人員</label><input type="text" class="fi" value="陳志強"></div></div>
+      <div class="fg mb12"><label class="fl">巡檢區域</label><input type="text" class="fi" placeholder="e.g. B3F、2F外牆、機電層..."></div>
+      <div class="fg mb12"><label class="fl">發現問題說明</label><textarea class="fta" placeholder="詳述發現之工安問題..."></textarea></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">風險等級</label><select class="fe"><option>低——口頭糾正</option><option>中——限期改善</option><option>高——立即停工</option></select></div><div class="fg"><label class="fl">是否開立工安缺失通知</label><select class="fe"><option>是</option><option>否</option></select></div></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-safety')">取消</button><button class="btn bp" onclick="cm('mo-safety');toast('工安巡檢記錄已儲存','ts')">儲存巡檢記錄</button></div>
+  </div>
+</div>
+
+<!-- Billing -->
+<div class="mo" id="mo-billing">
+  <div class="md" style="max-width:720px">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-wallet"/></svg></span></div><div class="mtitle">第五期估驗請款</div><div class="mcl" onclick="cm('mo-billing')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr3"><div class="fg"><label class="fl">實際進度（%）</label><input type="text" class="fi" value="68.3%"></div><div class="fg"><label class="fl">本期申請金額</label><input type="text" class="fi" value="$78,000,000"></div><div class="fg"><label class="fl">扣保留款(5%)後</label><input type="text" class="fi" value="$74,100,000"></div></div>
+      <div class="tw mb12">
+        <table>
+          <thead><tr><th>工項</th><th>合約金額</th><th>上期累計%</th><th>本期完成%</th><th>本期金額</th></tr></thead>
+          <tbody>
+            <tr><td class="tc1">地下結構工程</td><td class="tcm">$245,000,000</td><td class="tcm">78%</td><td class="tcm">82%</td><td class="tcm">$9,800,000</td></tr>
+            <tr><td class="tc1">地上結構工程</td><td class="tcm">$180,000,000</td><td class="tcm">42%</td><td class="tcm">51%</td><td class="tcm">$16,200,000</td></tr>
+            <tr><td class="tc1">機電工程</td><td class="tcm">$95,000,000</td><td class="tcm">30%</td><td class="tcm">38%</td><td class="tcm">$7,600,000</td></tr>
+            <tr><td class="tc1">外牆帷幕工程</td><td class="tcm">$128,000,000</td><td class="tcm">2%</td><td class="tcm">5%</td><td class="tcm">$3,840,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="flex fxc gap16" style="font-size:13px;font-weight:600;justify-content:flex-end;flex-wrap:wrap">
+        <span>本期請款合計：<span class="goldc">$37,440,000</span></span>
+        <span>扣保留款後實請：<span style="color:var(--green)">$35,568,000</span></span>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-billing')">取消</button><button class="btn bp" onclick="cm('mo-billing');toast('第五期估驗申請已送出，待業主審核','ts')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span> 送出估驗申請</button></div>
+  </div>
+</div>
+
+<!-- Morning view -->
+<div class="mo" id="mo-morning">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-sun"/></svg></span></div><div class="mtitle">新增工地晨會記錄</div><div class="mcl" onclick="cm('mo-morning')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">晨會日期</label><input type="date" class="fi" value="2025-03-21"></div><div class="fg"><label class="fl">晨會時間</label><input type="time" class="fi" value="07:30"></div></div>
+      <div class="fr fr3"><div class="fg"><label class="fl">計劃出工</label><input type="number" class="fi" value="135"></div><div class="fg"><label class="fl">實際出工</label><input type="number" class="fi" value="127"></div><div class="fg"><label class="fl">天氣</label><select class="fe"><option>晴天</option><option>多雲</option><option>雨天</option><option>雷雨（停工）</option></select></div></div>
+      <div class="fg mb12"><label class="fl">今日主要施工項目</label><textarea class="fta"></textarea></div>
+      <div class="fg mb12"><label class="fl">工安宣導重點</label><textarea class="fta"></textarea></div>
+      <div class="fg"><label class="fl">協議事項 / 指示</label><textarea class="fta"></textarea></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-morning')">取消</button><button class="btn bp" onclick="cm('mo-morning');toast('晨會記錄儲存成功','ts')">儲存晨會記錄</button></div>
+  </div>
+</div>
+
+<!-- Daily Modal -->
+<div class="mo" id="mo-daily">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-clipboard"/></svg></span></div><div class="mtitle">新增施工日報</div><div class="mcl" onclick="cm('mo-daily')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">日報日期</label><input type="date" class="fi"></div><div class="fg"><label class="fl">天氣</label><select class="fe"><option>晴天</option><option>多雲</option><option>雨天</option></select></div></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">出工人數</label><input type="number" class="fi"></div><div class="fg"><label class="fl">工地主任</label><input type="text" class="fi" value="王建明"></div></div>
+      <div class="fg mb12"><label class="fl">施工概況說明</label><textarea class="fta" placeholder="今日施工情形概述..."></textarea></div>
+      <div class="fg"><label class="fl">問題 / 特殊事項</label><textarea class="fta" placeholder="問題、協調事項、停工原因..."></textarea></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-daily')">取消</button><button class="btn bp" onclick="cm('mo-daily');toast('施工日報已儲存','ts')">儲存日報</button></div>
+  </div>
+</div>
+
+<!-- Quick Add -->
+<div class="mo" id="mo-quick">
+  <div class="md" style="max-width:400px">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-bolt"/></svg></span></div><div class="mtitle">快速新增</div><div class="mcl" onclick="cm('mo-quick')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r);padding:18px;cursor:pointer;text-align:center;transition:.15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--bd1)'" onclick="cm('mo-quick');om('mo-ir')"><div style="font-size:26px;margin-bottom:8px;display:flex;justify-content:center;color:var(--gold-txt)"><span class="ic s28"><svg><use href="#ic-chksq"/></svg></span></div><div style="font-size:12px;font-weight:600">查驗資料申請</div></div>
+      <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r);padding:18px;cursor:pointer;text-align:center;transition:.15s" onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--bd1)'" onclick="cm('mo-quick');om('mo-ncr')"><div style="margin-bottom:8px;display:flex;justify-content:center;color:var(--red)"><span class="ic s28"><svg><use href="#ic-alert-t"/></svg></span></div><div style="font-size:12px;font-weight:600">開立缺失 (NCR)</div></div>
+      <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r);padding:18px;cursor:pointer;text-align:center;transition:.15s" onmouseover="this.style.borderColor='var(--amber)'" onmouseout="this.style.borderColor='var(--bd1)'" onclick="cm('mo-quick');om('mo-material')"><div style="font-size:26px;margin-bottom:7px"><span class="ic s28"><svg><use href="#ic-box"/></svg></span></div><div style="font-size:12px;font-weight:600">材料進場登記</div></div>
+      <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r);padding:18px;cursor:pointer;text-align:center;transition:.15s" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--bd1)'" onclick="cm('mo-quick');om('mo-safety')"><div style="font-size:26px;margin-bottom:8px;display:flex;justify-content:center;color:var(--blue)"><span class="ic s28"><svg><use href="#ic-hat"/></svg></span></div><div style="font-size:12px;font-weight:600">工安巡檢</div></div>
+      <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r);padding:18px;cursor:pointer;text-align:center;transition:.15s" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--bd1)'" onclick="cm('mo-quick');om('mo-morning')"><div style="font-size:26px;margin-bottom:8px;display:flex;justify-content:center;color:var(--gold-txt)"><span class="ic s28"><svg><use href="#ic-sun"/></svg></span></div><div style="font-size:12px;font-weight:600">晨會記錄</div></div>
+      <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r);padding:18px;cursor:pointer;text-align:center;transition:.15s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--bd1)'" onclick="cm('mo-quick');om('mo-daily')"><div style="font-size:26px;margin-bottom:8px;display:flex;justify-content:center;color:var(--green)"><span class="ic s28"><svg><use href="#ic-clipboard"/></svg></span></div><div style="font-size:12px;font-weight:600">施工日報</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Alerts -->
+<div class="mo" id="mo-alerts">
+  <div class="md" style="max-width:480px">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-bell"/></svg></span></div><div class="mtitle">系統通知</div><div class="mcl" onclick="cm('mo-alerts')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb" style="padding:12px;display:flex;flex-direction:column;gap:6px">
+      <div class="notif-item" onclick="navFromAlert('ncr','缺失追蹤 (NCR)')">
+        <div class="ni-left ni-red"><span class="ic s18"><svg><use href="#ic-alert-c"/></svg></span></div>
+        <div class="ni-body"><div class="ni-title">NCR-085 改善逾期 3 天</div><div class="ni-desc">大地模板工程尚未回報，請立即追催</div></div>
+        <div class="ni-arr"><span class="ic s16"><svg><use href="#ic-chev-r"/></svg></span></div>
+      </div>
+      <div class="notif-item" onclick="navFromAlert('ncr','缺失追蹤 (NCR)')">
+        <div class="ni-left ni-red"><span class="ic s18"><svg><use href="#ic-alert-c"/></svg></span></div>
+        <div class="ni-body"><div class="ni-title">NCR-081 複驗逾期</div><div class="ni-desc">臨時施工電源漏電保護，需立即安排複驗</div></div>
+        <div class="ni-arr"><span class="ic s16"><svg><use href="#ic-chev-r"/></svg></span></div>
+      </div>
+      <div class="notif-item" onclick="navFromAlert('sub','分包商管理')">
+        <div class="ni-left ni-amber"><span class="ic s18"><svg><use href="#ic-alert-t"/></svg></span></div>
+        <div class="ni-body"><div class="ni-title">王子水電進度落後</div><div class="ni-desc">實際 38%，計劃應達 42%，請安排協調會</div></div>
+        <div class="ni-arr"><span class="ic s16"><svg><use href="#ic-chev-r"/></svg></span></div>
+      </div>
+      <div class="notif-item" onclick="navFromAlert('ir','查驗資料 (IR)','mo-review')">
+        <div class="ni-left ni-blue"><span class="ic s18"><svg><use href="#ic-info"/></svg></span></div>
+        <div class="ni-body"><div class="ni-title">IR-2025-0318 待您審查</div><div class="ni-desc">B3F 底板 柱C-12 鋼筋綁紮查驗</div></div>
+        <div class="ni-arr"><span class="ic s16"><svg><use href="#ic-chev-r"/></svg></span></div>
+      </div>
+      <div class="notif-item" onclick="navFromAlert('material','材料進場驗收')">
+        <div class="ni-left ni-green"><span class="ic s18"><svg><use href="#ic-chk-c"/></svg></span></div>
+        <div class="ni-body"><div class="ni-title">SD420 鋼筋試驗報告通過</div><div class="ni-desc">03/19 進場 #5 鋼筋抗拉試驗符合規範</div></div>
+        <div class="ni-arr"><span class="ic s16"><svg><use href="#ic-chev-r"/></svg></span></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-alerts')">關閉</button><button class="btn bp" onclick="cm('mo-alerts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 全部標記已讀</button></div>
+  </div>
+</div>
+
+<!-- Mobile mat QC -->
+<div class="mo" id="mo-mat-qc">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-box"/></svg></span></div><div><div class="mtitle">材料進場驗收</div><div class="msub" id="matqc-sub">—</div></div><div class="mcl" onclick="cm('mo-mat-qc')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="ip"><span class="ip-k">進場日期</span><span class="ip-v" id="matqc-date">—</span></div>
+      <div class="ip"><span class="ip-k">材料名稱</span><span class="ip-v" id="matqc-name">—</span></div>
+      <div class="ip"><span class="ip-k">供應廠商</span><span class="ip-v" id="matqc-vendor">—</span></div>
+      <div class="ip"><span class="ip-k">數量</span><span class="ip-v" id="matqc-qty">—</span></div>
+      <div class="ip"><span class="ip-k">取樣狀態</span><span class="ip-v" id="matqc-sample">—</span></div>
+      <div class="fg mb12" style="margin-top:12px"><label class="fl">外觀初驗</label>
+        <div class="flex gap12" style="margin-top:4px">
+          <label class="fck"><input type="radio" name="mq2" checked>合格</label>
+          <label class="fck"><input type="radio" name="mq2">不合格</label>
+        </div>
+      </div>
+      <div class="fg mb12"><label class="fl">送驗試體標記</label><input type="text" class="fi" placeholder="試體編號 e.g. S-25-0321-01"></div>
+      <div class="fg"><label class="fl">備註</label><textarea class="fta" placeholder="驗收備註..."></textarea></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-mat-qc')">取消</button><button class="btn bp" onclick="cm('mo-mat-qc');toast('材料驗收記錄完成，已通知送驗','ts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 完成驗收</button></div>
+  </div>
+</div>
+
+
+<!-- NCR View already exists -->
+<div class="mo" id="mo-ncr-view">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-alert-t"/></svg></span></div><div><div class="mtitle" id="ncrd-id">NCR 詳情</div><div class="msub" id="ncrd-type">—</div></div><div class="mcl" onclick="cm('mo-ncr-view')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="ip"><span class="ip-k">責任廠商</span><span class="ip-v" id="ncrd-vendor"><strong>—</strong></span></div>
+      <div class="ip"><span class="ip-k">改善期限</span><span class="ip-v" id="ncrd-deadline">—</span></div>
+      <div class="ip"><span class="ip-k">缺失狀態</span><span class="ip-v" id="ncrd-status">—</span></div>
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>缺失說明</div>
+      <div id="ncrd-desc" style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:11px;font-size:12px;color:var(--tx2);margin-bottom:13px">—</div>
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>廠商改善回報</div>
+      <textarea class="fta" placeholder="廠商填寫改善說明及完成時間..."></textarea>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-ncr-view')">關閉</button><button class="btn bp" onclick="cm('mo-ncr-view');toast('改善回報已提交，通知監造工程師安排複驗','ts')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span>提交改善回報</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: IR Detail ═══ -->
+<div class="mo" id="mo-ir-detail">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-chksq"/></svg></span></div><div><div class="mtitle" id="ird-id">查驗記錄</div><div class="msub" id="ird-loc">—</div></div><div class="mcl" onclick="cm('mo-ir-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="ip"><span class="ip-k">查驗項目</span><span class="ip-v" id="ird-item">—</span></div>
+      <div class="ip"><span class="ip-k">申請日期</span><span class="ip-v" id="ird-date">—</span></div>
+      <div class="ip"><span class="ip-k">最終結果</span><span class="ip-v" id="ird-result">—</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;margin-bottom:14px">
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div id="ird-l1" style="font-size:11px;margin-bottom:3px">—</div><div style="font-family:var(--fm);font-size:9px;color:var(--tx3)">第一級（廠商）</div></div>
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div id="ird-l2" style="font-size:11px;margin-bottom:3px">—</div><div style="font-family:var(--fm);font-size:9px;color:var(--tx3)">第二級（監造）</div></div>
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div id="ird-l3" style="font-size:11px;margin-bottom:3px">—</div><div style="font-family:var(--fm);font-size:9px;color:var(--tx3)">三級（請款送驗）</div></div>
+      </div>
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>查驗說明</div>
+      <div id="ird-notes" style="font-size:12px;color:var(--tx2);line-height:1.7">—</div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-ir-detail')">關閉</button><button class="btn bg" onclick="toast('下載查驗記錄 PDF','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span>下載記錄</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Sub Detail ═══ -->
+<div class="mo" id="mo-sub-detail">
+  <div class="md" style="max-width:720px">
+    <div class="mh">
+      <div class="mi"><span class="ic s20"><svg><use href="#ic-users"/></svg></span></div>
+      <div><div class="mtitle" id="subd-name">分包商詳情</div><div class="msub" id="subd-work">—</div></div>
+      <div class="mcl" onclick="cm('mo-sub-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div>
+    </div>
+    <div class="mb">
+
+      <!-- ── 上方：合約資料（唯讀）── -->
+      <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;margin-bottom:14px">
+        <div style="font-family:var(--fm);font-size:8px;color:var(--tx3);letter-spacing:1.5px;margin-bottom:9px;display:flex;align-items:center;gap:6px">
+          <span class="ic s12"><svg><use href="#ic-lock"/></svg></span> 合約資料（唯讀，不可修改）
+        </div>
+        <div class="ip"><span class="ip-k">合約金額</span><span class="ip-v" id="subd-contract">—</span></div>
+        <div class="ip"><span class="ip-k">合約期間</span><span class="ip-v" id="subd-period">—</span></div>
+        <div class="ip"><span class="ip-k">工項範圍</span><span class="ip-v" id="subd-scope">—</span></div>
+        <div class="ip"><span class="ip-k">合約進度</span><span class="ip-v" id="subd-pct"><strong>—</strong></span></div>
+        <div class="ip"><span class="ip-k">施工狀態</span><span class="ip-v" id="subd-status">—</span></div>
+        <div style="margin-top:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span style="font-size:11px;flex:1;color:var(--tx3)">進度</span>
+            <span style="font-family:var(--fm);color:var(--gold-txt);font-size:10px" id="subd-bar-pct">—</span>
+          </div>
+          <div class="pb" style="height:7px;border-radius:3px"><div class="pf pg" id="subd-bar" style="width:0%;border-radius:3px"></div></div>
+        </div>
+      </div>
+
+      <!-- ── 下方：出工工作記錄（工程師可編輯）── -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px">
+          <span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>
+          出工記錄 / 評比筆記
+        </div>
+        <button class="btn bp btn-sm" onclick="addWorkLog()"><span class="ic s12"><svg><use href="#ic-plus"/></svg></span> 新增記錄</button>
+      </div>
+
+      <!-- 新增日誌表單（預設隱藏）-->
+      <div id="wl-form" style="display:none;background:var(--s2);border:1px solid var(--gold-dim);border-radius:var(--r);padding:14px;margin-bottom:12px">
+        <div class="ct" style="margin-bottom:12px"><span class="bar"></span>新增出工記錄</div>
+        <div class="fr fr2">
+          <div class="fg"><label class="fl">日期</label><input type="date" class="fi" id="wl-date"></div>
+          <div class="fg"><label class="fl">出工人數</label><input type="number" class="fi" id="wl-workers" placeholder="人數"></div>
+        </div>
+        <div class="fr fr2">
+          <div class="fg"><label class="fl">施工進度 (%)</label><input type="number" class="fi" id="wl-progress" placeholder="0–100"></div>
+          <div class="fg"><label class="fl">整體評比</label>
+            <select class="fe" id="wl-rating">
+              <option>優 — 超出預期</option><option>良 — 符合要求</option>
+              <option>普 — 略有問題</option><option>差 — 需要關注</option>
+            </select>
+          </div>
+        </div>
+        <div class="fr fr2">
+          <div class="fg"><label class="fl">品質評比</label>
+            <select class="fe" id="wl-quality"><option>合格</option><option>良好</option><option>優良</option><option>不合格</option></select>
+          </div>
+          <div class="fg"><label class="fl">配合度</label>
+            <select class="fe" id="wl-coop"><option>良好</option><option>積極</option><option>尚可</option><option>待改善</option></select>
+          </div>
+        </div>
+        <div class="fg" style="margin-bottom:12px">
+          <label class="fl">施工情形 / 評比筆記</label>
+          <textarea class="fta" id="wl-notes" placeholder="記錄施工狀況、品質情形、廠商表現評比..."></textarea>
+        </div>
+        <div class="flex gap8">
+          <button class="btn bg" onclick="document.getElementById('wl-form').style.display='none'">取消</button>
+          <button class="btn bp" onclick="saveWorkLog()"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 儲存記錄</button>
+        </div>
+      </div>
+
+      <!-- 記錄清單 -->
+      <div id="work-log-entries">
+        <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:13px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+            <span class="fm-font" style="font-size:10px;color:var(--gold-txt)">2025/03/20 (三)</span>
+            <span class="tag to">良</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">出工</div><div style="font-size:14px;font-weight:600;color:var(--tx1)">45 人</div></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">進度</div><div style="font-size:14px;font-weight:600;color:var(--green)">68%</div></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">品質</div><span class="tag tg">良好</span></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">配合</div><span class="tag tg">積極</span></div>
+          </div>
+          <div style="font-size:11px;color:var(--tx3)">備註：B3F底板北側鋼筋綁紮完成，品質符合設計要求。</div>
+        </div>
+        <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:13px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+            <span class="fm-font" style="font-size:10px;color:var(--gold-txt)">2025/03/19 (二)</span>
+            <span class="tag tg">良</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">出工</div><div style="font-size:14px;font-weight:600;color:var(--tx1)">42 人</div></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">進度</div><div style="font-size:14px;font-weight:600;color:var(--gold-txt)">66%</div></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">品質</div><span class="tag tg">合格</span></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">配合</div><span class="tag tg">良好</span></div>
+          </div>
+          <div style="font-size:11px;color:var(--tx3)">備註：人力正常，持續推進B3F底板南側。</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="mf">
+      <button class="btn bg" onclick="cm('mo-sub-detail')">關閉</button>
+      <button class="btn bg" onclick="toast('匯出廠商評比表','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span> 匯出評比</button>
+      <button class="btn ba" onclick="cm('mo-sub-detail');toast('協調會通知已送出','tw')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span> 通知協調會</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Billing Detail ═══ -->
+<div class="mo" id="mo-billing-detail">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-wallet"/></svg></span></div><div><div class="mtitle" id="bd-title">請款記錄</div><div class="msub" id="bd-period">—</div></div><div class="mcl" onclick="cm('mo-billing-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="ip"><span class="ip-k">期間進度</span><span class="ip-v" id="bd-pct">—</span></div>
+      <div class="ip"><span class="ip-k">申請金額</span><span class="ip-v" id="bd-applied">—</span></div>
+      <div class="ip"><span class="ip-k">核准金額</span><span class="ip-v" id="bd-approved">—</span></div>
+      <div class="ip"><span class="ip-k">入帳日期</span><span class="ip-v" id="bd-paid">—</span></div>
+      <div class="ip"><span class="ip-k">請款狀態</span><span class="ip-v"><span class="tag tg">已入帳</span></span></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-billing-detail')">關閉</button><button class="btn bg" onclick="toast('下載請款憑證 PDF','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span>下載憑證</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Material Detail ═══ -->
+<div class="mo" id="mo-mat-detail">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-box"/></svg></span></div><div><div class="mtitle">材料驗收記錄</div><div class="msub" id="matd-sub">—</div></div><div class="mcl" onclick="cm('mo-mat-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="ip"><span class="ip-k">進場日期</span><span class="ip-v" id="matd-date">—</span></div>
+      <div class="ip"><span class="ip-k">材料名稱</span><span class="ip-v" id="matd-name">—</span></div>
+      <div class="ip"><span class="ip-k">供應廠商</span><span class="ip-v" id="matd-vendor">—</span></div>
+      <div class="ip"><span class="ip-k">數量</span><span class="ip-v" id="matd-qty">—</span></div>
+      <div class="ip"><span class="ip-k">驗收結果</span><span class="ip-v" id="matd-result">—</span></div>
+      <div class="ip"><span class="ip-k">試驗報告</span><span class="ip-v" id="matd-report">—</span></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-mat-detail')">關閉</button><button class="btn bg" onclick="toast('下載試驗報告 PDF','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span>下載報告</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Material Return ═══ -->
+<div class="mo" id="mo-mat-return">
+  <div class="md">
+    <div class="mh"><div class="mi" style="background:var(--red-dim);border-color:rgba(184,68,68,.2);color:var(--red)"><span class="ic s20"><svg><use href="#ic-truck"/></svg></span></div><div><div class="mtitle">材料退料申請</div><div class="msub" id="matr-sub">—</div></div><div class="mcl" onclick="cm('mo-mat-return')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="al al-d" style="font-size:11px"><span class="ic s14"><svg><use href="#ic-alert-t"/></svg></span>此批材料驗收不合格，需辦理退料。退料完成後請附回廠確認單。</div>
+      <div class="ip"><span class="ip-k">材料名稱</span><span class="ip-v" id="matr-name">—</span></div>
+      <div class="ip"><span class="ip-k">供應廠商</span><span class="ip-v" id="matr-vendor">—</span></div>
+      <div class="ip"><span class="ip-k">退料數量</span><span class="ip-v" id="matr-qty">—</span></div>
+      <div class="fg mb12" style="margin-top:12px"><label class="fl">不合格原因</label><textarea class="fta" placeholder="說明材料不合格之具體原因..."></textarea></div>
+      <div class="fg"><label class="fl">退料日期</label><input type="date" class="fi"></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-mat-return')">取消</button><button class="btn bd" onclick="cm('mo-mat-return');toast('退料申請已送出，通知廠商辦理退料','tw')"><span class="ic s14"><svg><use href="#ic-truck"/></svg></span>確認退料</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Safety Issue ═══ -->
+<div class="mo" id="mo-safety-issue">
+  <div class="md">
+    <div class="mh"><div class="mi" style="background:var(--red-dim);border-color:rgba(184,68,68,.2);color:var(--red)"><span class="ic s20"><svg><use href="#ic-alert-c"/></svg></span></div><div class="mtitle">開立工安缺失通知</div><div class="mcl" onclick="cm('mo-safety-issue')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">缺失類型</label><select class="fe"><option>高空作業安全</option><option>電氣安全</option><option>消防設備</option><option>個人防護具</option><option>機具設備</option><option>其他</option></select></div><div class="fg"><label class="fl">發現地點</label><input type="text" class="fi" placeholder="e.g. B3F北側"></div></div>
+      <div class="fg mb12"><label class="fl">缺失說明</label><textarea class="fta" placeholder="詳細描述工安缺失情形..."></textarea></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">風險等級</label><select class="fe"><option>低（口頭糾正）</option><option>中（限期改善）</option><option>高（立即停工）</option></select></div><div class="fg"><label class="fl">責任廠商</label><select class="fe"><option>誠實營造</option><option>王子水電</option><option>大地模板</option></select></div></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-safety-issue')">取消</button><button class="btn bd" onclick="cm('mo-safety-issue');toast('工安缺失通知已開立','tw')"><span class="ic s14"><svg><use href="#ic-alert-c"/></svg></span>開立缺失通知</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Morning View ═══ -->
+<div class="mo" id="mo-morning-view">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-sun"/></svg></span></div><div><div class="mtitle" id="mv-date">晨會記錄</div><div class="msub" id="mv-weather">—</div></div><div class="mcl" onclick="cm('mo-morning-view')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="ip"><span class="ip-k">實際出工</span><span class="ip-v" id="mv-actual"><strong>—</strong></span></div>
+        <div class="ip"><span class="ip-k">計劃出工</span><span class="ip-v" id="mv-plan">—</span></div>
+      </div>
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>今日施工項目</div>
+      <div id="mv-works" style="font-size:12px;color:var(--tx2);line-height:1.7;white-space:pre-line;margin-bottom:12px">—</div>
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>工安宣導</div>
+      <div id="mv-safety" style="font-size:12px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;margin-bottom:12px">—</div>
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>協議事項</div>
+      <div id="mv-note" style="font-size:12px;color:var(--tx2);line-height:1.7">—</div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-morning-view')">關閉</button><button class="btn bg" onclick="toast('下載晨會記錄 PDF','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span>下載</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Doc View ═══ -->
+<div class="mo" id="mo-doc-view">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-file"/></svg></span></div><div><div class="mtitle" id="dv-name">—</div><div class="msub" id="dv-cat">—</div></div><div class="mcl" onclick="cm('mo-doc-view')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="ip"><span class="ip-k">版次</span><span class="ip-v" id="dv-rev">—</span></div>
+      <div class="ip"><span class="ip-k">上傳日期</span><span class="ip-v" id="dv-date">—</span></div>
+      <div class="ip"><span class="ip-k">上傳者</span><span class="ip-v" id="dv-author">—</span></div>
+      <div class="ip"><span class="ip-k">狀態</span><span class="ip-v"><span class="tag tg">核准</span></span></div>
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>文件摘要</div>
+      <div id="dv-desc" style="font-size:12px;color:var(--tx2);line-height:1.7">—</div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-doc-view')">關閉</button><button class="btn bp" onclick="toast('開始下載文件','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span>下載文件</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Doc Review ═══ -->
+<div class="mo" id="mo-doc-review">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-edit"/></svg></span></div><div><div class="mtitle" id="dr-name">文件審查</div><div class="msub" id="dr-sub">—</div></div><div class="mcl" onclick="cm('mo-doc-review')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="ip"><span class="ip-k">版次</span><span class="ip-v" id="dr-rev">—</span></div>
+      <div class="ip"><span class="ip-k">提交單位</span><span class="ip-v" id="dr-author">—</span></div>
+      <div class="ip"><span class="ip-k">提交日期</span><span class="ip-v" id="dr-date">—</span></div>
+      <div class="fg mb12" style="margin-top:12px"><label class="fl">審查意見</label><textarea class="fta" placeholder="填寫審查意見及需修訂事項..."></textarea></div>
+      <div class="fg"><label class="fl">審查結論</label>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:5px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--tx2)"><input type="radio" name="dr" checked style="accent-color:var(--gold)">A — 核准，可照圖施工</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--tx2)"><input type="radio" name="dr" style="accent-color:var(--gold)">B — 核准，依意見修訂後施工</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--tx2)"><input type="radio" name="dr" style="accent-color:var(--gold)">C — 退件，修訂後重新送審</label>
+        </div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-doc-review')">取消</button><button class="btn bp" onclick="cm('mo-doc-review');toast('文件審查意見已送出','ts')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span>送出審查意見</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Doc Upload ═══ -->
+<div class="mo" id="mo-doc-upload">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-up"/></svg></span></div><div class="mtitle">上傳文件</div><div class="mcl" onclick="cm('mo-doc-upload')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">文件名稱</label><input type="text" class="fi" placeholder="文件完整名稱"></div><div class="fg"><label class="fl">文件類別</label><select class="fe"><option>施工計畫書</option><option>設計圖說</option><option>品管文件</option><option>工安文件</option><option>合約文件</option></select></div></div>
+      <div class="fr fr2 mb12"><div class="fg"><label class="fl">版次</label><input type="text" class="fi" placeholder="e.g. Rev.0"></div><div class="fg"><label class="fl">提交單位</label><input type="text" class="fi" placeholder="e.g. 設計部"></div></div>
+      <div onclick="toast('選擇要上傳的文件','ts')" style="border:1.5px dashed var(--bd2);border-radius:var(--r);padding:22px;text-align:center;cursor:pointer;color:var(--tx3);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:8px;transition:.12s" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold-txt)'" onmouseout="this.style.borderColor='var(--bd2)';this.style.color='var(--tx3)'"><span class="ic s28"><svg><use href="#ic-up"/></svg></span><span>點擊選擇文件（PDF / DWG / DOC）</span></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-doc-upload')">取消</button><button class="btn bp" onclick="cm('mo-doc-upload');toast('文件已上傳，進入審查流程','ts')"><span class="ic s14"><svg><use href="#ic-up"/></svg></span>上傳並送審</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Doc Request ═══ -->
+<div class="mo" id="mo-doc-request">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-lock"/></svg></span></div><div><div class="mtitle">申請調閱機密文件</div><div class="msub">主要工程承攬合約（限閱）</div></div><div class="mcl" onclick="cm('mo-doc-request')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="al al-w" style="font-size:11px"><span class="ic s14"><svg><use href="#ic-info"/></svg></span>此文件為機密等級，調閱需主管核准並記錄調閱日誌。</div>
+      <div class="fg mb12"><label class="fl">調閱用途說明</label><textarea class="fta" placeholder="說明調閱目的及用途..."></textarea></div>
+      <div class="fg"><label class="fl">核准主管</label><select class="fe"><option>王建明（工地主任）</option><option>陳大維（監造工程師）</option><option>總公司授權</option></select></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-doc-request')">取消</button><button class="btn bp" onclick="cm('mo-doc-request');toast('調閱申請已送出，等待主管核准','tw')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span>送出申請</button></div>
+  </div>
+</div>
+
+
+<!-- 工程詳情 Modal -->
+<div class="mo" id="mo-work-detail">
+  <div class="md" style="max-width:640px">
+    <div class="mh">
+      <div class="mi" id="wd-mi"><span class="ic s20"><svg><use href="#ic-building"/></svg></span></div>
+      <div>
+        <div class="mtitle" id="wd-name">工程詳情</div>
+        <div class="msub" id="wd-sub">—</div>
+      </div>
+      <div class="mcl" onclick="cm('mo-work-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div>
+    </div>
+    <div class="mb">
+      <!-- 進度對比 -->
+      <div class="g2" style="gap:8px;margin-bottom:14px">
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:13px;text-align:center">
+          <div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:4px">計畫進度</div>
+          <div style="font-family:var(--fn);font-size:28px;font-weight:600;color:#4A7BAA" id="wd-plan">—</div>
+        </div>
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:13px;text-align:center">
+          <div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:4px">實際進度</div>
+          <div style="font-family:var(--fn);font-size:28px;font-weight:600" id="wd-actual" style="color:var(--gold-txt)">—</div>
+        </div>
+      </div>
+      <!-- 進度條 -->
+      <div style="margin-bottom:14px">
+        <div class="flex fxc gap8 mb8">
+          <span style="font-size:11px;color:var(--tx3);flex:1">計畫</span>
+          <span style="font-size:10px;color:#4A7BAA;font-family:var(--fm)" id="wd-plan-lbl">—</span>
+        </div>
+        <div class="pb" style="height:6px;margin-bottom:7px"><div id="wd-plan-bar" class="pf pbl" style="width:0%;opacity:.7"></div></div>
+        <div class="flex fxc gap8 mb8">
+          <span style="font-size:11px;color:var(--tx3);flex:1">實際</span>
+          <span style="font-size:10px;font-family:var(--fm)" id="wd-actual-lbl">—</span>
+        </div>
+        <div class="pb" style="height:6px"><div id="wd-actual-bar" class="pf" style="width:0%"></div></div>
+      </div>
+      <!-- 基本資訊 -->
+      <div class="ip"><span class="ip-k">合約金額</span><span class="ip-v" id="wd-contract">—</span></div>
+      <div class="ip"><span class="ip-k">施工期間</span><span class="ip-v" id="wd-period">—</span></div>
+      <div class="ip"><span class="ip-k">施工狀況</span><span class="ip-v" id="wd-status">—</span></div>
+      <!-- 施工範圍 -->
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin:12px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>施工範圍</div>
+      <div id="wd-scope" style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:13px">—</div>
+      <!-- 近況 -->
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>目前近況</div>
+      <div id="wd-recent" style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:13px">—</div>
+      <!-- 施工項目清單 -->
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>施工項目</div>
+      <ul id="wd-items" style="font-size:12px;color:var(--tx2);line-height:1.9;padding-left:18px;margin-bottom:13px">—</ul>
+    </div>
+    <div class="mf">
+      <button class="btn bg" onclick="cm('mo-work-detail')">關閉</button>
+      <button class="btn bp" onclick="gvDash('daily','施工日報');cm('mo-work-detail')"><span class="ic s14"><svg><use href="#ic-clipboard"/></svg></span> 施工日報</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: 新增分包合約 ═══ -->
+<div class="mo" id="mo-sub-new">
+  <div class="md" style="max-width:640px">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-users"/></svg></span></div><div class="mtitle">新增分包合約</div><div class="mcl" onclick="cm('mo-sub-new')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">分包商名稱</label><input type="text" class="fi" placeholder="公司全名"></div><div class="fg"><label class="fl">統一編號</label><input type="text" class="fi" placeholder="8碼"></div></div>
+      <div class="fg mb12"><label class="fl">施工工項</label><input type="text" class="fi" placeholder="e.g. 機電管路工程"></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">合約金額（元）</label><input type="number" class="fi" placeholder="0"></div><div class="fg"><label class="fl">保留款比例</label><select class="fe"><option>5%</option><option>3%</option><option>10%</option><option>無</option></select></div></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">合約開始日</label><input type="date" class="fi"></div><div class="fg"><label class="fl">合約完成日</label><input type="date" class="fi"></div></div>
+      <div class="fg mb12"><label class="fl">施工範圍說明</label><textarea class="fta" placeholder="詳述合約施工範圍、工區、樓層..."></textarea></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">聯絡人</label><input type="text" class="fi" placeholder="廠商現場負責人"></div><div class="fg"><label class="fl">聯絡電話</label><input type="tel" class="fi" placeholder="0912-345-678"></div></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-sub-new')">取消</button><button class="btn bp" onclick="cm('mo-sub-new');toast('分包合約已建立','ts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 建立合約</button></div>
+  </div>
+</div>
+<!-- TOAST -->
+<div class="tw-wrap" id="tw-wrap"></div>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
