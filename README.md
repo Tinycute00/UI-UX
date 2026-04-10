@@ -32,7 +32,34 @@ Push the project to the `main` branch, then enable **GitHub Pages** with **GitHu
 The workflow will build the Vite app and publish the `dist/` output automatically.
 
 ## Structure
-- `index.html`: Entry point. Includes the HTML layout.
+- `index.html`: Root HTML template. Assembles the app from `@include` partials during Vite dev/build.
+- `src/partials/`: App shell, views, mobile chrome, and modal partials for team collaboration.
 - `src/main.js`: Main JavaScript entry point. Imports styles and modules, exposes needed globals.
 - `src/styles/`: Contains stylesheets (`main.css`).
 - `src/js/`: Contains modularized JavaScript logic (`navigation.js`, `modals.js`, `safety.js`, `data-setters.js`).
+
+## Code Quality
+
+Run lint and formatting checks:
+
+```bash
+npm run lint
+npm run format:check
+```
+
+Auto-fix where possible:
+
+```bash
+npm run lint:fix
+npm run format
+```
+
+## CI
+
+GitHub Actions now runs:
+
+- `npm run lint`
+- `npm run format:check`
+- `npm run build`
+
+on pushes to `main` and on pull requests.
