@@ -1,0 +1,71 @@
+export const DOCUMENT_VIEW_DETAILS = {
+  masterPlan: {
+    name: '綜合施工計畫書',
+    rev: 'Rev.3',
+    cat: '施工計畫',
+    date: '2025/03/10',
+    author: '王建明',
+    status: '核准',
+    desc: '綜合施工計畫書涵蓋工程全週期施工方法、工序安排、品質管理計畫及工安計畫。本版Rev.3修訂更新帷幕施工章節及機電管路施工方法。',
+  },
+  undergroundDrawing: {
+    name: '地下結構工程施工圖',
+    rev: 'Rev.2',
+    cat: '設計圖說',
+    date: '2025/02/28',
+    author: '設計部',
+    status: '核准',
+    desc: '地下B1F~B3F結構平面圖、剖面圖及配筋圖。本版Rev.2修訂更新電梯坑配筋設計及B3F底板厚度修正。',
+  },
+  qualityPlan: {
+    name: '品質計畫書',
+    rev: 'Rev.1',
+    cat: '品管文件',
+    date: '2025/01/15',
+    author: '李家豪',
+    status: '核准',
+    desc: '工程三級品管計畫，包含材料管制、施工品管、查驗程序及不合格品管制辦法。本版依業主要求新增材料取樣送驗追蹤機制。',
+  },
+  safetyPlan: {
+    name: '職業安全衛生管理計畫',
+    rev: 'Rev.2',
+    cat: '工安文件',
+    date: '2025/03/01',
+    author: '陳志強',
+    status: '核准',
+    desc: '依職業安全衛生法規訂定，包含危害辨識、風險評估、安全教育訓練計畫及緊急應變程序。Rev.2新增高架作業及密閉空間管理章節。',
+  },
+  curtainPlan: {
+    name: '帷幕施工計畫書',
+    rev: 'Rev.0',
+    cat: '施工計畫',
+    date: '2025/03/18',
+    author: '建新帷幕',
+    status: '審查中',
+    desc: '外牆帷幕系統施工計畫，包含施工方法、品管計畫及施工時程。目前Rev.0首次送審，審查意見尚未回覆。',
+  },
+  fireDrawing: {
+    name: '消防設備設計圖',
+    rev: 'Rev.1',
+    cat: '設計圖說',
+    date: '2025/03/05',
+    author: '設計部',
+    status: '審查中',
+    desc: '消防灑水系統、火警系統及緊急廣播系統設計圖說。Rev.1依消防主管機關審查意見修訂，目前重新送審中。',
+  },
+};
+
+export const DOCUMENT_REVIEW_DETAILS = {
+  curtainPlan: {
+    name: '帷幕施工計畫書',
+    rev: 'Rev.0',
+    author: '建新帷幕',
+    date: '2025/03/18',
+  },
+  fireDrawing: {
+    name: '消防設備設計圖',
+    rev: 'Rev.1',
+    author: '設計部',
+    date: '2025/03/05',
+  },
+};
