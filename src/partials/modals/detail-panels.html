@@ -1,0 +1,130 @@
+<!-- ═══ MODAL: IR Detail ═══ -->
+<div class="mo" id="mo-ir-detail">
+  <div class="md">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-chksq"/></svg></span></div><div><div class="mtitle" id="ird-id">查驗記錄</div><div class="msub" id="ird-loc">—</div></div><div class="mcl" onclick="cm('mo-ir-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="ip"><span class="ip-k">查驗項目</span><span class="ip-v" id="ird-item">—</span></div>
+      <div class="ip"><span class="ip-k">申請日期</span><span class="ip-v" id="ird-date">—</span></div>
+      <div class="ip"><span class="ip-k">最終結果</span><span class="ip-v" id="ird-result">—</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;margin-bottom:14px">
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div id="ird-l1" style="font-size:11px;margin-bottom:3px">—</div><div style="font-family:var(--fm);font-size:9px;color:var(--tx3)">第一級（廠商）</div></div>
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div id="ird-l2" style="font-size:11px;margin-bottom:3px">—</div><div style="font-family:var(--fm);font-size:9px;color:var(--tx3)">第二級（監造）</div></div>
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;text-align:center"><div id="ird-l3" style="font-size:11px;margin-bottom:3px">—</div><div style="font-family:var(--fm);font-size:9px;color:var(--tx3)">三級（請款送驗）</div></div>
+      </div>
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>查驗說明</div>
+      <div id="ird-notes" style="font-size:12px;color:var(--tx2);line-height:1.7">—</div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-ir-detail')">關閉</button><button class="btn bg" onclick="toast('下載查驗記錄 PDF','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span>下載記錄</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Sub Detail ═══ -->
+<div class="mo" id="mo-sub-detail">
+  <div class="md" style="max-width:720px">
+    <div class="mh">
+      <div class="mi"><span class="ic s20"><svg><use href="#ic-users"/></svg></span></div>
+      <div><div class="mtitle" id="subd-name">分包商詳情</div><div class="msub" id="subd-work">—</div></div>
+      <div class="mcl" onclick="cm('mo-sub-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div>
+    </div>
+    <div class="mb">
+
+      <!-- ── 上方：合約資料（唯讀）── -->
+      <div style="background:var(--s3);border-radius:var(--r-sm);padding:12px;margin-bottom:14px">
+        <div style="font-family:var(--fm);font-size:8px;color:var(--tx3);letter-spacing:1.5px;margin-bottom:9px;display:flex;align-items:center;gap:6px">
+          <span class="ic s12"><svg><use href="#ic-lock"/></svg></span> 合約資料（唯讀，不可修改）
+        </div>
+        <div class="ip"><span class="ip-k">合約金額</span><span class="ip-v" id="subd-contract">—</span></div>
+        <div class="ip"><span class="ip-k">合約期間</span><span class="ip-v" id="subd-period">—</span></div>
+        <div class="ip"><span class="ip-k">工項範圍</span><span class="ip-v" id="subd-scope">—</span></div>
+        <div class="ip"><span class="ip-k">合約進度</span><span class="ip-v" id="subd-pct"><strong>—</strong></span></div>
+        <div class="ip"><span class="ip-k">施工狀態</span><span class="ip-v" id="subd-status">—</span></div>
+        <div style="margin-top:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span style="font-size:11px;flex:1;color:var(--tx3)">進度</span>
+            <span style="font-family:var(--fm);color:var(--gold-txt);font-size:10px" id="subd-bar-pct">—</span>
+          </div>
+          <div class="pb" style="height:7px;border-radius:3px"><div class="pf pg" id="subd-bar" style="width:0%;border-radius:3px"></div></div>
+        </div>
+      </div>
+
+      <!-- ── 下方：出工工作記錄（工程師可編輯）── -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px">
+          <span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>
+          出工記錄 / 評比筆記
+        </div>
+        <button class="btn bp btn-sm" onclick="addWorkLog()"><span class="ic s12"><svg><use href="#ic-plus"/></svg></span> 新增記錄</button>
+      </div>
+
+      <!-- 新增日誌表單（預設隱藏）-->
+      <div id="wl-form" style="display:none;background:var(--s2);border:1px solid var(--gold-dim);border-radius:var(--r);padding:14px;margin-bottom:12px">
+        <div class="ct" style="margin-bottom:12px"><span class="bar"></span>新增出工記錄</div>
+        <div class="fr fr2">
+          <div class="fg"><label class="fl">日期</label><input type="date" class="fi" id="wl-date"></div>
+          <div class="fg"><label class="fl">出工人數</label><input type="number" class="fi" id="wl-workers" placeholder="人數"></div>
+        </div>
+        <div class="fr fr2">
+          <div class="fg"><label class="fl">施工進度 (%)</label><input type="number" class="fi" id="wl-progress" placeholder="0–100"></div>
+          <div class="fg"><label class="fl">整體評比</label>
+            <select class="fe" id="wl-rating">
+              <option>優 — 超出預期</option><option>良 — 符合要求</option>
+              <option>普 — 略有問題</option><option>差 — 需要關注</option>
+            </select>
+          </div>
+        </div>
+        <div class="fr fr2">
+          <div class="fg"><label class="fl">品質評比</label>
+            <select class="fe" id="wl-quality"><option>合格</option><option>良好</option><option>優良</option><option>不合格</option></select>
+          </div>
+          <div class="fg"><label class="fl">配合度</label>
+            <select class="fe" id="wl-coop"><option>良好</option><option>積極</option><option>尚可</option><option>待改善</option></select>
+          </div>
+        </div>
+        <div class="fg" style="margin-bottom:12px">
+          <label class="fl">施工情形 / 評比筆記</label>
+          <textarea class="fta" id="wl-notes" placeholder="記錄施工狀況、品質情形、廠商表現評比..."></textarea>
+        </div>
+        <div class="flex gap8">
+          <button class="btn bg" onclick="document.getElementById('wl-form').style.display='none'">取消</button>
+          <button class="btn bp" onclick="saveWorkLog()"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 儲存記錄</button>
+        </div>
+      </div>
+
+      <!-- 記錄清單 -->
+      <div id="work-log-entries">
+        <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:13px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+            <span class="fm-font" style="font-size:10px;color:var(--gold-txt)">2025/03/20 (三)</span>
+            <span class="tag to">良</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">出工</div><div style="font-size:14px;font-weight:600;color:var(--tx1)">45 人</div></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">進度</div><div style="font-size:14px;font-weight:600;color:var(--green)">68%</div></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">品質</div><span class="tag tg">良好</span></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">配合</div><span class="tag tg">積極</span></div>
+          </div>
+          <div style="font-size:11px;color:var(--tx3)">備註：B3F底板北側鋼筋綁紮完成，品質符合設計要求。</div>
+        </div>
+        <div style="background:var(--s3);border:1px solid var(--bd1);border-radius:var(--r-sm);padding:13px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+            <span class="fm-font" style="font-size:10px;color:var(--gold-txt)">2025/03/19 (二)</span>
+            <span class="tag tg">良</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">出工</div><div style="font-size:14px;font-weight:600;color:var(--tx1)">42 人</div></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">進度</div><div style="font-size:14px;font-weight:600;color:var(--gold-txt)">66%</div></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">品質</div><span class="tag tg">合格</span></div>
+            <div><div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:3px">配合</div><span class="tag tg">良好</span></div>
+          </div>
+          <div style="font-size:11px;color:var(--tx3)">備註：人力正常，持續推進B3F底板南側。</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="mf">
+      <button class="btn bg" onclick="cm('mo-sub-detail')">關閉</button>
+      <button class="btn bg" onclick="toast('匯出廠商評比表','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span> 匯出評比</button>
+      <button class="btn ba" onclick="cm('mo-sub-detail');toast('協調會通知已送出','tw')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span> 通知協調會</button>
+    </div>
+  </div>
+</div>
