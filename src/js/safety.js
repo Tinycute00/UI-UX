@@ -26,7 +26,8 @@ export function markSI(btn, result) {
     ng.textContent = '不合格';
     fix = document.createElement('button');
     fix.textContent = '改為合格';
-    fix.style.cssText = 'padding:2px 8px;border-radius:3px;font-size:10px;margin-left:4px;cursor:pointer;border:1px solid rgba(78,156,106,.3);background:var(--green-dim);color:var(--green)';
+    fix.style.cssText =
+      'padding:2px 8px;border-radius:3px;font-size:10px;margin-left:4px;cursor:pointer;border:1px solid rgba(78,156,106,.3);background:var(--green-dim);color:var(--green)';
     fix.setAttribute('data-mark', 'pass');
     acts.appendChild(ng);
     acts.appendChild(fix);
@@ -37,16 +38,16 @@ export function markSI(btn, result) {
 export function safetyBuildStep2() {
   // 對應 step1 checkbox label → step2 查核描述
   var itemMap = {
-    '高空作業安全帶': '高空作業人員安全帶配戴確認（每人均檢查）',
-    '圍籬及警示標示': '工地周邊圍籬完整，警示標示清晰',
-    '消防設備有效期': '消防設備配置無缺失，滅火器有效期未過',
-    '起重機操作證照': '起重機操作人員持有效證照，每日作業前確認',
-    '電氣漏電斷路器': '電氣設備漏電斷路器動作測試正常',
-    '澆置區安全管制': '混凝土澆置區域管制線設置，閒雜人員禁止進入',
-    '車輛管制及淨高': '工地出入口車輛管制確實，淨高限制標示完整',
-    '個人防護具配備': '作業人員安全帽、安全鞋、手套配備齊全',
-    '物料堆置整齊': '材料堆置整齊，通道淨空無阻，無倒塌風險',
-    '機具設備狀況': '機具設備外觀無損傷，安全防護裝置完整'
+    高空作業安全帶: '高空作業人員安全帶配戴確認（每人均檢查）',
+    圍籬及警示標示: '工地周邊圍籬完整，警示標示清晰',
+    消防設備有效期: '消防設備配置無缺失，滅火器有效期未過',
+    起重機操作證照: '起重機操作人員持有效證照，每日作業前確認',
+    電氣漏電斷路器: '電氣設備漏電斷路器動作測試正常',
+    澆置區安全管制: '混凝土澆置區域管制線設置，閒雜人員禁止進入',
+    車輛管制及淨高: '工地出入口車輛管制確實，淨高限制標示完整',
+    個人防護具配備: '作業人員安全帽、安全鞋、手套配備齊全',
+    物料堆置整齊: '材料堆置整齊，通道淨空無阻，無倒塌風險',
+    機具設備狀況: '機具設備外觀無損傷，安全防護裝置完整',
   };
 
   var checked = [];
@@ -55,7 +56,7 @@ export function safetyBuildStep2() {
   // Read checked items from step 1 checkbox labels
   var step1 = document.getElementById('sw-step1');
   if (step1) {
-    step1.querySelectorAll('input[type=checkbox]').forEach(function(cb) {
+    step1.querySelectorAll('input[type=checkbox]').forEach((cb) => {
       if (cb.checked) {
         lbl = cb.parentElement.textContent.trim();
         if (itemMap[lbl]) checked.push(itemMap[lbl]);
@@ -72,13 +73,15 @@ export function safetyBuildStep2() {
   if (!container) return;
   container.innerHTML = '';
 
-  checked.forEach(function(txt, idx) {
+  checked.forEach((txt, idx) => {
     var row = document.createElement('div');
     row.className = 'cl-item';
-    row.style.cssText = 'display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r-sm);background:var(--s3);margin-bottom:2px';
+    row.style.cssText =
+      'display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r-sm);background:var(--s3);margin-bottom:2px';
     // Build row with DOM API — avoids all quote-escaping issues
     var box = document.createElement('div');
-    box.style.cssText = 'width:16px;height:16px;border-radius:3px;border:1.5px solid var(--bd2);flex-shrink:0';
+    box.style.cssText =
+      'width:16px;height:16px;border-radius:3px;border:1.5px solid var(--bd2);flex-shrink:0';
     box.className = 'cl-box';
 
     var label = document.createElement('span');
@@ -87,12 +90,14 @@ export function safetyBuildStep2() {
 
     var passBtn = document.createElement('button');
     passBtn.textContent = '合格';
-    passBtn.style.cssText = 'padding:3px 9px;border-radius:3px;font-family:var(--fm);font-size:10px;cursor:pointer;border:1px solid rgba(78,156,106,.3);background:var(--green-dim);color:var(--green)';
+    passBtn.style.cssText =
+      'padding:3px 9px;border-radius:3px;font-family:var(--fm);font-size:10px;cursor:pointer;border:1px solid rgba(78,156,106,.3);background:var(--green-dim);color:var(--green)';
     passBtn.setAttribute('data-mark', 'pass');
 
     var failBtn = document.createElement('button');
     failBtn.textContent = '不合格';
-    failBtn.style.cssText = 'padding:3px 9px;border-radius:3px;font-family:var(--fm);font-size:10px;cursor:pointer;border:1px solid rgba(184,68,68,.3);background:var(--red-dim);color:var(--red)';
+    failBtn.style.cssText =
+      'padding:3px 9px;border-radius:3px;font-family:var(--fm);font-size:10px;cursor:pointer;border:1px solid rgba(184,68,68,.3);background:var(--red-dim);color:var(--red)';
     failBtn.setAttribute('data-mark', 'fail');
 
     var acts = document.createElement('div');
@@ -111,7 +116,7 @@ export function safetyBuildStep2() {
 export function initSafety() {
   // Delegated click handler for data-mark buttons (pass/fail)
   // Added once after DOM ready — handles all dynamically created buttons
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', (e) => {
     var mark = e.target.getAttribute && e.target.getAttribute('data-mark');
     if (!mark) return;
     e.stopPropagation();
@@ -119,32 +124,34 @@ export function initSafety() {
   });
 }
 
-export function safetyStep(n){
-  var wiz=document.getElementById('safety-wizard');
+export function safetyStep(n) {
+  var wiz = document.getElementById('safety-wizard');
   var dot;
-  [1,2,3].forEach(function(i){
-    var panel=document.getElementById('sw-step'+i);
-    if(panel) panel.style.display=i===n?'block':'none';
-    var si=document.getElementById('sw-s'+i);
-    if(si) si.style.opacity=i<=n?'1':'0.4';
-    if(si){
-      dot=si.querySelector('div');
-      if(dot) dot.style.background=i<n?'var(--green)':i===n?'var(--gold)':'var(--bd2)';
-      if(dot) dot.style.color=i<=n?'#1A1200':'var(--tx3)';
+  [1, 2, 3].forEach((i) => {
+    var panel = document.getElementById('sw-step' + i);
+    if (panel) panel.style.display = i === n ? 'block' : 'none';
+    var si = document.getElementById('sw-s' + i);
+    if (si) si.style.opacity = i <= n ? '1' : '0.4';
+    if (si) {
+      dot = si.querySelector('div');
+      if (dot)
+        dot.style.background = i < n ? 'var(--green)' : i === n ? 'var(--gold)' : 'var(--bd2)';
+      if (dot) dot.style.color = i <= n ? '#1A1200' : 'var(--tx3)';
     }
   });
   // Build step 2 checklist dynamically when entering step 2
-  if(n===2) safetyBuildStep2();
+  if (n === 2) safetyBuildStep2();
 }
 
-export function safetyCancel(){
-  document.getElementById('safety-wizard').style.display='none';
+export function safetyCancel() {
+  document.getElementById('safety-wizard').style.display = 'none';
 }
 
-export function safetySend(){
-  if(!document.getElementById('sf-confirm').checked){
-    toast('請勾選安危確認聲明後再送出','tw'); return;
+export function safetySend() {
+  if (!document.getElementById('sf-confirm').checked) {
+    toast('請勾選安危確認聲明後再送出', 'tw');
+    return;
   }
-  document.getElementById('safety-wizard').style.display='none';
-  toast('巡檢日報已送出，記錄已存檔','ts');
+  document.getElementById('safety-wizard').style.display = 'none';
+  toast('巡檢日報已送出，記錄已存檔', 'ts');
 }
