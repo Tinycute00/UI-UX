@@ -1,6 +1,6 @@
 <!-- ══════ MORNING MEETING ══════ -->
 <div id="v-morning" class="view">
-  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-sun"/></svg></span> 工地晨會記錄</h2><button class="btn bp btn-sm" onclick="om('mo-morning')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 新增晨會</button></div>
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-sun"/></svg></span> 工地晨會記錄</h2><button class="btn bp btn-sm" data-action="open-modal" data-modal-id="mo-morning"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 新增晨會</button></div>
   <div class="alert al-w">今日 (2025/03/21) 晨會記錄尚未建立，請填寫後送出。</div>
   <div class="g2">
     <div class="card">
@@ -14,7 +14,7 @@ B2F 機電管路配管作業</textarea></div>
 2. 北側外牆施工人員強制配戴安全帶（距地面超過2米）
 3. 機電管路施工注意線路整理，避免絆倒</textarea></div>
       <div class="fg" style="margin-bottom:16px"><label class="fl">協議事項 / 指示</label><textarea class="fta" placeholder="主任指示、各廠商協調事項..."></textarea></div>
-      <div class="flex gap8"><button class="btn bp" onclick="toast('晨會記錄儲存成功','ts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 儲存晨會記錄</button><button class="btn bg"><span class="ic s14"><svg><use href="#ic-print"/></svg></span> 預覽 PDF</button></div>
+      <div class="flex gap8"><button class="btn bp" data-action="toast-msg" data-msg="晨會記錄儲存成功" data-type="ts"><span class="ic s14"><svg><use href="#ic-check"/></svg></span><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 儲存晨會記錄</button><button class="btn bg"><span class="ic s14"><svg><use href="#ic-print"/></svg></span> 預覽 PDF</button></div>
     </div>
     <div class="card">
       <div class="ct"><span class="bar"></span>歷史晨會紀錄</div>
@@ -22,11 +22,11 @@ B2F 機電管路配管作業</textarea></div>
         <table>
           <thead><tr><th>日期</th><th>天氣</th><th>出工</th><th>主要工項</th><th></th></tr></thead>
           <tbody>
-            <tr><td class="tc1 tcm">03/20</td><td>晴天</td><td class="tcm">132</td><td>B3F底板綁筋</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/20','晴天','132','135','B3F底板鋼筋綁紮（完成北側）\n2F模板組立繼續施工','1.高空作業確認安全帶配戴<br>2.起重機作業管制區落實','確認明日底板澆置前完成查驗申請');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-            <tr><td class="tc1 tcm">03/19</td><td>多雲</td><td class="tcm">128</td><td>2F模板組立</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/19','多雲','128','130','2F樓板模板組立（完成南側）\nB3F柱模板拆除作業','1. 模板堆放整齊，通道保持暢通\n2. 拆除廢棄模板及時清運','確認2F模板工程進度符合計劃，明日繼續推進北側作業');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-            <tr><td class="tc1 tcm">03/18</td><td>雨天</td><td class="tcm">89</td><td>室內施工（部分停工）</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/18','雨天（全日雨量38mm）','89','130','室內機電配管（B2F~B3F）\nB2F防水層室內側施工\n（外部作業全面停工）','1. 注意積水地點滑倒風險\n2. 電氣設備防潮、漏電保護確認\n3. 雨具及雨衣配備齊全','外部施工因強降雨全面停工，僅進行室內作業。預計明日天氣轉晴後恢復正常施工。');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-            <tr><td class="tc1 tcm">03/17</td><td>晴天</td><td class="tcm">135</td><td>B2F機電配管</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/17','晴天 26°C','135','135','B2F機電管路配管（天花板區域）\nB3F底板模板組立（A軸區）\n鋼筋進場驗收（SD420 #8）','1. 高空配管作業強制安全帶配戴\n2. 管路材料整齊堆放，不影響通道\n3. 進場鋼筋先辦理驗收再卸料','王子水電今日人力充足（18人），要求維持此水平。下週一前需完成B2F天花板配管。');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-            <tr><td class="tc1 tcm">03/16</td><td>晴天</td><td class="tcm">130</td><td>地下連續壁監測</td><td><button class="btn bg btn-sm" onclick="setMorningView('2025/03/16','晴天 25°C','130','130','地下連續壁施工監測（各測點量測）\nB3F底板模板準備\n臨時設施整理','1. 地下連續壁監測人員須持證作業\n2. 地錨拆除區域設置安全警示\n3. 監測資料當日回報','地下連續壁各測點監測數據正常，無異常位移，業主已知悉。');om('mo-morning-view')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/20</td><td>晴天</td><td class="tcm">132</td><td>B3F底板綁筋</td><td><button class="btn bg btn-sm" data-action="open-morning-view" data-morning-id="morning-0320"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/19</td><td>多雲</td><td class="tcm">128</td><td>2F模板組立</td><td><button class="btn bg btn-sm" data-action="open-morning-view" data-morning-id="morning-0319"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/18</td><td>雨天</td><td class="tcm">89</td><td>室內施工（部分停工）</td><td><button class="btn bg btn-sm" data-action="open-morning-view" data-morning-id="morning-0318"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/17</td><td>晴天</td><td class="tcm">135</td><td>B2F機電配管</td><td><button class="btn bg btn-sm" data-action="open-morning-view" data-morning-id="morning-0317"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tr><td class="tc1 tcm">03/16</td><td>晴天</td><td class="tcm">130</td><td>地下連續壁監測</td><td><button class="btn bg btn-sm" data-action="open-morning-view" data-morning-id="morning-0316"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
           </tbody>
         </table>
       </div>

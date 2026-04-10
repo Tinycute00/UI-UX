@@ -2117,3 +2117,11 @@ hr.div {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* ── Interactive element hover states (replaces inline onmouseover/onmouseout) ── */
+.quick-add-card:hover {
+  border-color: var(--gold) !important;
+}
+.upload-zone:hover {
+  border-color: var(--gold) !important;
+}

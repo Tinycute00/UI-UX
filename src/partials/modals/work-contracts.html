@@ -7,7 +7,7 @@
         <div class="mtitle" id="wd-name">工程詳情</div>
         <div class="msub" id="wd-sub">—</div>
       </div>
-      <div class="mcl" onclick="cm('mo-work-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div>
+      <div class="mcl" data-action="close-modal" data-modal-id="mo-work-detail"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div>
     </div>
     <div class="mb">
       <!-- 進度對比 -->
@@ -49,8 +49,8 @@
       <ul id="wd-items" style="font-size:12px;color:var(--tx2);line-height:1.9;padding-left:18px;margin-bottom:13px">—</ul>
     </div>
     <div class="mf">
-      <button class="btn bg" onclick="cm('mo-work-detail')">關閉</button>
-      <button class="btn bp" onclick="gvDash('daily','施工日報');cm('mo-work-detail')"><span class="ic s14"><svg><use href="#ic-clipboard"/></svg></span> 施工日報</button>
+      <button class="btn bg" data-action="close-modal" data-modal-id="mo-work-detail">關閉</button>
+      <button class="btn bp" data-action="dashboard-nav-close-modal" data-view="daily" data-label="施工日報" data-modal-id="mo-work-detail"><span class="ic s14"><svg><use href="#ic-clipboard"/></svg></span> 施工日報</button>
     </div>
   </div>
 </div>
@@ -58,7 +58,7 @@
 <!-- ═══ MODAL: 新增分包合約 ═══ -->
 <div class="mo" id="mo-sub-new">
   <div class="md" style="max-width:640px">
-    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-users"/></svg></span></div><div class="mtitle">新增分包合約</div><div class="mcl" onclick="cm('mo-sub-new')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-users"/></svg></span></div><div class="mtitle">新增分包合約</div><div class="mcl" data-action="close-modal" data-modal-id="mo-sub-new"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
     <div class="mb">
       <div class="fr fr2"><div class="fg"><label class="fl">分包商名稱</label><input type="text" class="fi" placeholder="公司全名"></div><div class="fg"><label class="fl">統一編號</label><input type="text" class="fi" placeholder="8碼"></div></div>
       <div class="fg mb12"><label class="fl">施工工項</label><input type="text" class="fi" placeholder="e.g. 機電管路工程"></div>
@@ -67,6 +67,6 @@
       <div class="fg mb12"><label class="fl">施工範圍說明</label><textarea class="fta" placeholder="詳述合約施工範圍、工區、樓層..."></textarea></div>
       <div class="fr fr2"><div class="fg"><label class="fl">聯絡人</label><input type="text" class="fi" placeholder="廠商現場負責人"></div><div class="fg"><label class="fl">聯絡電話</label><input type="tel" class="fi" placeholder="0912-345-678"></div></div>
     </div>
-    <div class="mf"><button class="btn bg" onclick="cm('mo-sub-new')">取消</button><button class="btn bp" onclick="cm('mo-sub-new');toast('分包合約已建立','ts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 建立合約</button></div>
+    <div class="mf"><button class="btn bg" data-action="close-modal" data-modal-id="mo-sub-new">取消</button><button class="btn bp" data-action="close-modal-toast" data-modal-id="mo-sub-new" data-msg="分包合約已建立" data-type="ts"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 建立合約</button></div>
   </div>
 </div>

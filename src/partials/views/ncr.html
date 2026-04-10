@@ -1,28 +1,28 @@
 <!-- ══════ NCR ══════ -->
 <div id="v-ncr" class="view">
-  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-alert-t"/></svg></span> 缺失追蹤 (NCR)</h2><button class="btn bp btn-sm" onclick="om('mo-ncr')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 開立缺失</button></div>
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-alert-t"/></svg></span> 缺失追蹤 (NCR)</h2><button class="btn bp btn-sm" data-action="open-modal" data-modal-id="mo-ncr"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 開立缺失</button></div>
   <div class="alert al-d"><span class="ic s14"><svg><use href="#ic-alert-c"/></svg></span> NCR-085、NCR-081 已逾期，請立即督促廠商處理並回報改善情形！</div>
   <div class="kanban">
     <div class="kc">
       <div class="kch" style="color:var(--red)">開立中<span class="fm-font" style="font-size:9px;color:var(--tx3)">3 筆</span></div>
-      <div class="kcc" onclick="setNCRDetail('NCR-087','2F樓板鋼筋保護層不足','品質缺失','大地模板工程','2025/03/25','open','2F樓板主筋保護層實測值僅2.5cm，設計規範要求≥4cm，共發現8處不足點，需全面補強後重新申請IR複驗。');om('mo-ncr-view')"><div class="kcid">NCR-087</div><div class="kct">2F樓板鋼筋保護層不足</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/25 ／ 大地模板</div></div>
-      <div class="kcc" onclick="setNCRDetail('NCR-086','B2F混凝土蜂窩缺陷','品質缺失','永達混凝土','2025/03/28','open','B2F頂板混凝土澆置後發現多處蜂窩，面積約1.2m²，深度超過設計允許值。');om('mo-ncr-view')"><div class="kcid">NCR-086</div><div class="kct">B2F混凝土蜂窩缺陷</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/28 ／ 永達混凝土</div></div>
-      <div class="kcc" onclick="setNCRDetail('NCR-085','工地西側排水溝堵塞','環境缺失','大地模板工程','2025/03/18','overdue','工地西側排水溝因施工廢棄物堆積造成堵塞，雨天時積水影響施工及安全。');om('mo-ncr-view')"><div class="kcid">NCR-085</div><div class="kct">工地西側排水溝堵塞</div><div class="kcm"><span class="tag ta" style="font-size:8px">環境</span></div><div class="kcd ov">已逾期 3 天</div></div>
+      <div class="kcc" data-action="open-ncr-detail" data-ncr-id="NCR-087"><div class="kcid">NCR-087</div><div class="kct">2F樓板鋼筋保護層不足</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/25 ／ 大地模板</div></div>
+      <div class="kcc" data-action="open-ncr-detail" data-ncr-id="NCR-086"><div class="kcid">NCR-086</div><div class="kct">B2F混凝土蜂窩缺陷</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/28 ／ 永達混凝土</div></div>
+      <div class="kcc" data-action="open-ncr-detail" data-ncr-id="NCR-085"><div class="kcid">NCR-085</div><div class="kct">工地西側排水溝堵塞</div><div class="kcm"><span class="tag ta" style="font-size:8px">環境</span></div><div class="kcd ov">已逾期 3 天</div></div>
     </div>
     <div class="kc">
       <div class="kch" style="color:var(--amber)">改善中<span class="fm-font" style="font-size:9px;color:var(--tx3)">2 筆</span></div>
-      <div class="kcc" onclick="setNCRDetail('NCR-084','B3F柱筋間距超差','品質缺失','誠實營造','2025/03/23','improving','B3F北區部分柱筋間距實測為28cm，超出設計值25cm±5mm允許範圍，需補強綁紮固定。');om('mo-ncr-view')"><div class="kcid">NCR-084</div><div class="kct">B3F柱筋間距超差</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/23 ／ 誠實營造</div></div>
-      <div class="kcc" onclick="setNCRDetail('NCR-083','消防管路坡度不足','機電缺失','王子水電','2025/03/24','improving','消防灑水主管坡度實測0.05%，規範要求≥0.1%，需重新調整管路坡度並固定支撐架。');om('mo-ncr-view')"><div class="kcid">NCR-083</div><div class="kct">消防管路坡度不足</div><div class="kcm"><span class="tag ta" style="font-size:8px">機電</span></div><div class="kcd">期限 03/24 ／ 王子水電</div></div>
+      <div class="kcc" data-action="open-ncr-detail" data-ncr-id="NCR-084"><div class="kcid">NCR-084</div><div class="kct">B3F柱筋間距超差</div><div class="kcm"><span class="tag tr" style="font-size:8px">品質</span></div><div class="kcd">期限 03/23 ／ 誠實營造</div></div>
+      <div class="kcc" data-action="open-ncr-detail" data-ncr-id="NCR-083"><div class="kcid">NCR-083</div><div class="kct">消防管路坡度不足</div><div class="kcm"><span class="tag ta" style="font-size:8px">機電</span></div><div class="kcd">期限 03/24 ／ 王子水電</div></div>
     </div>
     <div class="kc">
       <div class="kch" style="color:var(--blue)">待複驗<span class="fm-font" style="font-size:9px;color:var(--tx3)">2 筆</span></div>
-      <div class="kcc" onclick="setNCRDetail('NCR-082','地下室防水層施作','品質缺失','誠實營造','2025/03/22','pending_re','地下室外牆防水施工部分漏塗，廠商已回報重新施作完成，待監造工程師現場複驗確認。');om('mo-ncr-view')"><div class="kcid">NCR-082</div><div class="kct">地下室防水層施作</div><div class="kcm"><span class="tag tb" style="font-size:8px">複驗 03/22</span></div><div class="kcd">廠商已回報改善完成</div></div>
-      <div class="kcc" onclick="setNCRDetail('NCR-081','臨時施工電源漏電保護','工安缺失','誠實營造','2025/03/20','overdue_re','施工臨時電源漏電斷路器感應電流設定值超標，廠商已更換設備，但複驗日期已過，需儘速安排複驗。');om('mo-ncr-view')"><div class="kcid">NCR-081</div><div class="kct">臨時施工電源漏電保護</div><div class="kcm"><span class="tag tr" style="font-size:8px">工安</span></div><div class="kcd ov">複驗逾期</div></div>
+      <div class="kcc" data-action="open-ncr-detail" data-ncr-id="NCR-082"><div class="kcid">NCR-082</div><div class="kct">地下室防水層施作</div><div class="kcm"><span class="tag tb" style="font-size:8px">複驗 03/22</span></div><div class="kcd">廠商已回報改善完成</div></div>
+      <div class="kcc" data-action="open-ncr-detail" data-ncr-id="NCR-081"><div class="kcid">NCR-081</div><div class="kct">臨時施工電源漏電保護</div><div class="kcm"><span class="tag tr" style="font-size:8px">工安</span></div><div class="kcd ov">複驗逾期</div></div>
     </div>
     <div class="kc">
       <div class="kch" style="color:var(--green)">已關閉<span class="fm-font" style="font-size:9px;color:var(--tx3)">78 筆</span></div>
-      <div class="kcc" style="opacity:.5" onclick="setNCRDetail('NCR-080','外牆防水材料品牌不符','品質缺失','建新帷幕','2025/03/10','closed','廠商已更換符合設計規範之防水材料品牌，監造確認，NCR關閉。');om('mo-ncr-view')"><div class="kcid">NCR-080</div><div class="kct">外牆防水材料品牌不符</div><div class="kcm"><span class="tag tg" style="font-size:8px">已關閉</span></div><div class="kcd">—</div></div>
-      <div class="kcc" style="opacity:.5" onclick="setNCRDetail('NCR-079','牆面裂縫填補','品質缺失','誠實營造','2025/03/08','closed','裂縫已依規範填補，並完成防水處理，驗收合格，NCR關閉。');om('mo-ncr-view')"><div class="kcid">NCR-079</div><div class="kct">牆面裂縫填補</div><div class="kcm"><span class="tag tg" style="font-size:8px">已關閉</span></div><div class="kcd">—</div></div>
+      <div class="kcc" style="opacity:.5" data-action="open-ncr-detail" data-ncr-id="NCR-080"><div class="kcid">NCR-080</div><div class="kct">外牆防水材料品牌不符</div><div class="kcm"><span class="tag tg" style="font-size:8px">已關閉</span></div><div class="kcd">—</div></div>
+      <div class="kcc" style="opacity:.5" data-action="open-ncr-detail" data-ncr-id="NCR-079"><div class="kcid">NCR-079</div><div class="kct">牆面裂縫填補</div><div class="kcm"><span class="tag tg" style="font-size:8px">已關閉</span></div><div class="kcd">—</div></div>
       <div style="text-align:center;font-size:10px;color:var(--tx3);padding:8px;font-family:var(--fm)">另有 76 筆已關閉…</div>
     </div>
   </div>

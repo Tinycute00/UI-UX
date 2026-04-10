@@ -62,8 +62,8 @@ export const WORK_DETAILS = {
 };
 
 export const SUBCONTRACTOR_DETAILS = {
-  honest: {
-    id: 'honest',
+  'sub-chengshi': {
+    id: 'sub-chengshi',
     name: '誠實營造',
     work: '結構鋼筋工程',
     pct: 68,
@@ -72,8 +72,8 @@ export const SUBCONTRACTOR_DETAILS = {
     period: '2024/03 ～ 2025/08',
     scope: 'B1F~15F 全棟結構鋼筋綁紮工程',
   },
-  prince: {
-    id: 'prince',
+  'sub-wangzi': {
+    id: 'sub-wangzi',
     name: '王子水電',
     work: '機電管路工程',
     pct: 38,
@@ -82,8 +82,8 @@ export const SUBCONTRACTOR_DETAILS = {
     period: '2024/06 ～ 2025/10',
     scope: '消防、空調冷媒、電氣幹管、給排水全棟配管',
   },
-  earthform: {
-    id: 'earthform',
+  'sub-dadi': {
+    id: 'sub-dadi',
     name: '大地模板',
     work: '模板工程',
     pct: 78,
@@ -92,8 +92,8 @@ export const SUBCONTRACTOR_DETAILS = {
     period: '2024/03 ～ 2025/06',
     scope: 'B3F~15F 模板組立與拆除',
   },
-  yongda: {
-    id: 'yongda',
+  'sub-yongda': {
+    id: 'sub-yongda',
     name: '永達預拌混凝土',
     work: '混凝土供料',
     pct: 65,
@@ -102,8 +102,8 @@ export const SUBCONTRACTOR_DETAILS = {
     period: '2024/03 ～ 2025/08',
     scope: '全棟各樓層混凝土供料',
   },
-  curtain: {
-    id: 'curtain',
+  'sub-jianxin': {
+    id: 'sub-jianxin',
     name: '建新帷幕',
     work: '外牆帷幕工程',
     pct: 5,

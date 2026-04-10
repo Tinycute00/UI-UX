@@ -1,5 +1,5 @@
 export const MORNING_VIEW_DETAILS = {
-  '2025-03-20': {
+  'morning-0320': {
     date: '2025/03/20',
     weather: '晴天',
     actual: '132',
@@ -8,7 +8,7 @@ export const MORNING_VIEW_DETAILS = {
     safety: '1.高空作業確認安全帶配戴<br>2.起重機作業管制區落實',
     note: '確認明日底板澆置前完成查驗申請',
   },
-  '2025-03-19': {
+  'morning-0319': {
     date: '2025/03/19',
     weather: '多雲',
     actual: '128',
@@ -17,7 +17,7 @@ export const MORNING_VIEW_DETAILS = {
     safety: '1. 模板堆放整齊，通道保持暢通\n2. 拆除廢棄模板及時清運',
     note: '確認2F模板工程進度符合計劃，明日繼續推進北側作業',
   },
-  '2025-03-18': {
+  'morning-0318': {
     date: '2025/03/18',
     weather: '雨天（全日雨量38mm）',
     actual: '89',
@@ -26,7 +26,7 @@ export const MORNING_VIEW_DETAILS = {
     safety: '1. 注意積水地點滑倒風險\n2. 電氣設備防潮、漏電保護確認\n3. 雨具及雨衣配備齊全',
     note: '外部施工因強降雨全面停工，僅進行室內作業。預計明日天氣轉晴後恢復正常施工。',
   },
-  '2025-03-17': {
+  'morning-0317': {
     date: '2025/03/17',
     weather: '晴天 26°C',
     actual: '135',
@@ -36,7 +36,7 @@ export const MORNING_VIEW_DETAILS = {
       '1. 高空配管作業強制安全帶配戴\n2. 管路材料整齊堆放，不影響通道\n3. 進場鋼筋先辦理驗收再卸料',
     note: '王子水電今日人力充足（18人），要求維持此水平。下週一前需完成B2F天花板配管。',
   },
-  '2025-03-16': {
+  'morning-0316': {
     date: '2025/03/16',
     weather: '晴天 25°C',
     actual: '130',

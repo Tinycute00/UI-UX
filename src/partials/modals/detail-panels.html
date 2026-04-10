@@ -1,7 +1,7 @@
 <!-- ═══ MODAL: IR Detail ═══ -->
 <div class="mo" id="mo-ir-detail">
   <div class="md">
-    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-chksq"/></svg></span></div><div><div class="mtitle" id="ird-id">查驗記錄</div><div class="msub" id="ird-loc">—</div></div><div class="mcl" onclick="cm('mo-ir-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-chksq"/></svg></span></div><div><div class="mtitle" id="ird-id">查驗記錄</div><div class="msub" id="ird-loc">—</div></div><div class="mcl" data-action="close-modal" data-modal-id="mo-ir-detail"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
     <div class="mb">
       <div class="ip"><span class="ip-k">查驗項目</span><span class="ip-v" id="ird-item">—</span></div>
       <div class="ip"><span class="ip-k">申請日期</span><span class="ip-v" id="ird-date">—</span></div>
@@ -14,7 +14,7 @@
       <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>查驗說明</div>
       <div id="ird-notes" style="font-size:12px;color:var(--tx2);line-height:1.7">—</div>
     </div>
-    <div class="mf"><button class="btn bg" onclick="cm('mo-ir-detail')">關閉</button><button class="btn bg" onclick="toast('下載查驗記錄 PDF','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span>下載記錄</button></div>
+    <div class="mf"><button class="btn bg" data-action="close-modal" data-modal-id="mo-ir-detail">關閉</button><button class="btn bg" data-action="toast-msg" data-msg="下載查驗記錄 PDF" data-type="ts"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span>下載記錄</button></div>
   </div>
 </div>
 
@@ -24,7 +24,7 @@
     <div class="mh">
       <div class="mi"><span class="ic s20"><svg><use href="#ic-users"/></svg></span></div>
       <div><div class="mtitle" id="subd-name">分包商詳情</div><div class="msub" id="subd-work">—</div></div>
-      <div class="mcl" onclick="cm('mo-sub-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div>
+      <div class="mcl" data-action="close-modal" data-modal-id="mo-sub-detail"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div>
     </div>
     <div class="mb">
 
@@ -53,7 +53,7 @@
           <span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>
           出工記錄 / 評比筆記
         </div>
-        <button class="btn bp btn-sm" onclick="addWorkLog()"><span class="ic s12"><svg><use href="#ic-plus"/></svg></span> 新增記錄</button>
+        <button class="btn bp btn-sm" data-action="add-work-log"><span class="ic s12"><svg><use href="#ic-plus"/></svg></span> 新增記錄</button>
       </div>
 
       <!-- 新增日誌表單（預設隱藏）-->
@@ -85,8 +85,8 @@
           <textarea class="fta" id="wl-notes" placeholder="記錄施工狀況、品質情形、廠商表現評比..."></textarea>
         </div>
         <div class="flex gap8">
-          <button class="btn bg" onclick="document.getElementById('wl-form').style.display='none'">取消</button>
-          <button class="btn bp" onclick="saveWorkLog()"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 儲存記錄</button>
+          <button class="btn bg" data-action="hide-form" data-form-id="wl-form">取消</button>
+          <button class="btn bp" data-action="save-work-log"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 儲存記錄</button>
         </div>
       </div>
 
@@ -122,9 +122,9 @@
 
     </div>
     <div class="mf">
-      <button class="btn bg" onclick="cm('mo-sub-detail')">關閉</button>
-      <button class="btn bg" onclick="toast('匯出廠商評比表','ts')"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span> 匯出評比</button>
-      <button class="btn ba" onclick="cm('mo-sub-detail');toast('協調會通知已送出','tw')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span> 通知協調會</button>
+      <button class="btn bg" data-action="close-modal" data-modal-id="mo-sub-detail">關閉</button>
+      <button class="btn bg" data-action="toast-msg" data-msg="匯出廠商評比表" data-type="ts"><span class="ic s14"><svg><use href="#ic-dl"/></svg></span> 匯出評比</button>
+      <button class="btn ba" data-action="close-modal-toast" data-modal-id="mo-sub-detail" data-msg="協調會通知已送出" data-type="tw"><span class="ic s14"><svg><use href="#ic-send"/></svg></span> 通知協調會</button>
     </div>
   </div>
 </div>

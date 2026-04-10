@@ -1,7 +1,7 @@
 <!-- Mobile mat QC -->
 <div class="mo" id="mo-mat-qc">
   <div class="md">
-    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-box"/></svg></span></div><div><div class="mtitle">材料進場驗收</div><div class="msub" id="matqc-sub">—</div></div><div class="mcl" onclick="cm('mo-mat-qc')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-box"/></svg></span></div><div><div class="mtitle">材料進場驗收</div><div class="msub" id="matqc-sub">—</div></div><div class="mcl" data-action="close-modal" data-modal-id="mo-mat-qc"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
     <div class="mb">
       <div class="ip"><span class="ip-k">進場日期</span><span class="ip-v" id="matqc-date">—</span></div>
       <div class="ip"><span class="ip-k">材料名稱</span><span class="ip-v" id="matqc-name">—</span></div>
@@ -17,7 +17,7 @@
       <div class="fg mb12"><label class="fl">送驗試體標記</label><input type="text" class="fi" placeholder="試體編號 e.g. S-25-0321-01"></div>
       <div class="fg"><label class="fl">備註</label><textarea class="fta" placeholder="驗收備註..."></textarea></div>
     </div>
-    <div class="mf"><button class="btn bg" onclick="cm('mo-mat-qc')">取消</button><button class="btn bp" onclick="cm('mo-mat-qc');toast('材料驗收記錄完成，已通知送驗','ts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 完成驗收</button></div>
+    <div class="mf"><button class="btn bg" data-action="close-modal" data-modal-id="mo-mat-qc">取消</button><button class="btn bp" data-action="close-modal-toast" data-modal-id="mo-mat-qc" data-msg="材料驗收記錄完成，已通知送驗" data-type="ts"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 完成驗收</button></div>
   </div>
 </div>
 
@@ -25,7 +25,7 @@
 <!-- NCR View already exists -->
 <div class="mo" id="mo-ncr-view">
   <div class="md">
-    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-alert-t"/></svg></span></div><div><div class="mtitle" id="ncrd-id">NCR 詳情</div><div class="msub" id="ncrd-type">—</div></div><div class="mcl" onclick="cm('mo-ncr-view')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-alert-t"/></svg></span></div><div><div class="mtitle" id="ncrd-id">NCR 詳情</div><div class="msub" id="ncrd-type">—</div></div><div class="mcl" data-action="close-modal" data-modal-id="mo-ncr-view"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
     <div class="mb">
       <div class="ip"><span class="ip-k">責任廠商</span><span class="ip-v" id="ncrd-vendor"><strong>—</strong></span></div>
       <div class="ip"><span class="ip-k">改善期限</span><span class="ip-v" id="ncrd-deadline">—</span></div>
@@ -35,6 +35,6 @@
       <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>廠商改善回報</div>
       <textarea class="fta" placeholder="廠商填寫改善說明及完成時間..."></textarea>
     </div>
-    <div class="mf"><button class="btn bg" onclick="cm('mo-ncr-view')">關閉</button><button class="btn bp" onclick="cm('mo-ncr-view');toast('改善回報已提交，通知監造工程師安排複驗','ts')"><span class="ic s14"><svg><use href="#ic-send"/></svg></span>提交改善回報</button></div>
+    <div class="mf"><button class="btn bg" data-action="close-modal" data-modal-id="mo-ncr-view">關閉</button><button class="btn bp" data-action="close-modal-toast" data-modal-id="mo-ncr-view" data-msg="改善回報已提交，通知監造工程師安排複驗" data-type="ts"><span class="ic s14"><svg><use href="#ic-send"/></svg></span>提交改善回報</button></div>
   </div>
 </div>

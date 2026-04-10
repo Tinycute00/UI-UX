@@ -1,4 +1,3 @@
-import { initIRFilter } from '../js/data-setters.js';
 import { initModals, toast } from '../js/modals.js';
 import { getActiveViewId, syncHomeButtonVisibility } from '../js/navigation.js';
 import { initSafety } from '../js/safety.js';
@@ -37,7 +36,6 @@ function initWelcomeToast() {
 export function bootstrapApp() {
   initModals();
   initSafety();
-  initIRFilter();
   initActionDispatcher();
   initDateDisplay();
   initResponsiveHomeButton();

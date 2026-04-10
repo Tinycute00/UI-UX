@@ -1,22 +1,22 @@
 <!-- ══════ INSPECTION (IR) ══════ -->
 <div id="v-ir" class="view">
-  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-chksq"/></svg></span> 查驗資料 (IR)</h2><button class="btn bp btn-sm" onclick="om('mo-ir')"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 申請查驗</button></div>
+  <div class="sh"><h2><span class="ic s22"><svg><use href="#ic-chksq"/></svg></span> 查驗資料 (IR)</h2><button class="btn bp btn-sm" data-action="open-modal" data-modal-id="mo-ir"><span class="ic s14"><svg><use href="#ic-plus"/></svg></span> 申請查驗</button></div>
   <div class="fbar">
-    <button class="fb act">全部 (24)</button>
-    <button class="fb" onclick="filterIR(this,'wait')">待審查 (3)</button>
-    <button class="fb" onclick="filterIR(this,'pass')">已通過 (18)</button>
-    <button class="fb" onclick="filterIR(this,'fail')">不合格 (3)</button>
+    <button class="fb act" data-action="filter-ir" data-filter="all">全部 (24)</button>
+    <button class="fb" data-action="filter-ir" data-filter="wait">待審查 (3)</button>
+    <button class="fb" data-action="filter-ir" data-filter="pass">已通過 (18)</button>
+    <button class="fb" data-action="filter-ir" data-filter="fail">不合格 (3)</button>
   </div>
   <div class="tw">
     <table id="ir-tbl">
       <thead><tr><th>IR 編號</th><th>查驗部位</th><th>查驗項目</th><th>申請日</th><th>一級 廠商</th><th>二級 監造</th><th>三級 請款附件</th><th>操作</th></tr></thead>
       <tbody>
-        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0318</td><td>B3F底板 柱C-12</td><td>鋼筋綁紮</td><td class="tcm">03/21</td><td><span class="tag tg">合格</span></td><td><span class="tag ta">待審</span></td><td><span class="tag tx">待第 5 期請款</span></td><td><button class="btn bs btn-sm" onclick="om('mo-review')"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 審核</button></td></tr>
-        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0317</td><td>2F樓板 S-B2</td><td>模板組立</td><td class="tcm">03/21</td><td><span class="tag tg">合格</span></td><td><span class="tag ta">待審</span></td><td><span class="tag tx">待第 5 期請款</span></td><td><button class="btn bs btn-sm" onclick="om('mo-review')"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 審核</button></td></tr>
-        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0316</td><td>B2F天花 機電</td><td>管路隱蔽</td><td class="tcm">03/20</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag to">第 5 期 正請款</span></td><td><button class="btn bg btn-sm" onclick="setIRDetail('IR-2025-0316','B2F天花 機電','管路隱蔽查驗','03/20','進行中','pass','pass','pending');om('mo-ir-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-        <tr data-s="pass"><td class="tc1 tcm">IR-2025-0315</td><td>B3F底板 柱C-11</td><td>鋼筋綁紮</td><td class="tcm">03/19</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag tg">第 4 期已請款</span></td><td><button class="btn bg btn-sm" onclick="setIRDetail('IR-2025-0315','B3F底板 柱C-11','鋼筋綁紮查驗','03/19','通過','pass','pass','pass');om('mo-ir-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-        <tr data-s="fail"><td class="tc1 tcm">IR-2025-0309</td><td>2F樓板 S-A1</td><td>鋼筋保護層</td><td class="tcm">03/16</td><td><span class="tag tg">合格</span></td><td><span class="tag tr">不合格</span></td><td><span class="tag tr" style="white-space:nowrap">退件無法請款</span></td><td><button class="btn bd btn-sm" onclick="om('mo-ncr')"><span class="ic s12"><svg><use href="#ic-alert-t"/></svg></span> 開NCR</button></td></tr>
-        <tr data-s="pass"><td class="tc1 tcm">IR-2025-0305</td><td>B3F連續壁</td><td>接頭品質</td><td class="tcm">03/14</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag tg">第 4 期已請款</span></td><td><button class="btn bg btn-sm" onclick="setIRDetail('IR-2025-0305','B3F連續壁','接頭品質查驗','03/14','通過','pass','pass','pass');om('mo-ir-detail')"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0318</td><td>B3F底板 柱C-12</td><td>鋼筋綁紮</td><td class="tcm">03/21</td><td><span class="tag tg">合格</span></td><td><span class="tag ta">待審</span></td><td><span class="tag tx">待第 5 期請款</span></td><td><button class="btn bs btn-sm" data-action="open-modal" data-modal-id="mo-review"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 審核</button></td></tr>
+        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0317</td><td>2F樓板 S-B2</td><td>模板組立</td><td class="tcm">03/21</td><td><span class="tag tg">合格</span></td><td><span class="tag ta">待審</span></td><td><span class="tag tx">待第 5 期請款</span></td><td><button class="btn bs btn-sm" data-action="open-modal" data-modal-id="mo-review"><span class="ic s12"><svg><use href="#ic-edit"/></svg></span> 審核</button></td></tr>
+        <tr data-s="wait"><td class="tc1 tcm">IR-2025-0316</td><td>B2F天花 機電</td><td>管路隱蔽</td><td class="tcm">03/20</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag to">第 5 期 正請款</span></td><td><button class="btn bg btn-sm" data-action="open-ir-detail" data-ir-id="IR-2025-0316"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr data-s="pass"><td class="tc1 tcm">IR-2025-0315</td><td>B3F底板 柱C-11</td><td>鋼筋綁紮</td><td class="tcm">03/19</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag tg">第 4 期已請款</span></td><td><button class="btn bg btn-sm" data-action="open-ir-detail" data-ir-id="IR-2025-0315"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+        <tr data-s="fail"><td class="tc1 tcm">IR-2025-0309</td><td>2F樓板 S-A1</td><td>鋼筋保護層</td><td class="tcm">03/16</td><td><span class="tag tg">合格</span></td><td><span class="tag tr">不合格</span></td><td><span class="tag tr" style="white-space:nowrap">退件無法請款</span></td><td><button class="btn bd btn-sm" data-action="open-modal" data-modal-id="mo-ncr"><span class="ic s12"><svg><use href="#ic-alert-t"/></svg></span> 開NCR</button></td></tr>
+        <tr data-s="pass"><td class="tc1 tcm">IR-2025-0305</td><td>B3F連續壁</td><td>接頭品質</td><td class="tcm">03/14</td><td><span class="tag tg">合格</span></td><td><span class="tag tg">合格</span></td><td><span class="tag tg">第 4 期已請款</span></td><td><button class="btn bg btn-sm" data-action="open-ir-detail" data-ir-id="IR-2025-0305"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
       </tbody>
     </table>
   </div>
