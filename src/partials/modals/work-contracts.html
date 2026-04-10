@@ -1,0 +1,72 @@
+<!-- 工程詳情 Modal -->
+<div class="mo" id="mo-work-detail">
+  <div class="md" style="max-width:640px">
+    <div class="mh">
+      <div class="mi" id="wd-mi"><span class="ic s20"><svg><use href="#ic-building"/></svg></span></div>
+      <div>
+        <div class="mtitle" id="wd-name">工程詳情</div>
+        <div class="msub" id="wd-sub">—</div>
+      </div>
+      <div class="mcl" onclick="cm('mo-work-detail')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div>
+    </div>
+    <div class="mb">
+      <!-- 進度對比 -->
+      <div class="g2" style="gap:8px;margin-bottom:14px">
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:13px;text-align:center">
+          <div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:4px">計畫進度</div>
+          <div style="font-family:var(--fn);font-size:28px;font-weight:600;color:#4A7BAA" id="wd-plan">—</div>
+        </div>
+        <div style="background:var(--s3);border-radius:var(--r-sm);padding:13px;text-align:center">
+          <div class="fm-font" style="font-size:8px;color:var(--tx3);margin-bottom:4px">實際進度</div>
+          <div style="font-family:var(--fn);font-size:28px;font-weight:600" id="wd-actual" style="color:var(--gold-txt)">—</div>
+        </div>
+      </div>
+      <!-- 進度條 -->
+      <div style="margin-bottom:14px">
+        <div class="flex fxc gap8 mb8">
+          <span style="font-size:11px;color:var(--tx3);flex:1">計畫</span>
+          <span style="font-size:10px;color:#4A7BAA;font-family:var(--fm)" id="wd-plan-lbl">—</span>
+        </div>
+        <div class="pb" style="height:6px;margin-bottom:7px"><div id="wd-plan-bar" class="pf pbl" style="width:0%;opacity:.7"></div></div>
+        <div class="flex fxc gap8 mb8">
+          <span style="font-size:11px;color:var(--tx3);flex:1">實際</span>
+          <span style="font-size:10px;font-family:var(--fm)" id="wd-actual-lbl">—</span>
+        </div>
+        <div class="pb" style="height:6px"><div id="wd-actual-bar" class="pf" style="width:0%"></div></div>
+      </div>
+      <!-- 基本資訊 -->
+      <div class="ip"><span class="ip-k">合約金額</span><span class="ip-v" id="wd-contract">—</span></div>
+      <div class="ip"><span class="ip-k">施工期間</span><span class="ip-v" id="wd-period">—</span></div>
+      <div class="ip"><span class="ip-k">施工狀況</span><span class="ip-v" id="wd-status">—</span></div>
+      <!-- 施工範圍 -->
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin:12px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>施工範圍</div>
+      <div id="wd-scope" style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:13px">—</div>
+      <!-- 近況 -->
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>目前近況</div>
+      <div id="wd-recent" style="font-size:12px;color:var(--tx2);line-height:1.7;margin-bottom:13px">—</div>
+      <!-- 施工項目清單 -->
+      <div style="font-family:var(--fn);font-size:10px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--bd1);display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:3px;height:11px;background:var(--gold);border-radius:2px"></span>施工項目</div>
+      <ul id="wd-items" style="font-size:12px;color:var(--tx2);line-height:1.9;padding-left:18px;margin-bottom:13px">—</ul>
+    </div>
+    <div class="mf">
+      <button class="btn bg" onclick="cm('mo-work-detail')">關閉</button>
+      <button class="btn bp" onclick="gvDash('daily','施工日報');cm('mo-work-detail')"><span class="ic s14"><svg><use href="#ic-clipboard"/></svg></span> 施工日報</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: 新增分包合約 ═══ -->
+<div class="mo" id="mo-sub-new">
+  <div class="md" style="max-width:640px">
+    <div class="mh"><div class="mi"><span class="ic s20"><svg><use href="#ic-users"/></svg></span></div><div class="mtitle">新增分包合約</div><div class="mcl" onclick="cm('mo-sub-new')"><span class="ic s16"><svg><use href="#ic-x"/></svg></span></div></div>
+    <div class="mb">
+      <div class="fr fr2"><div class="fg"><label class="fl">分包商名稱</label><input type="text" class="fi" placeholder="公司全名"></div><div class="fg"><label class="fl">統一編號</label><input type="text" class="fi" placeholder="8碼"></div></div>
+      <div class="fg mb12"><label class="fl">施工工項</label><input type="text" class="fi" placeholder="e.g. 機電管路工程"></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">合約金額（元）</label><input type="number" class="fi" placeholder="0"></div><div class="fg"><label class="fl">保留款比例</label><select class="fe"><option>5%</option><option>3%</option><option>10%</option><option>無</option></select></div></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">合約開始日</label><input type="date" class="fi"></div><div class="fg"><label class="fl">合約完成日</label><input type="date" class="fi"></div></div>
+      <div class="fg mb12"><label class="fl">施工範圍說明</label><textarea class="fta" placeholder="詳述合約施工範圍、工區、樓層..."></textarea></div>
+      <div class="fr fr2"><div class="fg"><label class="fl">聯絡人</label><input type="text" class="fi" placeholder="廠商現場負責人"></div><div class="fg"><label class="fl">聯絡電話</label><input type="tel" class="fi" placeholder="0912-345-678"></div></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="cm('mo-sub-new')">取消</button><button class="btn bp" onclick="cm('mo-sub-new');toast('分包合約已建立','ts')"><span class="ic s14"><svg><use href="#ic-check"/></svg></span> 建立合約</button></div>
+  </div>
+</div>
