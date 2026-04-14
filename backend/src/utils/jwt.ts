@@ -1,11 +1,10 @@
-// jsonwebtoken is a CommonJS module; in ESM we access it via the default export
-import * as _jwt from 'jsonwebtoken';
+// jsonwebtoken is a CommonJS module; use createRequire for reliable ESM interop
+import { createRequire } from 'module';
 import { config } from '../config.js';
 
-// Safely resolve the jsonwebtoken API regardless of whether we get the default
-// interop wrapper or the raw CJS namespace.
-const jwtLib = (_jwt as { default?: typeof _jwt } & typeof _jwt).default ?? _jwt;
-const { sign, verify } = jwtLib;
+const require = createRequire(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { sign, verify } = require('jsonwebtoken') as typeof import('jsonwebtoken');
 
 /**
  * Access Token payload shape
