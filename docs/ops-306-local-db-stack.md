@@ -62,10 +62,12 @@ docker exec pmis_postgres_dev psql -U pmis -d pmis_dev -c "\dn"
 ```bash
 cd backend
 cp .env.local.example .env.local
-# .env.local 已預設指向 docker compose postgres，通常不需要修改
+# DATABASE_URL 已對齊 docker-compose.yml 的 postgres service（user: pmis, password: pmis_dev_pw, db: pmis_dev）
+# 複製後無需手動修改密碼，可直接執行 prisma migrate dev
 ```
 
-> ⚠️ `.env.local` 已在 `.gitignore`，不會 commit。
+> ⚠️ **DEV-ONLY**：`pmis_dev_pw` 僅供本地開發環境。`.env.local` 已在 `.gitignore`，不會 commit。
+> staging / production 必須使用強隨機密碼並透過 secrets manager 注入，**絕對不可沿用此密碼**。
 
 ### Step 3：執行 Prisma Migration
 
