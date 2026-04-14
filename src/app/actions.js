@@ -23,6 +23,7 @@ import {
 import { cm, om, closeDr, openDr, tCl, toast } from '../js/modals.js';
 import { goHome, gv, gvDash, gvMobile, navFromAlert, toggleSB } from '../js/navigation.js';
 import { safetyStep, safetyCancel, safetySend } from '../js/safety.js';
+import { showDashState, showBillingState } from '../js/state-controller.js';
 
 function requireDatasetValue(actionElement, key) {
   return actionElement.dataset[key] || '';
@@ -231,6 +232,14 @@ const actionHandlers = {
   'close-drawer': () => {
     closeDr();
   },
+  'reload-dashboard': () => {
+    showDashState('loading');
+    setTimeout(() => showDashState('content'), 1500);
+  },
+  'retry-dashboard': () => {
+    showDashState('loading');
+    setTimeout(() => showDashState('content'), 1500);
+  },
   'dashboard-nav': (actionElement) => {
     gvDash(requireDatasetValue(actionElement, 'view'), requireDatasetValue(actionElement, 'label'));
   },
@@ -367,6 +376,10 @@ const actionHandlers = {
   /* ── Billing ── */
   'open-billing-detail': (actionElement) => {
     openBillingDetail(actionElement);
+  },
+  'retry-billing': () => {
+    showBillingState('loading');
+    setTimeout(() => showBillingState('content'), 1500);
   },
 
   /* ── Documents ── */
