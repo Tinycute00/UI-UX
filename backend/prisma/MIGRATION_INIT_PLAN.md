@@ -1,67 +1,85 @@
 # Prisma Migration Init — Readiness Plan
 
-> **狀態 (2026-04-14)：PREFLIGHT / NOT YET EXECUTED**
-> `backend/prisma/migrations/` 目前不存在。  
+> **狀態 (2026-04-14，BE-309 reconciled)：PREFLIGHT COMPLETE / MIGRATION NOT YET EXECUTED**  
+> `backend/prisma/migrations/` 目前**不存在**。  
 > 本文件為 migration 初始化前的就緒盤點與執行計畫，不代表任何 migration 已跑完。
 
 ---
 
-## 1. 現狀盤點
+## 1. 現狀盤點（截至 BE-309 對帳）
 
 | 項目 | 現狀 |
 |------|------|
 | `backend/prisma/schema.prisma` | ✅ 存在（4 models：User / Session / AuditLoginAttempt / UserProjectRole） |
-| `backend/prisma/migrations/` | ❌ **不存在** — 尚未初始化 |
+| `backend/prisma/migrations/` | ❌ **不存在** — 尚未執行 `prisma migrate dev` |
+| `backend/prisma.config.ts` | ✅ 存在（Prisma 7.x config 格式） |
 | Prisma CLI 版本 | ✅ `7.7.0`（已安裝在 `node_modules`） |
-| `DATABASE_URL` | ⚠️ 已設定 `postgresql://localhost:5432/tachenpmis`，但本地 PostgreSQL 尚未就緒（OPS-306 pending） |
-| `package.json` prisma scripts | ⚠️ **缺少** `db:migrate`, `db:generate`, `db:push` 腳本（見下方「需補齊事項」） |
+| `backend/package.json` db scripts | ✅ **已補齊**（`db:generate` / `db:validate` / `db:migrate:dev` / `db:migrate:deploy` / `db:migrate:status` / `db:migrate:reset` / `db:push` / `db:studio`） |
+| `npx prisma validate` | ✅ **通過**（PM 實跑驗證，schema 對 Prisma 7.x 相容） |
 | `previewFeatures = ["multiSchema"]` | ✅ 已在 schema 中啟用（auth / project 雙 schema） |
-| Local PostgreSQL / Docker Compose | ❌ **尚未就緒**（等待 DevOps OPS-306） |
+| Local PostgreSQL / Docker Compose | ✅ **OPS-306 已落地**（`docker-compose.yml` 含 `pmis_dev` 資料庫 + `pmis` 服務帳號 + `infra/init-schemas.sql`） |
+| DATABASE_URL credential 對帳 | ⚠️ **OPS-307 部分完成** — `backend/.env.local.example` 已對齊 docker-compose（`pmis:pmis_dev_pw@localhost:5432/pmis_dev`），但 `backend/.env.example`（template）內仍殘留舊格式 `tachenpmis`（歷史遺留，不影響新開發者照 `.env.local.example` 操作） |
+| migration 實際執行 | ❌ **尚未執行** |
 
 ---
 
-## 2. 等待 DevOps 的依賴（阻塞條件）
+## 2. 前置就緒狀態分層說明
 
-執行 `prisma migrate dev` **需要** live PostgreSQL 連線。以下是必須由 DevOps（OPS-306）先行提供的前置條件：
+### ✅ 已完成的 preflight
 
-1. **PostgreSQL 服務可連線**  
-   - 目標：`localhost:5432`（或 docker-compose 服務）  
-   - 驗證：`pg_isready -h localhost -p 5432`
+1. **Schema 驗證**：`prisma validate` 通過，schema 語法與 Prisma 7.x 相容
+2. **package.json scripts 補齊**：所有 db:* 腳本已就位（BE-308）
+3. **Docker Compose 本地 stack**：OPS-306 落地，postgres 服務 `pmis_postgres_dev` 可用，資料庫 `pmis_dev`，schema 初始化 SQL 已掛載
+4. **prisma.config.ts**：Prisma 7.x 格式設定檔已建立
 
-2. **資料庫與 schema 建立**  
-   - 需要建立 database：`tachenpmis`（或依 `DATABASE_URL` 設定）  
-   - 需要建立 PostgreSQL schema：`auth`、`project`（`multiSchema` 模式必要前置）  
-   - Prisma 的 multiSchema 模式要求 schema 需先存在，`migrate dev` 才能在對應 schema 建表  
+### ⚠️ 本地 stack 已建立，但 docs credential 對帳仍部分待完成（OPS-307）
 
-3. **Service Account 權限**  
-   - 連線帳號需要 `CREATE TABLE` / `CREATE INDEX` 等建立物件的 DDL 權限  
-   - 需要 `USAGE` + `CREATE` on schema `auth` 和 `project`  
+- **`.env.local.example`**：✅ OPS-307 已更新，`DATABASE_URL` 對齊 docker-compose（`postgresql://pmis:pmis_dev_pw@localhost:5432/pmis_dev`）
+- **`.env.example`**（template）：⚠️ 仍含舊值 `postgresql://localhost:5432/tachenpmis`，未更新。**開發者請以 `.env.local.example` 為準**，不要沿用 `.env.example` 的 DATABASE_URL
+- **`.env`（實際 .gitignored 檔）**：各開發者自行建立，請參考 `.env.local.example` 設定
 
-4. **環境變數同步**  
-   - `DATABASE_URL` 的 user / password 需替換為 DevOps 提供的實際 service account  
-   - 生產環境應使用 Secrets Manager，不可 hardcode
+### ❌ 尚未執行的工作
+
+- **`prisma migrate dev --name init_auth_schema`**：migration 本體尚未執行，`backend/prisma/migrations/` 目錄不存在
+- **migration SQL 人工審核**：須在執行後審核 migration.sql 的 DDL 正確性
+- **migration push 至 staging / production**：`prisma migrate deploy` 尚未執行
 
 ---
 
-## 3. Migration Init 最小執行步驟（DevOps stack 就緒後）
+## 3. 本地開發快速啟動（OPS-306 stack 就緒後）
 
 ```bash
-# Step 1：確認 DB 連線
+# Step 0：建立 backend/.env（以 .env.local.example 為範本）
+cd /home/beer8/team-workspace/UI-UX/backend
+cp .env.local.example .env.local
+# 確認 DATABASE_URL=postgresql://pmis:pmis_dev_pw@localhost:5432/pmis_dev
+
+# Step 1：啟動本地 postgres stack
+cd ..
+docker compose up -d postgres
+# 等待 health check 通過（約 10 秒）
+docker compose ps
+
+# Step 2：確認 DB 連線
 cd backend
 npx prisma db ping --schema=prisma/schema.prisma
-# 或
-pg_isready -h localhost -p 5432
 
-# Step 2：手動建立 multi-schema（若 DevOps 尚未建立）
-# 需在 psql 執行：
-#   CREATE SCHEMA IF NOT EXISTS auth;
-#   CREATE SCHEMA IF NOT EXISTS project;
-
-# Step 3：執行 migration init
+# Step 3：執行 migration init（第一次建立 migrations/ 目錄）
 npx prisma migrate dev --name init_auth_schema --schema=prisma/schema.prisma
 
-# Step 4：生成 Prisma Client（migration 會自動觸發，但可手動確認）
+# Step 4：驗證 migration 狀態
+npx prisma migrate status --schema=prisma/schema.prisma
+
+# Step 5：生成 Prisma Client（migrate dev 會自動觸發，可手動確認）
 npx prisma generate --schema=prisma/schema.prisma
+```
+
+或使用 npm scripts：
+```bash
+npm run db:validate         # 無需 live DB
+npm run db:migrate:dev      # 需 live DB（init 時加 --name）
+npm run db:migrate:status   # 確認狀態
+npm run db:generate         # 生成 client
 ```
 
 ---
@@ -111,22 +129,25 @@ psql $DATABASE_URL -c "\dt auth.*"
 
 ---
 
-## 5. 需補齊的 package.json scripts（建議 DevOps stack 就緒前先補）
+## 5. 依賴 OPS-306 / OPS-307 的前置條件（備查）
 
-目前 `package.json` 缺少以下 Prisma 相關腳本，建議補齊：
+執行 `prisma migrate dev` **需要** live PostgreSQL 連線，以下由 DevOps 提供：
 
-```json
-"scripts": {
-  "db:generate": "prisma generate",
-  "db:migrate:dev": "prisma migrate dev --schema=prisma/schema.prisma",
-  "db:migrate:deploy": "prisma migrate deploy --schema=prisma/schema.prisma",
-  "db:migrate:status": "prisma migrate status --schema=prisma/schema.prisma",
-  "db:migrate:reset": "prisma migrate reset --schema=prisma/schema.prisma",
-  "db:push": "prisma db push --schema=prisma/schema.prisma",
-  "db:studio": "prisma studio --schema=prisma/schema.prisma",
-  "db:validate": "prisma validate --schema=prisma/schema.prisma"
-}
-```
+1. **PostgreSQL 服務可連線**（OPS-306 ✅）  
+   - `docker-compose up -d postgres`  
+   - 驗證：`pg_isready -h localhost -p 5432`
+
+2. **資料庫與 schema 建立**（OPS-306 ✅）  
+   - 資料庫：`pmis_dev`  
+   - PostgreSQL schemas：`auth`、`project`（由 `infra/init-schemas.sql` 初始化）
+
+3. **Service Account 權限**（OPS-306 ✅）  
+   - 帳號 `pmis` 擁有 `pmis_dev` 的 DDL 權限
+
+4. **環境變數 credential 完整對帳**（OPS-307 ⚠️ 部分完成）  
+   - `.env.local.example` ✅ 已對齊  
+   - `.env.example` template ⚠️ 仍含舊格式，開發者使用 `.env.local.example`  
+   - 生產環境需 Secrets Manager 注入，不可使用本地 dev 密碼
 
 ---
 
@@ -134,46 +155,14 @@ psql $DATABASE_URL -c "\dt auth.*"
 
 | 風險項目 | 說明 | 緩解措施 |
 |----------|------|----------|
-| `multiSchema` 需要手動建 schema | Prisma 的 multiSchema 模式不會自動 `CREATE SCHEMA`，需手動或在 init SQL 中補 | 於 migration.sql review 時確認 schema 建立語句 |
+| `multiSchema` 需要手動建 schema | Prisma 的 multiSchema 模式不會自動 `CREATE SCHEMA`，需手動或在 init SQL 中補 | OPS-306 的 `infra/init-schemas.sql` 已處理；於 migration.sql review 時二次確認 |
 | `UserProjectRole.projectId` FK 暫缺 | `project.projects` 尚未定義，`user_project_roles.project_id` 沒有 FK 約束 | schema.prisma 已標注 DB_PENDING，在 project schema 完成後補齊 FK migration |
-| `DATABASE_URL` 含 placeholder | `.env.example` 有 `***` 和重複行，`.env` 使用 `postgresql://localhost:5432/tachenpmis`（無帳密） | DevOps 提供 service account 後更新 `.env`，確認帳密正確 |
-| `prisma migrate reset` 會清空 DB | 開發環境誤操作風險 | 只在 feature branch 測試時用，main branch migration 走 `migrate deploy` |
-| Migration 歷史一旦開始不可輕易刪除 | 刪除 migration 目錄後若 DB 已套用會導致 schema drift | 每次 migration 前備份，production 走 `migrate deploy` 而非 `migrate dev` |
+| `.env.example` 舊 DATABASE_URL | template 仍含 `tachenpmis` 舊值，未與 OPS-307 對齊 | 開發者以 `.env.local.example` 為準，`tachenpmis` 僅為歷史遺留 |
 
 ---
 
-## 7. Git 提交策略
-
-Migration 完成後，以下檔案需要 commit 並 PR：
-- `backend/prisma/migrations/XXXXXX_init_auth_schema/migration.sql`
-- `backend/prisma/migrations/XXXXXX_init_auth_schema/migration.json`
-- `backend/package.json`（補 db:migrate scripts）
-
-**不應 commit 的檔案：**
-- `backend/.env`（含 credentials，已在 `.gitignore`）
-- `backend/node_modules/`
-
----
-
-## 8. 實際執行命令（最小集合）
-
-```bash
-# 前置（DevOps 提供 stack 後）
-export DATABASE_URL="postgresql://SERVICE_ACCOUNT:PASSWORD@localhost:5432/tachenpmis"
-# 或確認 backend/.env 已正確設定
-
-# Preflight 驗證（無需 live DB）
-cd /home/beer8/team-workspace/UI-UX/backend
-npx prisma validate
-
-# Migration init（需 live DB + auth/project schema 已建立）
-npx prisma migrate dev --name init_auth_schema
-
-# 驗收
-npx prisma migrate status
-```
-
----
-
-_Last updated: 2026-04-14 by Backend_  
-_Blocked by: OPS-306 (DevOps local postgres stack)_
+_Last updated: 2026-04-14 by Backend (BE-309 reconciliation)_  
+_Previous: 2026-04-14 by Backend (BE-308 preflight)_  
+_OPS-306: ✅ DevOps 本地 postgres stack 已落地_  
+_OPS-307: ⚠️ credential 對帳部分完成（.env.local.example ✅，.env.example template ⚠️ 舊格式殘留）_  
+_Migration: ❌ 尚未執行 — `backend/prisma/migrations/` 不存在_
