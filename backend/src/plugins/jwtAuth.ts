@@ -1,5 +1,6 @@
+import type { FastifyPluginAsync } from 'fastify';
 import fp from 'fastify-plugin';
-import type { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 import { verifyAccessToken, type JwtAccessPayload } from '../utils/jwt.js';
 
 // Extend FastifyRequest to include the decoded user payload
@@ -17,7 +18,8 @@ function extractToken(request: FastifyRequest): string | null {
   if (authHeader?.startsWith('Bearer ')) {
     return authHeader.slice(7);
   }
-  const cookieToken = (request.cookies as Record<string, string | undefined>)['access_token'];
+  // @fastify/cookie augments request.cookies at runtime; cast to access it
+  const cookieToken = (request as FastifyRequest & { cookies: Record<string, string | undefined> }).cookies['access_token'];
   if (cookieToken) return cookieToken;
   return null;
 }

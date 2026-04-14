@@ -1,5 +1,11 @@
-import * as jwt from 'jsonwebtoken';
+// jsonwebtoken is a CommonJS module; in ESM we access it via the default export
+import * as _jwt from 'jsonwebtoken';
 import { config } from '../config.js';
+
+// Safely resolve the jsonwebtoken API regardless of whether we get the default
+// interop wrapper or the raw CJS namespace.
+const jwtLib = (_jwt as { default?: typeof _jwt } & typeof _jwt).default ?? _jwt;
+const { sign, verify } = jwtLib;
 
 /**
  * Access Token payload shape
@@ -24,7 +30,7 @@ export interface JwtRefreshPayload {
  * Sign a short-lived Access Token (default: 15 min)
  */
 export function signAccessToken(payload: { userId: string; role: string }): string {
-  return jwt.sign(payload, config.JWT_SECRET, {
+  return sign(payload, config.JWT_SECRET, {
     expiresIn: config.JWT_ACCESS_EXPIRES_MINUTES * 60,
   });
 }
@@ -33,7 +39,7 @@ export function signAccessToken(payload: { userId: string; role: string }): stri
  * Sign a long-lived Refresh Token (default: 7 days)
  */
 export function signRefreshToken(payload: { userId: string }): string {
-  return jwt.sign(payload, config.JWT_SECRET, {
+  return sign(payload, config.JWT_SECRET, {
     expiresIn: config.JWT_REFRESH_EXPIRES_DAYS * 24 * 60 * 60,
   });
 }
@@ -44,7 +50,7 @@ export function signRefreshToken(payload: { userId: string }): string {
  */
 export function verifyAccessToken(token: string): JwtAccessPayload | null {
   try {
-    return jwt.verify(token, config.JWT_SECRET) as JwtAccessPayload;
+    return verify(token, config.JWT_SECRET) as JwtAccessPayload;
   } catch {
     return null;
   }
@@ -56,7 +62,7 @@ export function verifyAccessToken(token: string): JwtAccessPayload | null {
  */
 export function verifyRefreshToken(token: string): JwtRefreshPayload | null {
   try {
-    return jwt.verify(token, config.JWT_SECRET) as JwtRefreshPayload;
+    return verify(token, config.JWT_SECRET) as JwtRefreshPayload;
   } catch {
     return null;
   }

@@ -1,10 +1,12 @@
-import fp from 'fastify-plugin';
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { LoginBodySchema, RefreshBodySchema } from '../types/auth.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { authenticate } from '../plugins/jwtAuth.js';
 import { config } from '../config.js';
+
+type RequestWithCookies = FastifyRequest & { cookies: Record<string, string | undefined> };
+type ReplyWithCookie = { setCookie(name: string, value: string, opts: object): void };
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   // ─── POST /login ────────────────────────────────────────────────────────────
@@ -39,7 +41,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     const refreshToken = signRefreshToken({ userId: stubUserId });
 
     // Set refresh token as httpOnly cookie
-    void reply.setCookie('refresh_token', refreshToken, {
+    void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: config.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -63,7 +65,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     //   await db.session.delete({ where: { userId: request.user.userId } });
 
     // Clear the refresh token cookie
-    void reply.setCookie('refresh_token', '', {
+    void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', '', {
       httpOnly: true,
       secure: config.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -77,7 +79,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   // ─── POST /refresh ──────────────────────────────────────────────────────────
   fastify.post('/refresh', async (request, reply) => {
     // Read refresh token from cookie (preferred) or body
-    const cookieToken = (request.cookies as Record<string, string | undefined>)['refresh_token'];
+    const cookieToken = (request as unknown as RequestWithCookies).cookies['refresh_token'];
     const parseResult = RefreshBodySchema.safeParse(request.body);
     const bodyToken = parseResult.success ? parseResult.data.refreshToken : undefined;
     const token = cookieToken ?? bodyToken;
@@ -125,7 +127,4 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   });
 };
 
-export default fp(authRoutes, {
-  name: 'authRoutes',
-  fastify: '5.x',
-});
+export default authRoutes;
