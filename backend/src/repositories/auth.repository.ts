@@ -1,5 +1,5 @@
 /**
- * Auth Repository — BE-002
+ * Auth Repository — BE-002 (updated BE-307: contract-aligned stub)
  *
  * Defines the IAuthRepository interface (data access contract) and
  * AuthRepositoryStub (hardcoded stub implementation for pre-DB-migration use).
@@ -7,6 +7,11 @@
  * DB_PENDING: IAuthRepository methods will be replaced with PrismaAuthRepository
  *             once live DB migration (auth schema) is applied and service account
  *             GRANTS are configured per DB-302 proposal.
+ *
+ * BE-307 changes:
+ *   - Added findUserByUsername() to interface and stub
+ *   - revokeAllUserSessions() now returns { count: number } instead of void
+ *   - Stub user includes displayName field
  */
 
 import type {
@@ -24,6 +29,9 @@ import type {
  * All methods are DB_PENDING until Prisma client is connected to a live DB.
  */
 export interface IAuthRepository {
+  /** Find a user record by username (primary lookup per contract) */
+  findUserByUsername(username: string): Promise<AuthUser | null>;
+
   /** Find a user record by email address */
   findUserByEmail(email: string): Promise<AuthUser | null>;
 
@@ -42,8 +50,11 @@ export interface IAuthRepository {
   /** Mark a single session as revoked */
   revokeSession(sessionId: bigint, revokedAt: Date): Promise<void>;
 
-  /** Revoke all sessions belonging to a user (e.g. logout-all) */
-  revokeAllUserSessions(userId: bigint): Promise<void>;
+  /**
+   * Revoke all sessions belonging to a user (e.g. logout-all).
+   * BE-307: returns { count: number } so route can report clearedSessions.
+   */
+  revokeAllUserSessions(userId: bigint): Promise<{ count: number }>;
 
   /** Delete sessions that have expired before the given date. Returns count deleted. */
   cleanExpiredSessions(before: Date): Promise<number>;
@@ -76,6 +87,14 @@ export class AuthRepositoryStub implements IAuthRepository {
   // Hardcoded stub credentials — STUB only, not real data
   private readonly stubPasswordHash =
     '$2b$12$stubHashForTestingDoNotUseInProduction000000000000000000';
+
+  async findUserByUsername(username: string): Promise<AuthUser | null> {
+    // DB_PENDING: SELECT * FROM auth.users WHERE username = $1
+    if (username === 'stub_user') {
+      return this._stubUser();
+    }
+    return null;
+  }
 
   async findUserByEmail(email: string): Promise<AuthUser | null> {
     // DB_PENDING: SELECT * FROM auth.users WHERE email = $1
@@ -138,9 +157,10 @@ export class AuthRepositoryStub implements IAuthRepository {
     return;
   }
 
-  async revokeAllUserSessions(_userId: bigint): Promise<void> {
+  async revokeAllUserSessions(_userId: bigint): Promise<{ count: number }> {
     // DB_PENDING: UPDATE auth.sessions SET revoked_at = NOW() WHERE user_id = $1 AND revoked_at IS NULL
-    return;
+    // Stub returns count=1 to indicate the single stub session was cleared
+    return { count: 1 };
   }
 
   async cleanExpiredSessions(_before: Date): Promise<number> {
@@ -176,6 +196,7 @@ export class AuthRepositoryStub implements IAuthRepository {
     return {
       id: STUB_USER_ID,
       username: 'stub_user',
+      displayName: 'Stub User', // DB_PENDING: from auth.users.display_name column
       email: 'stub@example.com',
       passwordHash: this.stubPasswordHash,
       role: 'admin',

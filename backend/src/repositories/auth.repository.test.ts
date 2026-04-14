@@ -1,8 +1,12 @@
 /**
- * Tests for AuthRepositoryStub
+ * Tests for AuthRepositoryStub — BE-002 (updated BE-307)
  *
  * Verifies that the stub implementation returns expected fixture data
  * and correctly reflects DB_PENDING behaviour (no real DB calls).
+ *
+ * BE-307 changes:
+ *   - Added findUserByUsername tests
+ *   - revokeAllUserSessions now returns { count: number }
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -13,6 +17,24 @@ describe('AuthRepositoryStub', () => {
 
   beforeEach(() => {
     repo = new AuthRepositoryStub();
+  });
+
+  // ─── findUserByUsername ───────────────────────────────────────────────────
+
+  describe('findUserByUsername', () => {
+    it('returns stub user for known username', async () => {
+      const user = await repo.findUserByUsername('stub_user');
+      expect(user).not.toBeNull();
+      expect(user!.username).toBe('stub_user');
+      expect(user!.email).toBe('stub@example.com');
+      expect(user!.role).toBe('admin');
+      expect(user!.isActive).toBe(true);
+    });
+
+    it('returns null for unknown username', async () => {
+      const user = await repo.findUserByUsername('unknown_user');
+      expect(user).toBeNull();
+    });
   });
 
   // ─── findUserByEmail ──────────────────────────────────────────────────────
@@ -107,12 +129,14 @@ describe('AuthRepositoryStub', () => {
   });
 
   // ─── revokeAllUserSessions ────────────────────────────────────────────────
+  // BE-307: now returns { count: number } instead of void
 
   describe('revokeAllUserSessions', () => {
-    it('resolves without error (DB_PENDING stub)', async () => {
-      await expect(
-        repo.revokeAllUserSessions(BigInt(1)),
-      ).resolves.toBeUndefined();
+    it('resolves with { count: number } (DB_PENDING stub)', async () => {
+      const result = await repo.revokeAllUserSessions(BigInt(1));
+      expect(result).toHaveProperty('count');
+      expect(typeof result.count).toBe('number');
+      expect(result.count).toBeGreaterThanOrEqual(0);
     });
   });
 

@@ -1,8 +1,15 @@
 /**
- * Tests for AuthService — BE-002
+ * Tests for AuthService — BE-002 (updated BE-307: contract-aligned)
  *
  * Uses vitest vi.mock to isolate from real DB and JWT utilities.
  * IAuthRepository is mocked via vi.fn() objects — no real DB calls.
+ *
+ * BE-307 changes:
+ *   - login() uses username not email; mock repo must have findUserByUsername
+ *   - login() result has expiresAt (Unix timestamp) + user object, not expiresIn
+ *   - logout() returns { clearedSessions: number }; mock returns { count: 1 }
+ *   - refresh() throws RefreshTokenInvalidError (not UnauthorizedError) on bad JWT
+ *   - getMe() returns id/username/displayName/createdAt/lastLoginAt (not userId/name)
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -32,6 +39,7 @@ import {
   SessionExpiredError,
   SessionRevokedError,
   UnauthorizedError,
+  RefreshTokenInvalidError,
 } from '../errors/auth.errors.js';
 import { comparePassword } from '../utils/password.js';
 import {
@@ -53,6 +61,7 @@ function makeStubUser(overrides: Partial<AuthUser> = {}): AuthUser {
   return {
     id: BigInt(1),
     username: 'testuser',
+    displayName: 'Test User',
     email: 'test@example.com',
     passwordHash: '$2b$12$hashedpassword',
     role: 'admin',
@@ -96,13 +105,16 @@ function makeStubProjectRole(overrides: Partial<UserProjectRole> = {}): UserProj
 
 function makeMockRepo(overrides: Partial<IAuthRepository> = {}): IAuthRepository {
   return {
+    // BE-307: findUserByUsername is now the primary lookup method
+    findUserByUsername: vi.fn(),
     findUserByEmail: vi.fn(),
     findUserById: vi.fn(),
     updateUserLastLogin: vi.fn().mockResolvedValue(undefined),
     createSession: vi.fn().mockResolvedValue(makeStubSession()),
     findSessionByTokenHash: vi.fn(),
     revokeSession: vi.fn().mockResolvedValue(undefined),
-    revokeAllUserSessions: vi.fn().mockResolvedValue(undefined),
+    // BE-307: revokeAllUserSessions returns { count: number }
+    revokeAllUserSessions: vi.fn().mockResolvedValue({ count: 1 }),
     cleanExpiredSessions: vi.fn().mockResolvedValue(0),
     createAuditAttempt: vi.fn().mockResolvedValue(undefined),
     findUserProjectRoles: vi.fn().mockResolvedValue([]),
@@ -122,32 +134,42 @@ describe('AuthService', () => {
   // ─── login() ───────────────────────────────────────────────────────────────
 
   describe('login()', () => {
-    it('returns accessToken and refreshToken on success', async () => {
+    it('returns accessToken, refreshToken, expiresAt and user on success', async () => {
       const repo = makeMockRepo({
-        findUserByEmail: vi.fn().mockResolvedValue(makeStubUser()),
+        // BE-307: uses findUserByUsername
+        findUserByUsername: vi.fn().mockResolvedValue(makeStubUser()),
+        findUserProjectRoles: vi.fn().mockResolvedValue([makeStubProjectRole()]),
       });
       mockedComparePassword.mockResolvedValue(true);
 
       const service = new AuthService(repo);
-      const result = await service.login('test@example.com', 'password123', {});
+      const result = await service.login('testuser', 'password123', {});
 
       expect(result.accessToken).toBe('mock-access-token');
       expect(result.refreshToken).toBe('mock-refresh-token');
       expect(result.tokenType).toBe('Bearer');
-      expect(typeof result.expiresIn).toBe('number');
-      expect(result.expiresIn).toBeGreaterThan(0);
+      // BE-307: expiresAt is Unix timestamp (number), not expiresIn
+      expect(typeof result.expiresAt).toBe('number');
+      expect(result.expiresAt).toBeGreaterThan(Math.floor(Date.now() / 1000));
+      // BE-307: user object in response
+      expect(result.user).toBeDefined();
+      expect(result.user.id).toBe('1');
+      expect(result.user.username).toBe('testuser');
+      expect(result.user.email).toBe('test@example.com');
+      expect(result.user.role).toBe('admin');
+      expect(Array.isArray(result.user.projectIds)).toBe(true);
       expect(repo.createSession).toHaveBeenCalledOnce();
       expect(repo.updateUserLastLogin).toHaveBeenCalledOnce();
     });
 
     it('throws InvalidCredentialsError when user not found', async () => {
       const repo = makeMockRepo({
-        findUserByEmail: vi.fn().mockResolvedValue(null),
+        findUserByUsername: vi.fn().mockResolvedValue(null),
       });
 
       const service = new AuthService(repo);
       await expect(
-        service.login('unknown@example.com', 'password123', {}),
+        service.login('unknownuser', 'password123', {}),
       ).rejects.toThrow(InvalidCredentialsError);
 
       expect(repo.createAuditAttempt).toHaveBeenCalledWith(
@@ -157,13 +179,13 @@ describe('AuthService', () => {
 
     it('throws InvalidCredentialsError when password is wrong', async () => {
       const repo = makeMockRepo({
-        findUserByEmail: vi.fn().mockResolvedValue(makeStubUser()),
+        findUserByUsername: vi.fn().mockResolvedValue(makeStubUser()),
       });
       mockedComparePassword.mockResolvedValue(false);
 
       const service = new AuthService(repo);
       await expect(
-        service.login('test@example.com', 'wrongpassword', {}),
+        service.login('testuser', 'wrongpassword', {}),
       ).rejects.toThrow(InvalidCredentialsError);
 
       expect(repo.createAuditAttempt).toHaveBeenCalledWith(
@@ -173,16 +195,16 @@ describe('AuthService', () => {
 
     it('throws AccountDisabledError when account is inactive', async () => {
       const repo = makeMockRepo({
-        findUserByEmail: vi.fn().mockResolvedValue(makeStubUser({ isActive: false })),
+        findUserByUsername: vi.fn().mockResolvedValue(makeStubUser({ isActive: false })),
       });
 
       const service = new AuthService(repo);
       await expect(
-        service.login('test@example.com', 'password123', {}),
+        service.login('testuser', 'password123', {}),
       ).rejects.toThrow(AccountDisabledError);
 
       expect(repo.createAuditAttempt).toHaveBeenCalledWith(
-        expect.objectContaining({ success: false, failureReason: 'account_disabled' }),
+        expect.objectContaining({ success: false, failureReason: 'account_locked' }),
       );
     });
   });
@@ -190,21 +212,24 @@ describe('AuthService', () => {
   // ─── logout() ──────────────────────────────────────────────────────────────
 
   describe('logout()', () => {
-    it('calls revokeAllUserSessions with the correct userId', async () => {
+    it('calls revokeAllUserSessions with the correct userId and returns clearedSessions', async () => {
       const repo = makeMockRepo();
       const service = new AuthService(repo);
 
-      await service.logout(BigInt(42));
+      // BE-307: logout returns { clearedSessions: number }
+      const result = await service.logout(BigInt(42));
 
       expect(repo.revokeAllUserSessions).toHaveBeenCalledOnce();
       expect(repo.revokeAllUserSessions).toHaveBeenCalledWith(BigInt(42));
+      expect(result).toHaveProperty('clearedSessions');
+      expect(typeof result.clearedSessions).toBe('number');
     });
   });
 
   // ─── refresh() ─────────────────────────────────────────────────────────────
 
   describe('refresh()', () => {
-    it('returns new accessToken for a valid token with active session', async () => {
+    it('returns new accessToken and expiresAt for a valid token with active session', async () => {
       mockedVerifyRefreshToken.mockReturnValue({
         userId: '1',
         iat: Math.floor(Date.now() / 1000) - 60,
@@ -219,15 +244,19 @@ describe('AuthService', () => {
       const result = await service.refresh('valid-refresh-token');
       expect(result.accessToken).toBe('mock-access-token');
       expect(result.tokenType).toBe('Bearer');
+      // BE-307: expiresAt is Unix timestamp
+      expect(typeof result.expiresAt).toBe('number');
+      expect(result.expiresAt).toBeGreaterThan(Math.floor(Date.now() / 1000));
     });
 
-    it('throws UnauthorizedError when JWT is invalid', async () => {
+    it('throws RefreshTokenInvalidError when JWT is invalid', async () => {
+      // BE-307: throws RefreshTokenInvalidError (not UnauthorizedError)
       mockedVerifyRefreshToken.mockReturnValue(null);
 
       const repo = makeMockRepo();
       const service = new AuthService(repo);
 
-      await expect(service.refresh('bad-token')).rejects.toThrow(UnauthorizedError);
+      await expect(service.refresh('bad-token')).rejects.toThrow(RefreshTokenInvalidError);
     });
 
     it('throws SessionRevokedError when session is revoked', async () => {
@@ -268,7 +297,7 @@ describe('AuthService', () => {
   // ─── getMe() ───────────────────────────────────────────────────────────────
 
   describe('getMe()', () => {
-    it('returns full user profile with projects and permissions', async () => {
+    it('returns full user profile with correct BE-307 field names', async () => {
       const repo = makeMockRepo({
         findUserById: vi.fn().mockResolvedValue(makeStubUser()),
         findUserProjectRoles: vi.fn().mockResolvedValue([makeStubProjectRole()]),
@@ -277,12 +306,18 @@ describe('AuthService', () => {
 
       const result = await service.getMe(BigInt(1));
 
-      expect(result.userId).toBe('1');
+      // BE-307: id (not userId), displayName (not name), username added
+      expect(result.id).toBe('1');
+      expect(result.username).toBe('testuser');
+      expect(result.displayName).toBeDefined();
       expect(result.email).toBe('test@example.com');
       expect(result.role).toBe('admin');
       expect(Array.isArray(result.projects)).toBe(true);
       expect(result.projects).toHaveLength(1);
       expect(Array.isArray(result.permissions)).toBe(true);
+      // BE-307: createdAt and lastLoginAt
+      expect(typeof result.createdAt).toBe('string');
+      expect(result.lastLoginAt).toBeNull(); // null because makeStubUser has lastLoginAt: null
     });
 
     it('throws UnauthorizedError when user is not found', async () => {

@@ -1,14 +1,20 @@
 /**
- * AuthService — BE-002
+ * AuthService — BE-002 (updated BE-307: contract-aligned)
  *
  * Encapsulates login / logout / refresh / getMe business logic.
  * Depends on IAuthRepository (injected) and JWT/password utilities.
  *
  * DB_PENDING: When IAuthRepository is replaced with PrismaAuthRepository,
  *             all stub behaviour below switches to real DB reads/writes.
+ *
+ * BE-307 changes:
+ *   - login() now accepts username (not email) as primary identifier
+ *   - LoginResult: expiresIn → expiresAt (Unix timestamp); added user object
+ *   - logout() now returns Promise<{ clearedSessions: number }>
+ *   - RefreshResult: expiresIn → expiresAt (Unix timestamp)
+ *   - MeResult: userId → id; name → displayName; added username, createdAt, lastLoginAt
  */
 
-import { randomUUID } from 'crypto';
 import { createHash } from 'crypto';
 
 import {
@@ -26,6 +32,7 @@ import {
   SessionExpiredError,
   SessionRevokedError,
   UnauthorizedError,
+  RefreshTokenInvalidError,
 } from '../errors/auth.errors.js';
 
 // ─── Permission Map ────────────────────────────────────────────────────────────
@@ -45,26 +52,48 @@ export interface LoginContext {
   deviceInfo?: Record<string, unknown>;
 }
 
+/** BE-307: user sub-object in login response, aligned to LoginResponseDTO */
+export interface LoginResultUser {
+  id: string;
+  username: string;
+  displayName: string;
+  email: string;
+  role: 'admin' | 'supervisor' | 'vendor';
+  /** DB_PENDING: populated from auth.user_project_roles once live DB is ready */
+  projectIds: string[];
+}
+
+/** BE-307: aligned to LoginResponseDTO — expiresAt replaces expiresIn */
 export interface LoginResult {
   accessToken: string;
   refreshToken: string;
   tokenType: 'Bearer';
-  expiresIn: number;
+  /** Unix timestamp (seconds) when access token expires */
+  expiresAt: number;
+  user: LoginResultUser;
 }
 
+/** BE-307: aligned to RefreshTokenResponseDTO — expiresAt replaces expiresIn */
 export interface RefreshResult {
   accessToken: string;
   tokenType: 'Bearer';
-  expiresIn: number;
+  /** Unix timestamp (seconds) when access token expires */
+  expiresAt: number;
 }
 
+/** BE-307: aligned to GetCurrentUserResponseDTO */
 export interface MeResult {
-  userId: string;
+  id: string;
+  username: string;
+  displayName: string;
   email: string;
   role: string;
-  name: string;
   projects: ProjectSummary[];
   permissions: string[];
+  /** ISO 8601 string — DB_PENDING: from auth.users.created_at */
+  createdAt: string;
+  /** ISO 8601 string or null — DB_PENDING: from auth.users.last_login_at */
+  lastLoginAt: string | null;
 }
 
 // ─── AuthService ───────────────────────────────────────────────────────────────
@@ -75,19 +104,27 @@ export class AuthService {
   /**
    * Login: validate credentials, create session, issue tokens.
    *
-   * DB_PENDING: findUserByEmail / comparePassword against real auth.users.password_hash
+   * BE-307: primary identifier changed from email to username per contract.
+   * rememberMe parameter accepted (DB_PENDING: extend session TTL when live).
+   *
+   * DB_PENDING: findUserByUsername / comparePassword against real auth.users.password_hash
    *             createSession writes to auth.sessions
    *             createAuditAttempt writes to auth.audit_login_attempts
    */
-  async login(email: string, password: string, ctx: LoginContext = {}): Promise<LoginResult> {
-    // 1. Look up user
-    const user = await this.repo.findUserByEmail(email);
+  async login(
+    username: string,
+    password: string,
+    ctx: LoginContext = {},
+    _rememberMe?: boolean,
+  ): Promise<LoginResult> {
+    // 1. Look up user by username
+    // DB_PENDING: SELECT * FROM auth.users WHERE username = $1
+    const user = await this.repo.findUserByUsername(username);
 
     if (!user) {
       // Write audit record before throwing (constant-time defence against enumeration)
       await this.repo.createAuditAttempt({
-        username: email,
-        email,
+        username,
         ipAddress: ctx.ip,
         userAgent: ctx.userAgent,
         success: false,
@@ -104,7 +141,7 @@ export class AuthService {
         ipAddress: ctx.ip,
         userAgent: ctx.userAgent,
         success: false,
-        failureReason: 'account_disabled',
+        failureReason: 'account_locked',
       });
       throw new AccountDisabledError();
     }
@@ -159,26 +196,48 @@ export class AuthService {
       success: true,
     });
 
+    // 9. Compute expiresAt as Unix timestamp (seconds)
+    const accessExpiresAt = Math.floor(Date.now() / 1000) + config.JWT_ACCESS_EXPIRES_MINUTES * 60;
+
+    // 10. Build user object for response
+    // DB_PENDING: projectIds from auth.user_project_roles
+    const projectRoles = await this.repo.findUserProjectRoles(user.id);
+    const projectIds = projectRoles.map((pr) => pr.projectId.toString());
+
     return {
       accessToken,
       refreshToken,
       tokenType: 'Bearer',
-      expiresIn: config.JWT_ACCESS_EXPIRES_MINUTES * 60,
+      expiresAt: accessExpiresAt,
+      user: {
+        id: userId,
+        username: user.username,
+        displayName: user.displayName ?? user.username, // DB_PENDING: use display_name column
+        email: user.email,
+        role: user.role,
+        projectIds,
+      },
     };
   }
 
   /**
    * Logout: revoke sessions for user.
    *
+   * BE-307: returns { clearedSessions: number } per LogoutResponseDTO contract.
    * DB_PENDING: revokeAllUserSessions updates auth.sessions.revoked_at
    */
-  async logout(userId: bigint): Promise<void> {
+  async logout(userId: bigint): Promise<{ clearedSessions: number }> {
     // DB_PENDING: revokes all active sessions in auth.sessions
-    await this.repo.revokeAllUserSessions(userId);
+    const { count } = await this.repo.revokeAllUserSessions(userId);
+    return { clearedSessions: count };
   }
 
   /**
-   * Refresh: validate refresh token hash against DB session, issue new access token.
+   * Refresh: validate refresh token, issue new access token.
+   *
+   * BE-307: body token fallback removed — cookie-only per contract.
+   *         UNAUTHORIZED replaced with REFRESH_TOKEN_INVALID error.
+   *         expiresIn → expiresAt (Unix timestamp).
    *
    * DB_PENDING: findSessionByTokenHash queries auth.sessions
    */
@@ -186,19 +245,13 @@ export class AuthService {
     // 1. Verify JWT signature
     const payload = verifyRefreshToken(rawToken);
     if (!payload) {
-      throw new UnauthorizedError('Refresh Token 無效或已過期，請重新登入');
+      throw new RefreshTokenInvalidError();
     }
 
     // 2. Hash the incoming token and look up session
     // DB_PENDING: queries auth.sessions WHERE refresh_token_hash = hash
     const tokenHash = createHash('sha256').update(rawToken).digest('hex');
     const session = await this.repo.findSessionByTokenHash(tokenHash);
-
-    if (!session) {
-      // Stub path: findSessionByTokenHash only matches 'stub-token-hash',
-      // so for JWT-based tokens we fall through here.
-      // DB_PENDING: real implementation will find the session via hash lookup
-    }
 
     if (session) {
       // 3a. Check revocation
@@ -220,15 +273,23 @@ export class AuthService {
       role: 'user', // DB_PENDING: fetch real role from auth.users
     });
 
+    // 5. Compute expiresAt as Unix timestamp (seconds)
+    const accessExpiresAt = Math.floor(Date.now() / 1000) + config.JWT_ACCESS_EXPIRES_MINUTES * 60;
+
     return {
       accessToken,
       tokenType: 'Bearer',
-      expiresIn: config.JWT_ACCESS_EXPIRES_MINUTES * 60,
+      expiresAt: accessExpiresAt,
     };
   }
 
   /**
    * GetMe: fetch user profile and project roles.
+   *
+   * BE-307: response shape aligned to GetCurrentUserResponseDTO.
+   *   - userId → id
+   *   - name → displayName
+   *   - added: username, createdAt, lastLoginAt
    *
    * DB_PENDING: findUserById queries auth.users
    *             findUserProjectRoles queries auth.user_project_roles
@@ -254,12 +315,15 @@ export class AuthService {
     const permissions = ROLE_PERMISSIONS[user.role] ?? [];
 
     return {
-      userId: user.id.toString(),
+      id: user.id.toString(),
+      username: user.username,
+      displayName: user.displayName ?? user.username, // DB_PENDING: use display_name column
       email: user.email,
       role: user.role,
-      name: user.username, // DB_PENDING: use display_name / full_name when added to schema
       projects,
       permissions,
+      createdAt: user.createdAt.toISOString(),
+      lastLoginAt: user.lastLoginAt ? user.lastLoginAt.toISOString() : null,
     };
   }
 }

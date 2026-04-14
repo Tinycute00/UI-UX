@@ -13,6 +13,8 @@ export type UserRoleType = 'admin' | 'supervisor' | 'vendor';
 export interface AuthUser {
   id: bigint;
   username: string;
+  /** DB_PENDING: display_name / full_name column not yet in schema; using username as fallback */
+  displayName?: string;
   email: string;
   passwordHash: string;
   role: UserRoleType;
@@ -89,40 +91,117 @@ export interface CreateAuditAttemptInput {
   failureReason?: string;
 }
 
-// ─── Request Schemas (Zod) ────────────────────────────────────────────────────
+// ─── Request Schemas (Zod) — BE-307: aligned to contract ─────────────────────
 
+/**
+ * LoginBodySchema — BE-307: username (required) replaces email as primary field.
+ * email is optional for future multi-field lookup support.
+ * rememberMe added per contract.
+ */
 export const LoginBodySchema = z.object({
-  email: z.string().email('Invalid email format'),
-  username: z.string().min(1).optional(),
+  /** 使用者帳號（員工編號或 email）*/
+  username: z.string().min(1, 'Username is required'),
+  /** 使用者密碼 */
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  /** 記住我（延長 token 有效期）*/
+  rememberMe: z.boolean().optional(),
+  /** Optional email — for future multi-field lookup; not required per contract */
+  email: z.string().email('Invalid email format').optional(),
 });
 
-export const RefreshBodySchema = z.object({
-  /** Optional: refresh token in body (cookie-based is preferred) */
-  refreshToken: z.string().optional(),
-});
+/**
+ * RefreshBodySchema — BE-307: body token fallback removed.
+ * Refresh token is read exclusively from httpOnly cookie per contract.
+ * Schema kept as empty object to avoid breaking imports.
+ */
+export const RefreshBodySchema = z.object({}).strict();
 
-// ─── Response Schemas (Zod) ───────────────────────────────────────────────────
+// ─── Response Schemas (Zod) — BE-307: aligned to contract ────────────────────
 
 export const ProjectSummarySchema = z.object({
   id: z.string(),
   name: z.string(),
-  role: z.string(),
+  role: z.enum(['admin', 'supervisor', 'vendor']),
 });
 
-export const MeResponseSchema = z.object({
-  userId: z.string(),
+/**
+ * LoginUserSchema — BE-307: user object in login response per contract.
+ */
+export const LoginUserSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  displayName: z.string(),
   email: z.string().email(),
-  role: z.string(),
-  name: z.string(),
+  role: z.enum(['admin', 'supervisor', 'vendor']),
+  /** DB_PENDING: populated from auth.user_project_roles once live DB is ready */
+  projectIds: z.array(z.string()),
+});
+
+/**
+ * LoginResponseSchema — BE-307: aligned to LoginResponseDTO in contract.
+ * expiresAt replaces expiresIn (now Unix timestamp).
+ */
+export const LoginResponseSchema = z.object({
+  accessToken: z.string(),
+  tokenType: z.literal('Bearer'),
+  /** Unix timestamp (seconds) */
+  expiresAt: z.number().int().positive(),
+  user: LoginUserSchema,
+  /** DB_PENDING stub marker */
+  _stub: z.string(),
+});
+
+/**
+ * RefreshResponseSchema — BE-307: aligned to RefreshTokenResponseDTO in contract.
+ */
+export const RefreshResponseSchema = z.object({
+  accessToken: z.string(),
+  tokenType: z.literal('Bearer'),
+  /** Unix timestamp (seconds) */
+  expiresAt: z.number().int().positive(),
+  /** DB_PENDING stub marker */
+  _stub: z.string(),
+});
+
+/**
+ * LogoutResponseSchema — BE-307: aligned to LogoutResponseDTO in contract.
+ */
+export const LogoutResponseSchema = z.object({
+  success: z.literal(true),
+  message: z.string(),
+  /** Number of sessions cleared */
+  clearedSessions: z.number().int().nonnegative(),
+  /** DB_PENDING stub marker */
+  _stub: z.string(),
+});
+
+/**
+ * MeResponseSchema — BE-307: aligned to GetCurrentUserResponseDTO in contract.
+ * userId → id, name → displayName; added username, createdAt, lastLoginAt.
+ */
+export const MeResponseSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  displayName: z.string(),
+  email: z.string().email(),
+  role: z.enum(['admin', 'supervisor', 'vendor']),
   projects: z.array(ProjectSummarySchema),
   permissions: z.array(z.string()),
+  /** ISO 8601 string — DB_PENDING: from auth.users.created_at */
+  createdAt: z.string(),
+  /** ISO 8601 string or null — DB_PENDING: from auth.users.last_login_at */
+  lastLoginAt: z.string().nullable(),
 });
 
+/**
+ * AuthTokensSchema — kept for legacy / internal use; new endpoints use
+ * LoginResponseSchema / RefreshResponseSchema which use expiresAt.
+ */
 export const AuthTokensSchema = z.object({
   accessToken: z.string(),
   tokenType: z.literal('Bearer'),
-  expiresIn: z.number().int().positive(),
+  /** Unix timestamp (seconds) */
+  expiresAt: z.number().int().positive(),
 });
 
 // ─── TypeScript Types ─────────────────────────────────────────────────────────
@@ -132,3 +211,7 @@ export type RefreshBody = z.infer<typeof RefreshBodySchema>;
 export type MeResponse = z.infer<typeof MeResponseSchema>;
 export type AuthTokens = z.infer<typeof AuthTokensSchema>;
 export type ProjectSummary = z.infer<typeof ProjectSummarySchema>;
+export type LoginUser = z.infer<typeof LoginUserSchema>;
+export type LoginResponse = z.infer<typeof LoginResponseSchema>;
+export type RefreshResponse = z.infer<typeof RefreshResponseSchema>;
+export type LogoutResponse = z.infer<typeof LogoutResponseSchema>;

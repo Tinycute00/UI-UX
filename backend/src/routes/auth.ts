@@ -1,11 +1,22 @@
 import type { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import { z } from 'zod';
-import { LoginBodySchema, RefreshBodySchema } from '../types/auth.js';
+import { LoginBodySchema } from '../types/auth.js';
 import { authenticate } from '../plugins/jwtAuth.js';
 import { config } from '../config.js';
 import { AuthRepositoryStub } from '../repositories/auth.repository.js';
 import { AuthService } from '../services/auth.service.js';
 import { AuthError } from '../errors/auth.errors.js';
+
+/**
+ * Auth Routes — BE-002 (updated BE-307: contract-aligned)
+ *
+ * BE-307 changes:
+ *   - /login: uses username (not email), returns expiresAt + user object
+ *   - /logout: returns { success, message, clearedSessions }
+ *   - /refresh: cookie-only (body fallback removed), returns expiresAt,
+ *               uses RefreshTokenInvalidError
+ *   - /me: returns id/username/displayName/createdAt/lastLoginAt
+ */
 
 type RequestWithCookies = FastifyRequest & { cookies: Record<string, string | undefined> };
 type ReplyWithCookie = { setCookie(name: string, value: string, opts: object): void };
@@ -14,6 +25,11 @@ type ReplyWithCookie = { setCookie(name: string, value: string, opts: object): v
 // DB_PENDING: Replace AuthRepositoryStub with PrismaAuthRepository once live DB is ready
 const repo = new AuthRepositoryStub();
 const authService = new AuthService(repo);
+
+// ─── Logout request schema ────────────────────────────────────────────────────
+const LogoutBodySchema = z.object({
+  logoutAllDevices: z.boolean().optional(),
+});
 
 // ─── Helper: map AuthError to reply ──────────────────────────────────────────
 
@@ -34,6 +50,7 @@ function handleAuthError(err: unknown, reply: { status: (code: number) => { send
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   // ─── POST /login ─────────────────────────────────────────────────────────
+  // BE-307: username (required) + rememberMe (optional) per contract
   fastify.post('/login', async (request, reply) => {
     const parseResult = LoginBodySchema.safeParse(request.body);
     if (!parseResult.success) {
@@ -46,15 +63,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const { email, password } = parseResult.data;
+    const { username, password, rememberMe } = parseResult.data;
     const ip = request.ip;
     const userAgent = request.headers['user-agent'];
 
     try {
-      const result = await authService.login(email, password, {
-        ip,
-        userAgent,
-      });
+      const result = await authService.login(username, password, { ip, userAgent }, rememberMe);
 
       // Set refresh token as httpOnly cookie
       void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', result.refreshToken, {
@@ -65,10 +79,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         path: '/api/v1/auth',
       });
 
+      // BE-307: response aligned to LoginResponseDTO — expiresAt + user object
       return reply.status(200).send({
         accessToken: result.accessToken,
         tokenType: result.tokenType,
-        expiresIn: result.expiresIn,
+        expiresAt: result.expiresAt,
+        user: result.user,
         // DB_PENDING: stub data — remove _stub after PrismaAuthRepository is connected
         _stub: 'DB_PENDING: auth.users lookup uses AuthRepositoryStub; real password hash comparison pending live DB',
       });
@@ -78,10 +94,15 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // ─── POST /logout ─────────────────────────────────────────────────────────
+  // BE-307: returns { success: true, message, clearedSessions } per contract
   fastify.post('/logout', { preHandler: authenticate }, async (request, reply) => {
+    // Accept logoutAllDevices (currently always logs out all sessions in stub)
+    // DB_PENDING: honour logoutAllDevices flag to selectively revoke sessions
+    const _parseResult = LogoutBodySchema.safeParse(request.body);
+
     try {
       const userId = BigInt(request.user.userId);
-      await authService.logout(userId);
+      const { clearedSessions } = await authService.logout(userId);
 
       // Clear the refresh token cookie
       void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', '', {
@@ -93,7 +114,9 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       });
 
       return reply.status(200).send({
-        message: 'logged out',
+        success: true as const,
+        message: '登出成功',
+        clearedSessions,
         // DB_PENDING: session revocation uses AuthRepositoryStub
         _stub: 'DB_PENDING: auth.sessions revocation pending live DB',
       });
@@ -103,15 +126,16 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // ─── POST /refresh ────────────────────────────────────────────────────────
+  // BE-307: body token fallback removed — cookie-only per contract
+  //         uses RefreshTokenInvalidError instead of generic UNAUTHORIZED
+  //         returns expiresAt (Unix timestamp) instead of expiresIn
   fastify.post('/refresh', async (request, reply) => {
-    const cookieToken = (request as unknown as RequestWithCookies).cookies['refresh_token'];
-    const parseResult = RefreshBodySchema.safeParse(request.body);
-    const bodyToken = parseResult.success ? parseResult.data.refreshToken : undefined;
-    const rawToken = cookieToken ?? bodyToken;
+    // Read refresh token exclusively from httpOnly cookie
+    const rawToken = (request as unknown as RequestWithCookies).cookies['refresh_token'];
 
     if (!rawToken) {
       return reply.status(401).send({
-        error: { code: 'UNAUTHORIZED', message: '缺少 Refresh Token' },
+        error: { code: 'REFRESH_TOKEN_INVALID', message: '缺少 Refresh Token，請重新登入' },
       });
     }
 
@@ -121,7 +145,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(200).send({
         accessToken: result.accessToken,
         tokenType: result.tokenType,
-        expiresIn: result.expiresIn,
+        expiresAt: result.expiresAt,
         // DB_PENDING: session validation uses AuthRepositoryStub
         _stub: 'DB_PENDING: auth.sessions hash lookup pending live DB; JWT signature is validated',
       });
@@ -131,6 +155,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // ─── GET /me ──────────────────────────────────────────────────────────────
+  // BE-307: returns id/username/displayName/createdAt/lastLoginAt per contract
   fastify.get('/me', { preHandler: authenticate }, async (request, reply) => {
     try {
       const userId = BigInt(request.user.userId);
