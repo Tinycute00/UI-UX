@@ -57,7 +57,7 @@ export function signPad(el) {
   var icon = document.createElement('span');
   icon.className = 'ic s16';
   icon.innerHTML = '<svg><use href="#ic-chk-c"/></svg>';
-  var name = el.id === 'sign-pad-ir' ? '李家豪' : '陳志強';
+  var name = el.dataset.signerName || (el.id === 'sign-pad-ir' ? '監造人員' : '承辦人員');
   var time = new Date().toLocaleTimeString('zh-TW');
   var txt = document.createElement('span');
   txt.style.cssText = 'color:var(--green);font-size:12px;margin-left:6px';
@@ -74,6 +74,17 @@ export function filterIR(btn, s) {
   btn.classList.add('act');
   document.querySelectorAll('#ir-tbl tbody tr').forEach((tr) => {
     tr.style.display = s === 'all' || tr.dataset.s === s ? '' : 'none';
+  });
+}
+
+/* ── DOCS TABLE FILTER ── */
+export function filterDocs(btn, s) {
+  document.querySelectorAll('.fbar .fb').forEach((b) => {
+    b.classList.remove('act');
+  });
+  btn.classList.add('act');
+  document.querySelectorAll('#docs-tbl tbody tr').forEach((tr) => {
+    tr.style.display = s === 'all' || tr.dataset.cat === s ? '' : 'none';
   });
 }
 

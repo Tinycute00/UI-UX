@@ -1,5 +1,5 @@
-import { WORK_DETAILS, SUBCONTRACTOR_DETAILS } from '../data/dashboard.js';
 import { IR_DETAILS, IR_NOTES, NCR_DETAILS } from '../data/quality.js';
+import { getWorkDetailById, getSubcontractorDetailById } from '../api/index.js';
 import { MATERIAL_DETAILS, MATERIAL_QC_DETAILS } from '../data/materials.js';
 import { BILLING_DETAILS } from '../data/finance.js';
 import { MORNING_VIEW_DETAILS } from '../data/meetings.js';
@@ -17,6 +17,7 @@ import {
   setDocReview,
   signPad,
   filterIR,
+  filterDocs,
   addWorkLog,
   saveWorkLog,
 } from '../js/data-setters.js';
@@ -24,6 +25,7 @@ import { cm, om, closeDr, openDr, tCl, toast } from '../js/modals.js';
 import { goHome, gv, gvDash, gvMobile, navFromAlert, toggleSB } from '../js/navigation.js';
 import { safetyStep, safetyCancel, safetySend } from '../js/safety.js';
 import { showDashState, showBillingState } from '../js/state-controller.js';
+import { initDashboard } from './dashboard-init.js';
 
 function requireDatasetValue(actionElement, key) {
   return actionElement.dataset[key] || '';
@@ -31,7 +33,7 @@ function requireDatasetValue(actionElement, key) {
 
 function openWorkDetail(actionElement) {
   const workId = requireDatasetValue(actionElement, 'workId');
-  const detail = WORK_DETAILS[workId];
+  const detail = getWorkDetailById(workId);
 
   if (!detail) {
     toast('找不到工程分項資料', 'te');
@@ -56,7 +58,7 @@ function openWorkDetail(actionElement) {
 
 function openSubcontractorDetail(actionElement) {
   const subcontractorId = requireDatasetValue(actionElement, 'subId');
-  const detail = SUBCONTRACTOR_DETAILS[subcontractorId];
+  const detail = getSubcontractorDetailById(subcontractorId);
 
   if (!detail) {
     toast('找不到分包商資料', 'te');
@@ -234,11 +236,11 @@ const actionHandlers = {
   },
   'reload-dashboard': () => {
     showDashState('loading');
-    setTimeout(() => showDashState('content'), 1500);
+    initDashboard();
   },
   'retry-dashboard': () => {
     showDashState('loading');
-    setTimeout(() => showDashState('content'), 1500);
+    initDashboard();
   },
   'dashboard-nav': (actionElement) => {
     gvDash(requireDatasetValue(actionElement, 'view'), requireDatasetValue(actionElement, 'label'));
@@ -330,6 +332,12 @@ const actionHandlers = {
   /* ── IR view ── */
   'filter-ir': (actionElement) => {
     filterIR(actionElement, requireDatasetValue(actionElement, 'filter'));
+  },
+
+  /* ── Docs view ── */
+  'filter-docs': (actionElement) => {
+    const f = actionElement.dataset.filter || 'all';
+    filterDocs(actionElement, f);
   },
   'open-ir-detail': (actionElement) => {
     openIRDetail(actionElement);
