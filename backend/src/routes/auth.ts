@@ -85,8 +85,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         tokenType: result.tokenType,
         expiresAt: result.expiresAt,
         user: result.user,
-        // DB_PENDING: stub data — remove _stub after PrismaAuthRepository is connected
-        _stub: 'DB_PENDING: auth.users lookup uses AuthRepositoryStub; real password hash comparison pending live DB',
+        // DB_PENDING: auth.users lookup uses AuthRepositoryStub; real password hash comparison pending live DB
       });
     } catch (err) {
       return handleAuthError(err, reply);
@@ -102,7 +101,9 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     try {
       const userId = BigInt(request.user.userId);
-      const { clearedSessions } = await authService.logout(userId);
+      // BE-312: pass raw refresh token to service for reuse detection tracking
+      const rawRefreshToken = (request as unknown as RequestWithCookies).cookies['refresh_token'];
+      const { clearedSessions } = await authService.logout(userId, rawRefreshToken);
 
       // Clear the refresh token cookie
       void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', '', {
@@ -118,7 +119,6 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         message: '登出成功',
         clearedSessions,
         // DB_PENDING: session revocation uses AuthRepositoryStub
-        _stub: 'DB_PENDING: auth.sessions revocation pending live DB',
       });
     } catch (err) {
       return handleAuthError(err, reply);
@@ -146,8 +146,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         accessToken: result.accessToken,
         tokenType: result.tokenType,
         expiresAt: result.expiresAt,
-        // DB_PENDING: session validation uses AuthRepositoryStub
-        _stub: 'DB_PENDING: auth.sessions hash lookup pending live DB; JWT signature is validated',
+        // DB_PENDING: session validation uses AuthRepositoryStub; JWT signature is validated
       });
     } catch (err) {
       return handleAuthError(err, reply);
@@ -164,7 +163,6 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(200).send({
         ...result,
         // DB_PENDING: user data & project roles use AuthRepositoryStub
-        _stub: 'DB_PENDING: real user profile from auth.users; project names pending project.projects JOIN',
       });
     } catch (err) {
       return handleAuthError(err, reply);

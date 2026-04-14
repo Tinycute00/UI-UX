@@ -40,6 +40,7 @@ import {
   SessionRevokedError,
   UnauthorizedError,
   RefreshTokenInvalidError,
+  RefreshTokenReusedError,
 } from '../errors/auth.errors.js';
 import { comparePassword } from '../utils/password.js';
 import {
@@ -292,6 +293,33 @@ describe('AuthService', () => {
 
       await expect(service.refresh('expired-token')).rejects.toThrow(SessionExpiredError);
     });
+
+    it('throws RefreshTokenReusedError when refresh is attempted after logout (BE-312)', async () => {
+      // Simulate: login → logout with rawToken → refresh with same rawToken
+      // logout() must be called with the raw token so it gets added to _revokedRefreshJtis
+      mockedVerifyRefreshToken.mockReturnValue({
+        userId: '1',
+        iat: Math.floor(Date.now() / 1000) - 60,
+        exp: Math.floor(Date.now() / 1000) + 3600,
+      });
+
+      const repo = makeMockRepo({
+        findSessionByTokenHash: vi.fn().mockResolvedValue(makeStubSession()),
+      });
+      const service = new AuthService(repo);
+
+      // Use a unique token per test to avoid cross-test Set contamination
+      const rawToken = `reuse-test-token-${Date.now()}-${Math.random()}`;
+
+      // Step 1: logout with the token — this should add the hash to _revokedRefreshJtis
+      await service.logout(BigInt(1), rawToken);
+
+      // Step 2: attempt to refresh with the same token — should throw REFRESH_TOKEN_REUSED
+      await expect(service.refresh(rawToken)).rejects.toThrow(RefreshTokenReusedError);
+
+      // Verify the repo's revokeAllUserSessions was called (reuse security response)
+      expect(repo.revokeAllUserSessions).toHaveBeenCalledTimes(2); // once for logout, once for reuse
+    });
   });
 
   // ─── getMe() ───────────────────────────────────────────────────────────────
@@ -317,7 +345,8 @@ describe('AuthService', () => {
       expect(Array.isArray(result.permissions)).toBe(true);
       // BE-307: createdAt and lastLoginAt
       expect(typeof result.createdAt).toBe('string');
-      expect(result.lastLoginAt).toBeNull(); // null because makeStubUser has lastLoginAt: null
+      // BE-312: lastLoginAt is string (non-null per contract); stub fallback = epoch ISO string
+      expect(typeof result.lastLoginAt).toBe('string');
     });
 
     it('throws UnauthorizedError when user is not found', async () => {

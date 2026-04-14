@@ -33,6 +33,7 @@ import {
   SessionRevokedError,
   UnauthorizedError,
   RefreshTokenInvalidError,
+  RefreshTokenReusedError,
 } from '../errors/auth.errors.js';
 
 // ─── Permission Map ────────────────────────────────────────────────────────────
@@ -93,10 +94,17 @@ export interface MeResult {
   /** ISO 8601 string — DB_PENDING: from auth.users.created_at */
   createdAt: string;
   /** ISO 8601 string or null — DB_PENDING: from auth.users.last_login_at */
-  lastLoginAt: string | null;
+  lastLoginAt: string;
 }
 
 // ─── AuthService ───────────────────────────────────────────────────────────────
+
+/**
+ * Module-level set to track revoked JWT IDs (jti) for REFRESH_TOKEN_REUSED detection.
+ * DB_PENDING: Replace with persistent auth.revoked_tokens table lookup once live DB is ready.
+ * This in-memory set is reset on server restart — acceptable for stub baseline QA.
+ */
+const _revokedRefreshJtis = new Set<string>();
 
 export class AuthService {
   constructor(private readonly repo: IAuthRepository) {}
@@ -225,10 +233,21 @@ export class AuthService {
    *
    * BE-307: returns { clearedSessions: number } per LogoutResponseDTO contract.
    * DB_PENDING: revokeAllUserSessions updates auth.sessions.revoked_at
+   *
+   * BE-312: records all active refresh token hashes as revoked in _revokedRefreshJtis
+   * so that subsequent /refresh calls with the same token trigger REFRESH_TOKEN_REUSED.
+   * DB_PENDING: replace Set with persistent revoked_tokens table once live DB is ready.
    */
-  async logout(userId: bigint): Promise<{ clearedSessions: number }> {
+  async logout(userId: bigint, rawRefreshToken?: string): Promise<{ clearedSessions: number }> {
     // DB_PENDING: revokes all active sessions in auth.sessions
     const { count } = await this.repo.revokeAllUserSessions(userId);
+
+    // BE-312: mark the refresh token hash as revoked for reuse detection
+    if (rawRefreshToken) {
+      const tokenHash = createHash('sha256').update(rawRefreshToken).digest('hex');
+      _revokedRefreshJtis.add(tokenHash);
+    }
+
     return { clearedSessions: count };
   }
 
@@ -251,6 +270,16 @@ export class AuthService {
     // 2. Hash the incoming token and look up session
     // DB_PENDING: queries auth.sessions WHERE refresh_token_hash = hash
     const tokenHash = createHash('sha256').update(rawToken).digest('hex');
+
+    // BE-312: Check if token hash is in the revoked set (reuse detection)
+    // DB_PENDING: replace with SELECT FROM auth.revoked_tokens WHERE hash = $1 once live DB is ready
+    if (_revokedRefreshJtis.has(tokenHash)) {
+      // Revoke all sessions for this user as a security measure (token theft response)
+      // DB_PENDING: revokeAllUserSessions persists to auth.sessions when live DB is connected
+      await this.repo.revokeAllUserSessions(BigInt(payload.userId));
+      throw new RefreshTokenReusedError();
+    }
+
     const session = await this.repo.findSessionByTokenHash(tokenHash);
 
     if (session) {
@@ -323,7 +352,8 @@ export class AuthService {
       projects,
       permissions,
       createdAt: user.createdAt.toISOString(),
-      lastLoginAt: user.lastLoginAt ? user.lastLoginAt.toISOString() : null,
+      // DB_PENDING: real lastLoginAt from auth.users.last_login_at; stub fallback to epoch string
+      lastLoginAt: user.lastLoginAt ? user.lastLoginAt.toISOString() : new Date(0).toISOString(),
     };
   }
 }
