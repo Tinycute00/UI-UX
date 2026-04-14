@@ -6,13 +6,13 @@
 // ============================================================
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // url is managed in prisma.config.ts (Prisma 7+ requirement)
+  // See: https://pris.ly/d/config-datasource
   schemas  = ["auth", "project"]
 }
 
