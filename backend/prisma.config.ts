@@ -7,6 +7,9 @@ import { defineConfig } from 'prisma/config'
 export default defineConfig({
   earlyAccess: true,
   schema: 'prisma/schema.prisma',
+  datasource: {
+    url: process.env.DATABASE_URL as string,
+  },
   migrate: {
     async adapter(env: Record<string, string | undefined>) {
       const { PrismaPg } = await import('@prisma/adapter-pg')
