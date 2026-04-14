@@ -1,17 +1,40 @@
 import type { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { LoginBodySchema, RefreshBodySchema } from '../types/auth.js';
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import { authenticate } from '../plugins/jwtAuth.js';
 import { config } from '../config.js';
+import { AuthRepositoryStub } from '../repositories/auth.repository.js';
+import { AuthService } from '../services/auth.service.js';
+import { AuthError } from '../errors/auth.errors.js';
 
 type RequestWithCookies = FastifyRequest & { cookies: Record<string, string | undefined> };
 type ReplyWithCookie = { setCookie(name: string, value: string, opts: object): void };
 
+// ─── Instantiate repo + service ───────────────────────────────────────────────
+// DB_PENDING: Replace AuthRepositoryStub with PrismaAuthRepository once live DB is ready
+const repo = new AuthRepositoryStub();
+const authService = new AuthService(repo);
+
+// ─── Helper: map AuthError to reply ──────────────────────────────────────────
+
+function handleAuthError(err: unknown, reply: { status: (code: number) => { send: (body: unknown) => unknown } }) {
+  if (err instanceof AuthError) {
+    return reply.status(err.statusCode).send({
+      error: {
+        code: err.code,
+        message: err.message,
+      },
+    });
+  }
+  // Re-throw unexpected errors to Fastify default error handler
+  throw err;
+}
+
+// ─── Routes ───────────────────────────────────────────────────────────────────
+
 const authRoutes: FastifyPluginAsync = async (fastify) => {
-  // ─── POST /login ────────────────────────────────────────────────────────────
+  // ─── POST /login ─────────────────────────────────────────────────────────
   fastify.post('/login', async (request, reply) => {
-    // Validate request body
     const parseResult = LoginBodySchema.safeParse(request.body);
     if (!parseResult.success) {
       return reply.status(400).send({
@@ -23,107 +46,104 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const { email } = parseResult.data;
+    const { email, password } = parseResult.data;
+    const ip = request.ip;
+    const userAgent = request.headers['user-agent'];
 
-    // TODO (DB_PENDING): Query database for user by email
-    //   const user = await db.user.findUnique({ where: { email } });
-    //   if (!user) return reply.status(401).send({ error: { code: 'UNAUTHORIZED', message: '帳號或密碼錯誤' } });
+    try {
+      const result = await authService.login(email, password, {
+        ip,
+        userAgent,
+      });
 
-    // TODO (DB_PENDING): Compare password
-    //   const valid = await comparePassword(password, user.passwordHash);
-    //   if (!valid) return reply.status(401).send({ error: { code: 'UNAUTHORIZED', message: '帳號或密碼錯誤' } });
+      // Set refresh token as httpOnly cookie
+      void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', result.refreshToken, {
+        httpOnly: true,
+        secure: config.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: config.JWT_REFRESH_EXPIRES_DAYS * 24 * 60 * 60,
+        path: '/api/v1/auth',
+      });
 
-    // STUB: Return placeholder tokens until Prisma schema is ready
-    const stubUserId = 'stub-user-id';
-    const stubRole = 'user';
-
-    const accessToken = signAccessToken({ userId: stubUserId, role: stubRole });
-    const refreshToken = signRefreshToken({ userId: stubUserId });
-
-    // Set refresh token as httpOnly cookie
-    void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: config.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: config.JWT_REFRESH_EXPIRES_DAYS * 24 * 60 * 60,
-      path: '/api/v1/auth',
-    });
-
-    return reply.status(200).send({
-      accessToken,
-      tokenType: 'Bearer' as const,
-      expiresIn: config.JWT_ACCESS_EXPIRES_MINUTES * 60,
-      // DB_PENDING: remove this message after Prisma schema is ready
-      _stub: 'DB_PENDING: real user lookup & password comparison waiting for Prisma schema',
-      _email: email,
-    });
+      return reply.status(200).send({
+        accessToken: result.accessToken,
+        tokenType: result.tokenType,
+        expiresIn: result.expiresIn,
+        // DB_PENDING: stub data — remove _stub after PrismaAuthRepository is connected
+        _stub: 'DB_PENDING: auth.users lookup uses AuthRepositoryStub; real password hash comparison pending live DB',
+      });
+    } catch (err) {
+      return handleAuthError(err, reply);
+    }
   });
 
-  // ─── POST /logout ───────────────────────────────────────────────────────────
-  fastify.post('/logout', { preHandler: authenticate }, async (_request, reply) => {
-    // TODO (DB_PENDING): Invalidate session / refresh token in DB
-    //   await db.session.delete({ where: { userId: request.user.userId } });
+  // ─── POST /logout ─────────────────────────────────────────────────────────
+  fastify.post('/logout', { preHandler: authenticate }, async (request, reply) => {
+    try {
+      const userId = BigInt(request.user.userId);
+      await authService.logout(userId);
 
-    // Clear the refresh token cookie
-    void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', '', {
-      httpOnly: true,
-      secure: config.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 0,
-      path: '/api/v1/auth',
-    });
+      // Clear the refresh token cookie
+      void (reply as unknown as ReplyWithCookie).setCookie('refresh_token', '', {
+        httpOnly: true,
+        secure: config.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 0,
+        path: '/api/v1/auth',
+      });
 
-    return reply.status(200).send({ message: 'logged out' });
+      return reply.status(200).send({
+        message: 'logged out',
+        // DB_PENDING: session revocation uses AuthRepositoryStub
+        _stub: 'DB_PENDING: auth.sessions revocation pending live DB',
+      });
+    } catch (err) {
+      return handleAuthError(err, reply);
+    }
   });
 
-  // ─── POST /refresh ──────────────────────────────────────────────────────────
+  // ─── POST /refresh ────────────────────────────────────────────────────────
   fastify.post('/refresh', async (request, reply) => {
-    // Read refresh token from cookie (preferred) or body
     const cookieToken = (request as unknown as RequestWithCookies).cookies['refresh_token'];
     const parseResult = RefreshBodySchema.safeParse(request.body);
     const bodyToken = parseResult.success ? parseResult.data.refreshToken : undefined;
-    const token = cookieToken ?? bodyToken;
+    const rawToken = cookieToken ?? bodyToken;
 
-    if (!token) {
+    if (!rawToken) {
       return reply.status(401).send({
         error: { code: 'UNAUTHORIZED', message: '缺少 Refresh Token' },
       });
     }
 
-    const payload = verifyRefreshToken(token);
-    if (!payload) {
-      return reply.status(401).send({
-        error: { code: 'UNAUTHORIZED', message: 'Refresh Token 無效或已過期，請重新登入' },
+    try {
+      const result = await authService.refresh(rawToken);
+
+      return reply.status(200).send({
+        accessToken: result.accessToken,
+        tokenType: result.tokenType,
+        expiresIn: result.expiresIn,
+        // DB_PENDING: session validation uses AuthRepositoryStub
+        _stub: 'DB_PENDING: auth.sessions hash lookup pending live DB; JWT signature is validated',
       });
+    } catch (err) {
+      return handleAuthError(err, reply);
     }
-
-    // TODO (DB_PENDING): Validate session in DB (check token not revoked)
-    //   const session = await db.session.findUnique({ where: { userId: payload.userId } });
-    //   if (!session || session.refreshToken !== token) { ... }
-
-    // STUB: Issue new access token with stub role
-    const newAccessToken = signAccessToken({ userId: payload.userId, role: 'user' });
-
-    return reply.status(200).send({
-      accessToken: newAccessToken,
-      tokenType: 'Bearer' as const,
-      expiresIn: config.JWT_ACCESS_EXPIRES_MINUTES * 60,
-      _stub: 'DB_PENDING: session validation against DB waiting for Prisma schema',
-    });
   });
 
-  // ─── GET /me ────────────────────────────────────────────────────────────────
+  // ─── GET /me ──────────────────────────────────────────────────────────────
   fastify.get('/me', { preHandler: authenticate }, async (request, reply) => {
-    // TODO (DB_PENDING): Fetch full user record from DB
-    //   const user = await db.user.findUnique({ where: { id: request.user.userId } });
-    //   return reply.status(200).send({ userId: user.id, email: user.email, role: user.role, name: user.name });
+    try {
+      const userId = BigInt(request.user.userId);
+      const result = await authService.getMe(userId);
 
-    // STUB: Return decoded token payload until Prisma schema is ready
-    return reply.status(200).send({
-      userId: request.user.userId,
-      role: request.user.role,
-      _stub: 'DB_PENDING: full user data (email, name, etc.) waiting for Prisma schema',
-    });
+      return reply.status(200).send({
+        ...result,
+        // DB_PENDING: user data & project roles use AuthRepositoryStub
+        _stub: 'DB_PENDING: real user profile from auth.users; project names pending project.projects JOIN',
+      });
+    } catch (err) {
+      return handleAuthError(err, reply);
+    }
   });
 };
 
