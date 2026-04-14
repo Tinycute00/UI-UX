@@ -140,6 +140,7 @@ export const LoginUserSchema = z.object({
 /**
  * LoginResponseSchema — BE-307: aligned to LoginResponseDTO in contract.
  * expiresAt replaces expiresIn (now Unix timestamp).
+ * NOTE (DB_PENDING): user.projectIds populated from auth.user_project_roles once live DB is ready.
  */
 export const LoginResponseSchema = z.object({
   accessToken: z.string(),
@@ -147,8 +148,6 @@ export const LoginResponseSchema = z.object({
   /** Unix timestamp (seconds) */
   expiresAt: z.number().int().positive(),
   user: LoginUserSchema,
-  /** DB_PENDING stub marker */
-  _stub: z.string(),
 });
 
 /**
@@ -159,8 +158,6 @@ export const RefreshResponseSchema = z.object({
   tokenType: z.literal('Bearer'),
   /** Unix timestamp (seconds) */
   expiresAt: z.number().int().positive(),
-  /** DB_PENDING stub marker */
-  _stub: z.string(),
 });
 
 /**
@@ -171,8 +168,6 @@ export const LogoutResponseSchema = z.object({
   message: z.string(),
   /** Number of sessions cleared */
   clearedSessions: z.number().int().nonnegative(),
-  /** DB_PENDING stub marker */
-  _stub: z.string(),
 });
 
 /**
@@ -189,8 +184,8 @@ export const MeResponseSchema = z.object({
   permissions: z.array(z.string()),
   /** ISO 8601 string — DB_PENDING: from auth.users.created_at */
   createdAt: z.string(),
-  /** ISO 8601 string or null — DB_PENDING: from auth.users.last_login_at */
-  lastLoginAt: z.string().nullable(),
+  /** ISO 8601 string — DB_PENDING: from auth.users.last_login_at; always populated by runtime */
+  lastLoginAt: z.string(),
 });
 
 /**
