@@ -16,9 +16,9 @@
 | Prisma CLI 版本 | ✅ `7.7.0`（已安裝在 `node_modules`） |
 | `backend/package.json` db scripts | ✅ **已補齊**（`db:generate` / `db:validate` / `db:migrate:dev` / `db:migrate:deploy` / `db:migrate:status` / `db:migrate:reset` / `db:push` / `db:studio`） |
 | `npx prisma validate` | ✅ **通過**（PM 實跑驗證，schema 對 Prisma 7.x 相容） |
-| `previewFeatures = ["multiSchema"]` | ✅ 已在 schema 中啟用（auth / project 雙 schema） |
+| `schemas = ["auth", "project"]` （datasource） | ✅ 已設定（Prisma 7.x 語法，`previewFeatures = ["multiSchema"]` 已移除；URL 改由 `prisma.config.ts` 管理，`datasource db` 不再含 `url` 欄位） |
 | Local PostgreSQL / Docker Compose | ✅ **OPS-306 已落地**（`docker-compose.yml` 含 `pmis_dev` 資料庫 + `pmis` 服務帳號 + `infra/init-schemas.sql`） |
-| DATABASE_URL credential 對帳 | ⚠️ **OPS-307 部分完成** — `backend/.env.local.example` 已對齊 docker-compose（`pmis:pmis_dev_pw@localhost:5432/pmis_dev`），但 `backend/.env.example`（template）內仍殘留舊格式 `tachenpmis`（歷史遺留，不影響新開發者照 `.env.local.example` 操作） |
+| DATABASE_URL credential 對帳 | ⚠️ **OPS-307 進行中** — `backend/.env.local.example` 的 `DATABASE_URL` 目前為 `postgresql://pmis:***@localhost:5432/pmis_dev`（密碼以 `***` 遮罩，尚未替換為明確可直接使用的 dev 密碼）；`backend/.env.example`（template）內仍殘留舊格式 `tachenpmis`。明確密碼對帳待 OPS-307 完成。 |
 | migration 實際執行 | ❌ **尚未執行** |
 
 ---
@@ -34,7 +34,7 @@
 
 ### ⚠️ 本地 stack 已建立，但 docs credential 對帳仍部分待完成（OPS-307）
 
-- **`.env.local.example`**：✅ OPS-307 已更新，`DATABASE_URL` 對齊 docker-compose（`postgresql://pmis:pmis_dev_pw@localhost:5432/pmis_dev`）
+- **`.env.local.example`**：⚠️ OPS-307 **進行中** — 目前 `DATABASE_URL=postgresql://pmis:***@localhost:5432/pmis_dev`（密碼欄位仍為 `***` 遮罩，尚未替換為明確可直接使用的 dev 密碼 `pmis_dev_pw`）；明確密碼對帳待 OPS-307 完成
 - **`.env.example`**（template）：⚠️ 仍含舊值 `postgresql://localhost:5432/tachenpmis`，未更新。**開發者請以 `.env.local.example` 為準**，不要沿用 `.env.example` 的 DATABASE_URL
 - **`.env`（實際 .gitignored 檔）**：各開發者自行建立，請參考 `.env.local.example` 設定
 
@@ -145,7 +145,7 @@ psql $DATABASE_URL -c "\dt auth.*"
    - 帳號 `pmis` 擁有 `pmis_dev` 的 DDL 權限
 
 4. **環境變數 credential 完整對帳**（OPS-307 ⚠️ 部分完成）  
-   - `.env.local.example` ✅ 已對齊  
+   - `.env.local.example` ⚠️ OPS-307 進行中（密碼欄位仍為 `***`，待明確替換）  
    - `.env.example` template ⚠️ 仍含舊格式，開發者使用 `.env.local.example`  
    - 生產環境需 Secrets Manager 注入，不可使用本地 dev 密碼
 
@@ -161,8 +161,8 @@ psql $DATABASE_URL -c "\dt auth.*"
 
 ---
 
-_Last updated: 2026-04-14 by Backend (BE-309 reconciliation)_  
-_Previous: 2026-04-14 by Backend (BE-308 preflight)_  
+_Last updated: 2026-04-14 by Backend (BE-310 accuracy fix — previewFeatures removed, .env.local.example credential status corrected)_  
+_Previous: 2026-04-14 by Backend (BE-309 reconciliation)_  
 _OPS-306: ✅ DevOps 本地 postgres stack 已落地_  
-_OPS-307: ⚠️ credential 對帳部分完成（.env.local.example ✅，.env.example template ⚠️ 舊格式殘留）_  
+_OPS-307: ⚠️ credential 對帳進行中（.env.local.example 密碼欄位仍為 `***`，待明確替換；.env.example template ⚠️ 舊格式殘留）_  
 _Migration: ❌ 尚未執行 — `backend/prisma/migrations/` 不存在_
