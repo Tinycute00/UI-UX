@@ -21,12 +21,12 @@ function handleHttpError(response, bodyData) {
   if (serverMessage) {
     errorMessage = serverMessage;
     if (status === 401) {
-      window.location.href = '/login.html';
+      window.location.href = './login.html';
     }
   } else {
     if (status === 401) {
       errorMessage = '登入已過期，請重新登入';
-      window.location.href = '/login.html';
+      window.location.href = './login.html';
     } else if (status === 403) {
       errorMessage = '您沒有權限執行此操作';
     } else if (status === 404) {

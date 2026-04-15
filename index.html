@@ -48,7 +48,7 @@
   // Auth guard — redirect to login if no valid token
   import { isAuthenticated } from '/src/api/adapters/auth-adapter.js';
   if (!isAuthenticated()) {
-    window.location.replace('/login.html');
+    window.location.replace('./login.html');
   }
 </script>
 </body>

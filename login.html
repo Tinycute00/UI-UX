@@ -194,7 +194,7 @@
 
     // If already authenticated, redirect to main app
     if (isAuthenticated()) {
-      window.location.replace('/index.html');
+      window.location.replace('./index.html');
     }
 
     var form = document.getElementById('login-form');
@@ -248,7 +248,7 @@
 
       login(username, password)
         .then(function () {
-          window.location.replace('/index.html');
+          window.location.replace('./index.html');
         })
         .catch(function (err) {
           setLoading(false);

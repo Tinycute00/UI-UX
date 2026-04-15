@@ -40,7 +40,7 @@ export function login(username, password, rememberMe) {
 
 /**
  * logout — POST /api/v1/auth/logout
- * Clears all sessionStorage auth data and redirects to /login.html.
+ * Clears all sessionStorage auth data and redirects to ./login.html.
  * @param {boolean} [logoutAllDevices]
  */
 export function logout(logoutAllDevices) {
@@ -50,11 +50,11 @@ export function logout(logoutAllDevices) {
   }
   return apiPost('/auth/logout', body).then(function () {
     clearAuthStorage();
-    window.location.href = '/login.html';
+    window.location.href = './login.html';
   }).catch(function () {
     // Even on network error, clear local auth and redirect
     clearAuthStorage();
-    window.location.href = '/login.html';
+    window.location.href = './login.html';
   });
 }
 
