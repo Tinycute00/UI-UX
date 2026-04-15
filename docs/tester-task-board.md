@@ -4,7 +4,8 @@
 **Scope:** Wave 1 static prototype validation for Dashboard / Billing / Safety  
 **Audience:** PM, Frontend, Backend, DevOps  
 **Status:** Ready for execution against current static frontend  
-**Workspace rule:** any Tester-triggered OpenCode or terminal workflow must explicitly set `workdir=/home/beer8/team-workspace`
+**Workspace rule:** any Tester-triggered OpenCode or terminal workflow must explicitly set `workdir=/home/beer8/team-workspace/UI-UX`
+**Rule-sync guardrail:** when PM changes cross-role execution rules, the tester must update workflow/skill/memory/docs together and report the actual updated carrier(s); do not rely on chat memory alone
 
 ---
 
@@ -27,11 +28,11 @@ Evidence types:
 
 | ID | Task | Acceptance criteria | Dependencies | Evidence required | Status |
 |---|---|---|---|---|---|
-| QA-P0-01 | Verify app shell boots cleanly | App opens with no blank screen and no blocking JS errors | Vite dev server; static assets load | SS + CON | Pending |
-| QA-P0-02 | Dashboard critical path smoke | Dashboard renders; KPI drilldowns and detail modals open correctly | App shell; static data modules | REC + SS + SRC | Pending |
-| QA-P0-03 | Billing critical path smoke | Billing view renders; billing detail modal opens for each period; “新增估驗” opens modal | App shell; `src/data/finance.js` | REC + SS + SRC | Pending |
-| QA-P0-04 | Safety wizard critical path smoke | Safety wizard reaches steps 1–3 and send/reset behavior works | App shell; `src/js/safety.js` | REC + SS + CON | Pending |
-| QA-P0-05 | Auth gap verification | Confirm login/session/RBAC are not implemented in current static repo and document as future-only | Source review of sidebar/shell | SS + SRC | Pending |
+| QA-P0-01 | Verify app shell boots cleanly | App opens with no blank screen and no blocking JS errors | Vite dev server; static assets load | SS + CON | Pass — live login→dashboard shell loaded; console clean on shell nav |
+| QA-P0-02 | Dashboard critical path smoke | Dashboard renders; KPI drilldowns and detail modals open correctly | App shell; static data modules | REC + SS + SRC | Blocked — live dashboard shows error state; backend contract gap still impacts initialization |
+| QA-P0-03 | Billing critical path smoke | Billing view renders; billing detail modal opens for each period; “新增估驗” opens modal | App shell; `src/data/finance.js` | REC + SS + SRC | Blocked — not re-run in stable preview during this evidence pass |
+| QA-P0-04 | Safety wizard critical path smoke | Safety wizard reaches steps 1–3 and send/reset behavior works | App shell; `src/js/safety.js` | REC + SS + CON | Blocked — not re-run in stable preview during this evidence pass |
+| QA-P0-05 | Auth gap verification | Confirm login/session/RBAC are not implemented in current static repo and document as future-only | Source review of sidebar/shell | SS + SRC | Blocked / future-only — static auth shell only; no session/RBAC UI flow implemented |
 
 ### P0 acceptance gate
 All P0 tasks must pass except the auth gap task, which must be **documented as blocked/future-only** rather than falsely passed.

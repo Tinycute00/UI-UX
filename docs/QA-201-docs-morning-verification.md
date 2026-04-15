@@ -3,7 +3,8 @@
 **Baseline Commit:** 621bb63 - NOT FOUND in git history  
 **Actual Source:** Current HEAD d98c798 (UIUX-201: Fix hardcoded names and implement filter-docs functionality)  
 **Verification Date:** 2026-04-14  
-**Workspace:** /home/beer8/team-workspace/UI-UX
+**Workspace:** /home/beer8/team-workspace/UI-UX  
+**Rule-sync note:** this artifact follows the latest QA rule set: all OpenCode work must use `/ulw-loop` with `workdir=/home/beer8/team-workspace/UI-UX`, and every conclusion must separate source-review evidence from browser/runtime/live evidence.
 
 ---
 

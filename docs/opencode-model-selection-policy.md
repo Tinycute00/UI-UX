@@ -1,9 +1,32 @@
 # OpenCode Model Selection Policy — Ta Chen PMIS
 
-**Version:** 1.0  
+**Version:** 1.2  
 **Effective Date:** 2026-04-15  
 **Owner:** Engineering Team / PM  
 **Review Cycle:** Monthly or upon significant model updates
+
+---
+
+## 0. 最新 Runtime 覆蓋規則 (Latest Runtime Override)
+
+> **⚠️ 當本政策內容與 `docs/opencode-executable-whitelist-matrix.md` 衝突時，以白名單矩陣為準。**
+
+**正式白名單矩陣文件**：`docs/opencode-executable-whitelist-matrix.md`
+
+**核心原則**：
+- 優先嘗試高端模型 (Tier P0)，但不保證可用
+- 高端模型連續失敗 2 次後，必須切換到穩定中階模型 (Tier P2)
+- Claude Sonnet 4.6 為 prefix-sensitive，只建議 `/ulw-loop` 路徑
+
+**已驗證的穩定中階模型 (Tier P2)**：
+- `opencode-go/glm-5.1` — 通用主力 (4/4 success)
+- `opencode-go/kimi-k2.5` — 分析/長文主力 (4/4 success)
+- `opencode-go/mimo-v2-pro` — 實作主力 (4/4 success)
+- `opencode-go/minimax-m2.7` — 快速/低成本主力 (4/4 success)
+
+**Premium 模型不穩定聲明**：
+- Claude Opus 4.6, Claude Opus 4.5, GPT-5.4, GPT-5.2, GPT-5.1, Gemini 3.1 Pro, Gemini 2.5 Pro 均為 Tier P0 (exploratory)，不保證每次可用
+- Claude Sonnet 4.6 為 Tier P1，僅 `/ulw-loop` 路徑穩定
 
 ---
 
@@ -83,6 +106,8 @@ opencode run '/ulw-loop
 - `opencode/minimax-m2.5-free` — 免費版 Minimax
 - `opencode/nemotron-3-super-free` — 免費版 Nemotron
 
+> **Runtime 驗證狀態（2026-04-15）**：上述 OpenCode-Go 模型中，`opencode-go/glm-5.1`、`opencode-go/kimi-k2.5`、`opencode-go/mimo-v2-pro`、`opencode-go/minimax-m2.7` 已通過 4/4 穩定性測試，為 Tier P2 穩定主力。其餘 OpenCode-Go 模型尚未完成完整 runtime 驗證。
+
 **GitHub Copilot 系列：**
 - `github-copilot/claude-haiku-4.5` — 輕量級 Claude
 - `github-copilot/claude-opus-4.5` — 最高推理能力
@@ -104,11 +129,15 @@ opencode run '/ulw-loop
 - `github-copilot/gpt-5.4-mini` — 高階輕量版
 - `github-copilot/grok-code-fast-1` — 快速推理
 
+> **Runtime 驗證狀態（2026-04-15）**：所有 GitHub Copilot 模型均為 Tier P0/P1，存在不同程度的不穩定性（not_supported / forbidden）。其中 Claude Sonnet 4.6 為 Tier P1 prefix-sensitive（只建議 `/ulw-loop` 路徑）。詳見 `docs/opencode-executable-whitelist-matrix.md`。
+
 ---
 
 ## 3. 依任務類型的模型選擇矩陣
 
 ### 3.1 任務類型對照表
+
+> **⚠️ 重要**：以下表格為「建議」層級。實際執行時的嘗試順序與穩定回退策略，請以 `docs/opencode-executable-whitelist-matrix.md` 的 Task-Type Try-Order Tables 為準。下表中的 Copilot 模型均為 Tier P0/P1，不保證每次可用。
 
 | 任務類型 | 主選模型 | 備援模型 | 升級條件 | 降級條件 |
 |----------|----------|----------|----------|----------|
@@ -125,11 +154,36 @@ opencode run '/ulw-loop
 | **大量批次處理** | GPT-5-nano | Minimax-free | 資料遷移任務 | 手動審查後 |
 | **程式碼審查** | Claude Sonnet | GPT-5.2 | 關鍵路徑變更 | 樣式微調 |
 
-### 3.2 Gemini 系列 UI/前端強項規範
+### 3.2 前端專職模型 / Frontend-Specialist Models
 
-**治理規則：Gemini 系列在 UI / 前端任務上應被視為首選強項，不應只把 Claude 當成前端首選。**
+**治理規則：前端任務需要高發想、發散型模型，因此 Gemini 系列應作為 frontend-specialist family 明確入規。**
 
-#### Gemini 適用情境：
+前端專職模型區分兩大類任務：
+- **高發想/發散型任務**：UI 概念生成、互動設計發想、設計系統規劃
+- **實作型任務**：切版、Responsive 實作、組件開發、快速迭代
+
+#### 前端專職模型選擇矩陣
+
+| 任務類型 | 主選模型 | 備援模型 | 狀態 | 適用情境 |
+|----------|----------|----------|------|----------|
+| **高發想/UI 概念生成** | Gemini-3.1-Pro-Preview | Claude Sonnet 4.6 | ✅ Runnable | 設計發想、互動概念、視覺創意 |
+| **切版/互動/Responsive** | Gemini-3.1-Pro-Preview | Claude Sonnet 4.6 | ✅ Runnable | 頁面實作、RWD、組件開發 |
+| **快速前端迭代** | Gemini-3-Flash-Preview | GPT-4o | ✅ Runnable | 樣式微調、快速試驗 |
+| **設計系統維護** | Gemini-3.1-Pro-Preview | Claude Opus 4.6 | ✅ Runnable | Design tokens、組件庫 |
+| ~~Gemini-2.5-Pro~~ | — | — | ❌ Listed but TOS/Permission Blocked | 目前不可執行，不得作為主選 |
+
+#### 模型執行狀態說明（已驗證）
+
+| 模型 | 完整名稱 | 狀態 | 備註 |
+|------|----------|------|------|
+| Gemini-3.1-Pro-Preview | `github-copilot/gemini-3.1-pro-preview` | ⚠️ Tier P0 Exploratory | ⚠️ Tier P0 Exploratory — 可嘗試但不穩定（1 success / 1 not_supported） |
+| Gemini-3-Flash-Preview | `github-copilot/gemini-3-flash-preview` | ⚠️ Tier P0 Exploratory | ⚠️ Tier P0 Exploratory — 可嘗試但不保證穩定 |
+| Gemini-2.5-Pro | `github-copilot/gemini-2.5-pro` | ⚠️ Tier P0 Exploratory | ⚠️ Tier P0 Exploratory — 目前回傳 Forbidden/TOS blocked，不保證每次可用 |
+| Claude Sonnet 4.6 | `github-copilot/claude-sonnet-4.6` | ⚠️ Tier P1 Prefix-Sensitive | ⚠️ Tier P1 Prefix-Sensitive — 只建議 /ulw-loop 路徑（/ulw-loop: 2/2 success; ulw-loop: 2/2 not_supported） |
+
+#### Gemini 系列前端強項
+
+**適用情境：**
 - ✅ CSS/Tailwind/Styled Components 樣式生成
 - ✅ React/Vue/Angular 組件開發
 - ✅ 響應式設計 (RWD) 實作
@@ -138,18 +192,57 @@ opencode run '/ulw-loop
 - ✅ 無障礙 (a11y) 標記優化
 - ✅ 設計系統 (Design System) 維護
 - ✅ UI 測試腳本生成
+- ✅ **高發想任務**：UI 概念發想、互動設計提案、設計變體生成
 
-#### 前端任務優先順序：
-1. **首選**：`github-copilot/gemini-3.1-pro-preview`
-2. **次選**：`github-copilot/gemini-2.5-pro`
-3. **快速迭代**：`github-copilot/gemini-3-flash-preview`
-4. **備援**：`github-copilot/claude-sonnet-4.6`
-
-#### Gemini 前端優勢：
+**為何 Gemini 適合前端高發想任務：**
 - 視覺理解能力強，適合處理設計稿轉換
 - CSS 生成品質穩定，較少無效屬性
 - 響應式斷點建議符合實務
 - 組件結構建議模組化程度高
+- **發散思維表現佳，適合生成多種 UI 設計方案**
+
+### 3.3 資料查詢模型 / Data-Query Specialist Models
+
+**治理規則：長文規格比對、文件交叉核對、多源資料查詢需使用專職資料查詢模型。**
+
+資料查詢模型專注於：
+- 長文規格比對與差異分析
+- 文件 / 報表 / source-of-truth 核對
+- 跨文件查詢與資料整理
+- 大量文本的資訊擷取
+
+#### 資料查詢模型選擇矩陣
+
+| 任務類型 | 主選模型 | 備援模型 | 升級條件 | 降級條件 |
+|----------|----------|----------|----------|----------|
+| **長文規格比對** | Kimi K2.5 | Claude Sonnet 4.6 | 超過 100K tokens 或跨 5+ 文件 | 單一簡短文件 |
+| **文件/報表核對** | Kimi K2.5 | GLM-5.1 | 技術規格 vs 實作對照 | 純格式檢查 |
+| **跨文件查詢整理** | Kimi K2.5 | Claude Sonnet 4.6 | 需從 10+ 文件提取資訊 | 2-3 文件內查詢 |
+| **Source-of-truth 驗證** | Kimi K2.5 | Claude Opus 4.6 | 關鍵業務數據核對 | 非關鍵數據 |
+| **大量資料批次處理** | GPT-5-nano | Minimax-free | 資料遷移、報表生成 | 人工審查後 |
+
+#### 模型執行狀態說明（已驗證）
+
+| 模型 | 完整名稱 | 狀態 | 資料查詢優勢 |
+|------|----------|------|--------------|
+| Kimi K2.5 | `opencode-go/kimi-k2.5` | ✅ Tier P2 Stable | 超長上下文、中文語境佳、文件理解強 |
+| GLM-5.1 | `opencode-go/glm-5.1` | ✅ Tier P2 Stable | 中文技術文件處理、術語準確 |
+| Claude Sonnet 4.6 | `github-copilot/claude-sonnet-4.6` | ⚠️ Tier P1 Prefix-Sensitive | ⚠️ Tier P1 Prefix-Sensitive — 只建議 /ulw-loop 路徑 |
+| Claude Opus 4.6 | `github-copilot/claude-opus-4.6` | ⚠️ Tier P0 Exploratory | ⚠️ Tier P0 Exploratory — 極不穩定，僅作為嘗試 |
+| GPT-5-nano | `opencode/gpt-5-nano` | ✅ Runnable now | 大量資料低成本處理 |
+
+#### 升級與備援指引
+
+**何時升級至高階模型：**
+- 核對結果影響關鍵業務決策
+- 涉及法規合規性驗證
+- 資料來源超過 10+ 文件且關聯複雜
+- 需要精確的差異比對（如合約條文對照）
+
+**備援啟動時機：**
+- Kimi K2.5 服務異常 → 改用 Claude Sonnet 4.6
+- 中文語境強化需求 → 改用 GLM-5.1
+- 需要更強邏輯推理 → 改用 Claude Opus 4.6
 
 ---
 
@@ -160,14 +253,25 @@ opencode run '/ulw-loop
 **日常工作：**
 | 任務 | 主選模型 | 備援模型 | 備註 |
 |------|----------|----------|------|
-| 新頁面開發 | Gemini-3.1-Pro | Claude Sonnet 4.6 | 優先 Gemini |
-| 組件重構 | Gemini-2.5-Pro | GPT-5.2 | 注意向後相容 |
-| Bug 修復 | Claude Sonnet 4.5 | Gemini Pro | 依複雜度調整 |
-| CSS 調整 | Gemini Flash | GPT-4o | 快速迭代 |
-| API 整合 | Claude Sonnet | GPT-5.2 | 型別檢查 |
-| 測試撰寫 | Claude Sonnet | GPT-5.2 | 覆蓋率優先 |
-| 效能優化 | Claude Opus | GPT-5.4 | 關鍵路徑 |
-| 設計系統 | Gemini Pro | Claude Opus | 一致性優先 |
+| 新頁面開發 | Gemini-3.1-Pro-Preview ✅ | Claude Sonnet 4.6 | UI/UX 高發想首選 |
+| 組件重構 | Gemini-3.1-Pro-Preview ✅ | GPT-5.2 | 注意向後相容 |
+| UI 概念發想 | Gemini-3.1-Pro-Preview ✅ | Claude Sonnet 4.6 | **高發想/發散任務** |
+| 快速原型開發 | Gemini-3-Flash-Preview ✅ | GPT-4o | 快速迭代首選 |
+| CSS 調整 | Gemini-3-Flash-Preview ✅ | GPT-4o | 樣式微調 |
+| RWD/Responsive | Gemini-3.1-Pro-Preview ✅ | Claude Sonnet 4.6 | 切版實作 |
+| 設計系統維護 | Gemini-3.1-Pro-Preview ✅ | Claude Opus 4.6 | 一致性優先 |
+| ~~Gemini-2.5-Pro~~ | — | — | ❌ Listed but TOS/Permission blocked，不可主用 |
+| API 整合 | Claude Sonnet 4.6 | GPT-5.2 | 型別檢查 |
+| Bug 修復 | Claude Sonnet 4.6 | Gemini-3.1-Pro | 依複雜度調整 |
+| 測試撰寫 | Claude Sonnet 4.6 | GPT-5.2 | 覆蓋率優先 |
+| 效能優化 | Claude Opus 4.6 | GPT-5.4 | 關鍵路徑 |
+
+**前端專職模型狀態備註：**
+- ⚠️ `github-copilot/gemini-3.1-pro-preview` = Tier P0 Exploratory，前端高發想/發散/UI 主選嘗試（1 success / 1 not_supported，不保證穩定）
+- ⚠️ `github-copilot/gemini-3-flash-preview` = Tier P0 Exploratory，快速前端迭代（尚未完成完整驗證）
+- ⚠️ `github-copilot/gemini-2.5-pro` = Tier P0 Exploratory，有 forbidden 風險（1 success / 1 forbidden）
+- ⚠️ `github-copilot/claude-sonnet-4.6` = Tier P1 Prefix-Sensitive，**只建議 `/ulw-loop` 路徑**（/ulw-loop: 2/2 success; ulw-loop: 2/2 not_supported）
+- ✅ 穩定回退：`opencode-go/minimax-m2.7` (Tier P2, 4/4 success)
 
 **升級觸發條件：**
 - 涉及核心使用者流程變更
@@ -310,49 +414,79 @@ opencode run '/ulw-loop
 
 ### 5.3 Gemini 系列 (Google)
 
-**Gemini 3.1 Pro / 2.5 Pro**
-- **治理建議**：UI/前端任務首選
+> **重要狀態聲明**：以下 Gemini 模型狀態已實際驗證，必須嚴格區分「可執行」與「Listed but blocked」。
+
+#### ✅ Runnable Now（可立即使用）
+
+**Gemini 3.1 Pro Preview** (`github-copilot/gemini-3.1-pro-preview`)
+- **治理建議**：前端高發想/發散/UI 任務可嘗試，但不保證穩定
+- **執行狀態**：⚠️ Tier P0 Exploratory（1 success / 1 not_supported）
 - **觀察特性**：
   - 視覺理解能力強
   - CSS/HTML 生成精準
   - 響應式設計建議實用
   - 組件結構模組化
+  - **發散思維佳，適合 UI 概念生成**
 - **建議情境**：
-  - 頁面切版
+  - 頁面切版與 RWD 實作
   - CSS 動畫效果
-  - React/Vue 組件
+  - React/Vue 組件開發
+  - **UI 概念發想與互動設計**
   - 設計系統維護
 
-**Gemini Flash**
-- **治理建議**：適用於快速前端迭代
+**Gemini 3 Flash Preview** (`github-copilot/gemini-3-flash-preview`)
+- **治理建議**：快速前端迭代可嘗試，但不保證穩定
+- **執行狀態**：⚠️ Tier P0 Exploratory
 - **觀察特性**：
   - 速度優先
   - 即時反饋
   - 適合迭代開發
   - 低延遲
 - **建議情境**：
-  - 現場調整
-  - 快速試驗
-  - 簡單組件
+  - 現場樣式調整
+  - 快速試驗與原型
+  - 簡單組件開發
   - 樣式微調
+
+#### ❌ Listed but Blocked（不可執行）
+
+**Gemini 2.5 Pro** (`github-copilot/gemini-2.5-pro`)
+- **執行狀態**：⚠️ Tier P0 Exploratory — 回傳 Forbidden / TOS blocked，不保證每次可用
+- **治理規則**：
+  - **不得作為當前可直接主用模型**
+  - 雖列於 provider models 清單，但執行時回傳 Forbidden / TOS blocked
+  - 若未來狀態改變，需重新驗證後更新本政策
+- **當前替代方案**：使用 opencode-go/kimi-k2.5 或 opencode-go/glm-5.1（Tier P2 穩定）
 
 ### 5.4 專業型模型
 
-**Kimi K2.5 (Moonshot)**
-- **定位**：長文本與文件
-- **適用**：大型文件分析、技術文件
-- **特點**：
-  - 超長上下文視窗
-  - 文件理解能力強
+#### 資料查詢專職 / Data-Query Specialist
+
+**Kimi K2.5 (Moonshot)** — `opencode-go/kimi-k2.5`
+- **定位**：**資料查詢與長文本分析主選**
+- **執行狀態**：✅ Runnable now（已驗證）
+- **核心強項**：
+  - **長文規格比對**：跨文件差異分析、版本對照
+  - **文件核對**：技術規格 vs 實作對照、報表交叉驗證
+  - **跨文件查詢**：從多份文件中擷取並整合資訊
+  - **超長上下文視窗**：支援大量文本的一次性處理
   - 中文語境理解佳
-  - 適合技術寫作
 - **建議情境**：
-  - 技術規格書撰寫
+  - 長文規格比對與差異分析
+  - Source-of-truth 文件核對
+  - 技術規格書撰寫與審查
   - 大型 codebase 分析
   - API 文件生成
-  - 多語言文件
+  - 多語言文件處理
+  - 報表/數據交叉驗證
+- **升級條件**：超過 100K tokens、跨 5+ 文件、關鍵業務數據核對
+- **備援模型**：Claude Sonnet 4.6（結構化分析）、GLM-5.1（中文強化）
 
-**GLM-5 / GLM-5.1 (Zhipu)**
+#### 其他專業模型
+
+**GLM-5 / GLM-5.1 (Zhipu)** — `opencode-go/glm-5.1`
+- **定位**：中文語境強化
+- **執行狀態**：✅ Runnable now
 - **治理建議**：適用於中文語境強化場景
 - **觀察特性**：
   - 中文表達自然
@@ -360,12 +494,15 @@ opencode run '/ulw-loop
   - 文化語境理解
   - 適合華語團隊
 - **建議情境**：
-  - 中文技術文件
+  - 中文技術文件撰寫與審查
   - 在地化內容
   - 團隊溝通文件
   - 中文程式碼註解
+- **資料查詢備援**：當 Kimi K2.5 無法使用且需中文語境時
 
-**Minimax M2.5 / M2.7**
+**Minimax M2.5 / M2.7** — `opencode-go/minimax-m2.5`
+- **定位**：對話介面與流程設計
+- **執行狀態**：✅ Runnable now
 - **治理建議**：適用於對話介面、流程設計
 - **觀察特性**：
   - 對話流暢自然
@@ -699,6 +836,7 @@ opencode run '/ulw-loop
 本政策與以下文件協同運作：
 
 - **OPENCODE_TEAM_STANDARD.md** — 基礎執行規範與 workdir 要求
+- **docs/opencode-executable-whitelist-matrix.md** — 最新 Runtime 驗證狀態與嘗試順序（衝突時以此為準）
 - **docs/uiux-task-board.md** — Frontend 任務細節與驗收標準
 - **docs/backend-task-board.md** — Backend 任務細節
 - **docs/tester-task-board.md** — QA 任務細節
@@ -724,15 +862,30 @@ opencode run '/ulw-loop
 **常用任務一鍵查詢：**
 
 ```
-新頁面開發    → Gemini-3.1-Pro / workdir=/home/beer8/team-workspace/UI-UX
-API 開發      → Claude Sonnet 4.6 / workdir=/home/beer8/team-workspace/UI-UX
-Bug 修復      → Claude Sonnet 4.5 / workdir=/home/beer8/team-workspace/UI-UX
-測試撰寫      → Claude Sonnet / workdir=/home/beer8/team-workspace/UI-UX
-文件整理      → Kimi K2.5 / workdir=/home/beer8/team-workspace/UI-UX
-效能優化      → Claude Opus / workdir=/home/beer8/team-workspace/UI-UX
-緊急修復      → GPT-4o / workdir=/home/beer8/team-workspace/UI-UX
-批次處理      → GPT-5-nano / workdir=/home/beer8/team-workspace/UI-UX
+新頁面開發          → Gemini-3.1-Pro-Preview / workdir=/home/beer8/team-workspace/UI-UX
+UI 概念發想         → Gemini-3.1-Pro-Preview / workdir=/home/beer8/team-workspace/UI-UX
+前端快速迭代        → Gemini-3-Flash-Preview / workdir=/home/beer8/team-workspace/UI-UX
+API 開發            → Claude Sonnet 4.6 / workdir=/home/beer8/team-workspace/UI-UX
+Bug 修復            → Claude Sonnet 4.6 / workdir=/home/beer8/team-workspace/UI-UX
+測試撰寫            → Claude Sonnet 4.6 / workdir=/home/beer8/team-workspace/UI-UX
+長文規格比對        → Kimi K2.5 / workdir=/home/beer8/team-workspace/UI-UX
+文件/報表核對       → Kimi K2.5 / workdir=/home/beer8/team-workspace/UI-UX
+Source-of-truth 驗證 → Kimi K2.5 / workdir=/home/beer8/team-workspace/UI-UX
+效能優化            → Claude Opus 4.6 / workdir=/home/beer8/team-workspace/UI-UX
+緊急修復            → GPT-4o / workdir=/home/beer8/team-workspace/UI-UX
+批次處理            → GPT-5-nano / workdir=/home/beer8/team-workspace/UI-UX
 ```
+
+**前端專職模型注意事項：**
+- ⚠️ Gemini-3.1-Pro-Preview = Tier P0 Exploratory，高發想/UI 首選嘗試（不保證穩定）
+- ⚠️ Gemini-3-Flash-Preview = Tier P0 Exploratory，快速迭代嘗試（不保證穩定）
+- ⚠️ Gemini-2.5-Pro = Tier P0 Exploratory，有 forbidden 風險
+- ⚠️ Claude Sonnet 4.6 = Tier P1 Prefix-Sensitive，**只建議 `/ulw-loop` 路徑**
+- ✅ 穩定回退：Minimax M2.7 (Tier P2)
+
+**資料查詢模型注意事項：**
+- ✅ Kimi K2.5 = 長文比對/文件核對主選
+- 備援：Claude Sonnet 4.6（結構化分析）、GLM-5.1（中文強化）
 
 ### 9.2 例外處理流程
 
@@ -756,6 +909,9 @@ Bug 修復      → Claude Sonnet 4.5 / workdir=/home/beer8/team-workspace/UI-UX
 | **降級** | 因成本或速度考量改用較輕量模型 |
 | **category** | OpenCode 任務分類（visual-engineering, ultrabrain, etc.） |
 | **skills** | OpenCode 技能外掛，增強特定領域能力 |
+| **Tier P0** | Premium Exploratory — 高端模型，不保證穩定可用 |
+| **Tier P1** | Upper-Mid Fallback — 中高階模型，有約束條件（如 prefix-sensitive） |
+| **Tier P2** | Stable Mid-Tier — 穩定中階模型，4/4 runtime 驗證通過 |
 
 ---
 
@@ -763,6 +919,8 @@ Bug 修復      → Claude Sonnet 4.5 / workdir=/home/beer8/team-workspace/UI-UX
 
 | 版本 | 日期 | 修訂內容 | 作者 |
 |------|------|----------|------|
+| 1.2 | 2026-04-15 | 新增 Section 0「最新 Runtime 覆蓋規則」引用白名單矩陣文件（`docs/opencode-executable-whitelist-matrix.md`）；修正多處模型狀態與最新 runtime 事實衝突：Claude Opus 4.6/4.5、GPT-5.4/5.2/5.1、Gemini 3.1 Pro/2.5 Pro 標記為 Tier P0 Exploratory；Claude Sonnet 4.6 標記為 Tier P1 Prefix-Sensitive（只建議 `/ulw-loop`）；所有 Copilot 模型加入不穩定性警告；更新 Section 4.1、5.3、9.1 狀態備註；Section 8.1 新增白名單矩陣引用 | Engineering Team |
+| 1.1 | 2026-04-15 | 增補兩類模型治理規則：(1) 新增 Section 3.2「前端專職模型」，明確 Gemini 系列為 frontend-specialist family，區分高發想/發散任務與實作型任務，明確標示 Gemini-2.5-Pro 為 listed but blocked 不可主用；(2) 新增 Section 3.3「資料查詢模型」，定義 Kimi K2.5 為長文規格比對/文件核對主選；更新 Section 4.1 Frontend Developer 表格與 Section 5.3 Gemini 系列說明；更新 OPENCODE_TEAM_STANDARD.md 索引 | Engineering Team |
 | 1.0 | 2026-04-15 | 初始版本：建立完整模型選擇治理框架，納入 Gemini UI/前端強項規範，定義各角色策略與 workdir 強制規則 | Engineering Team |
 
 ---

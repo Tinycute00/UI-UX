@@ -1,0 +1,61 @@
+{
+  "console": [
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "timestamp": "2026-04-15T04:38:51.728Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "timestamp": "2026-04-15T04:38:51.852Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "timestamp": "2026-04-15T04:38:52.635Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "timestamp": "2026-04-15T04:38:52.663Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "timestamp": "2026-04-15T04:38:52.779Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "timestamp": "2026-04-15T04:38:52.780Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "timestamp": "2026-04-15T04:38:52.780Z"
+    }
+  ],
+  "errors": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "timestamp": "2026-04-15T04:38:52.779Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "timestamp": "2026-04-15T04:38:52.780Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "timestamp": "2026-04-15T04:38:52.780Z"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "errors": 3,
+    "hasBlockingErrors": false
+  }
+}

@@ -35,6 +35,8 @@
 
 ## Detailed Findings
 
+**Rule-sync note:** This report must be revalidated against the current workspace using the latest QA rule set: `/ulw-loop` with `workdir=/home/beer8/team-workspace/UI-UX`, and all conclusions must distinguish source-review evidence from browser/runtime/live evidence.
+
 ### Requirement 1: v-docs Filter Bar - 6 Buttons
 **Status:** ✅ **PASSED**
 

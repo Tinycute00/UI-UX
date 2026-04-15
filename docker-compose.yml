@@ -17,9 +17,10 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       DATABASE_URL: "postgresql://pmis_admin:***@host.docker.internal:5432/public_works_db"
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: "3000"
       CORS_ORIGIN: "*"
+      JWT_SECRET: "dev-secret-key-at-least-32-characters-long!"
     ports:
       - "3000:3000"
     volumes:

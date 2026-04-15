@@ -140,3 +140,12 @@ Current DB situation:
 - **Live/staging execution is still blocked** by missing credentials, unresolved role names, and incomplete rollout readiness
 
 Tiny can now start by aligning with the existing BE-305 Prisma + DB-303 draft, but must first confirm live environment credentials and role names before any claim of deployment completion.
+
+## 7) Closed-loop reporting rule added
+
+- Any Database task that produces a completed or partially completed result must be reported to the exact PM target thread immediately after the evidence-backed summary is written.
+- A local report file is **not** considered closed-loop completion.
+- The required carriers for this rule are:
+  - this document
+  - `docs/db-patrol-reality-20260415.md`
+  - shared memory / workflow guidance

@@ -1,0 +1,260 @@
+{
+  "timestamp": "2026-04-15T04:54:39.584Z",
+  "url": "http://localhost:5180",
+  "console": [
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-04-15T04:54:41.117Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-04-15T04:54:41.170Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connecting...",
+      "time": "2026-04-15T04:54:42.589Z"
+    },
+    {
+      "type": "debug",
+      "text": "[vite] connected.",
+      "time": "2026-04-15T04:54:42.597Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "time": "2026-04-15T04:54:42.732Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "time": "2026-04-15T04:54:42.733Z"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+      "time": "2026-04-15T04:54:42.733Z"
+    }
+  ],
+  "network": [
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/adapters/auth-adapter.js",
+      "time": "2026-04-15T04:54:40.965Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://localhost:5180/src/api/adapters/auth-adapter.js",
+      "time": "2026-04-15T04:54:40.967Z",
+      "body": null
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/config.js",
+      "time": "2026-04-15T04:54:40.968Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/client.js",
+      "time": "2026-04-15T04:54:40.968Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://localhost:5180/src/api/config.js",
+      "time": "2026-04-15T04:54:40.978Z",
+      "body": null
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://localhost:5180/src/api/client.js",
+      "time": "2026-04-15T04:54:40.979Z",
+      "body": null
+    },
+    {
+      "type": "request",
+      "method": "POST",
+      "url": "http://localhost:5180/api/v1/auth/login",
+      "time": "2026-04-15T04:54:41.980Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://localhost:5180/api/v1/auth/login",
+      "time": "2026-04-15T04:54:42.337Z",
+      "body": null
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/adapters/auth-adapter.js",
+      "time": "2026-04-15T04:54:42.588Z"
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://localhost:5180/src/api/adapters/auth-adapter.js",
+      "time": "2026-04-15T04:54:42.596Z",
+      "body": null
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/config.js",
+      "time": "2026-04-15T04:54:42.597Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/client.js",
+      "time": "2026-04-15T04:54:42.597Z"
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://localhost:5180/src/api/config.js",
+      "time": "2026-04-15T04:54:42.601Z",
+      "body": null
+    },
+    {
+      "type": "response",
+      "status": 304,
+      "url": "http://localhost:5180/src/api/client.js",
+      "time": "2026-04-15T04:54:42.607Z",
+      "body": null
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/index.js",
+      "time": "2026-04-15T04:54:42.609Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/adapters/dashboard-adapter.js",
+      "time": "2026-04-15T04:54:42.614Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://localhost:5180/src/api/index.js",
+      "time": "2026-04-15T04:54:42.616Z",
+      "body": null
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/src/api/adapters/valuation-adapter.js",
+      "time": "2026-04-15T04:54:42.616Z"
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://localhost:5180/src/api/adapters/valuation-adapter.js",
+      "time": "2026-04-15T04:54:42.629Z",
+      "body": null
+    },
+    {
+      "type": "response",
+      "status": 200,
+      "url": "http://localhost:5180/src/api/adapters/dashboard-adapter.js",
+      "time": "2026-04-15T04:54:42.630Z",
+      "body": null
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/progress",
+      "time": "2026-04-15T04:54:42.670Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/work-items",
+      "time": "2026-04-15T04:54:42.670Z"
+    },
+    {
+      "type": "request",
+      "method": "GET",
+      "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/subcontractors",
+      "time": "2026-04-15T04:54:42.670Z"
+    },
+    {
+      "type": "response",
+      "status": 400,
+      "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/work-items",
+      "time": "2026-04-15T04:54:42.732Z",
+      "body": null
+    },
+    {
+      "type": "response",
+      "status": 400,
+      "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/progress",
+      "time": "2026-04-15T04:54:42.733Z",
+      "body": null
+    },
+    {
+      "type": "response",
+      "status": 400,
+      "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/subcontractors",
+      "time": "2026-04-15T04:54:42.733Z",
+      "body": null
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    {
+      "name": "01-login-page",
+      "path": "docs/qa/evidence/fe003-rerun-20260415/01-login-page.png"
+    },
+    {
+      "name": "02-dashboard-loaded",
+      "path": "docs/qa/evidence/fe003-rerun-20260415/02-dashboard-loaded.png"
+    },
+    {
+      "name": "03-dashboard-data",
+      "path": "docs/qa/evidence/fe003-rerun-20260415/03-dashboard-data.png"
+    }
+  ],
+  "summary": {
+    "workItemsApi": {
+      "status": 400,
+      "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/work-items",
+      "body": null
+    },
+    "subcontractorsApi": {
+      "status": 400,
+      "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/subcontractors",
+      "body": null
+    },
+    "dashboardStatus": "error",
+    "blockers": [
+      {
+        "type": "runtime",
+        "message": "work-items API returned 400",
+        "details": {
+          "status": 400,
+          "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/work-items",
+          "body": null
+        }
+      },
+      {
+        "type": "runtime",
+        "message": "subcontractors API returned 400",
+        "details": {
+          "status": 400,
+          "url": "http://localhost:5180/api/v1/projects/PROJ-2025-001/subcontractors",
+          "body": null
+        }
+      }
+    ]
+  }
+}
