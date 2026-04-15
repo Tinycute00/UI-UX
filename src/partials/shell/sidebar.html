@@ -76,10 +76,16 @@
   </nav>
 
   <div class="sb-user">
-    <div class="sb-avatar">王</div>
-    <div class="sb-user-info">
-      <div class="sb-uname">王建明</div>
-      <div class="sb-urole">Site Manager</div>
+    <div class="sb-user-main">
+      <div class="sb-avatar" id="sb-avatar">王</div>
+      <div class="sb-user-info">
+        <div class="sb-uname" id="sb-uname">王建明</div>
+        <div class="sb-urole" id="sb-urole">Site Manager</div>
+      </div>
     </div>
+    <button class="sb-logout" type="button" data-action="logout-user" title="登出">
+      <span class="ic s14"><svg><use href="#ic-lock"/></svg></span>
+      <span class="sb-logout-txt">登出</span>
+    </button>
   </div>
 </aside>

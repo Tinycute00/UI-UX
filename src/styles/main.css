@@ -335,8 +335,15 @@ body {
   border-top: 1px solid var(--bd1);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 9px;
   flex-shrink: 0;
+}
+.sb-user-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
 }
 .sb-avatar {
   width: 30px;
@@ -361,6 +368,27 @@ body {
   font-family: var(--fm);
   font-size: 9px;
   color: var(--tx3);
+}
+.sb-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--bd2);
+  background: var(--s2);
+  color: var(--tx2);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: .12s;
+}
+.sb-logout:hover {
+  background: var(--s3);
+  color: var(--tx1);
+}
+.sb-logout-txt {
+  font-size: 11px;
+  font-weight: 600;
 }
 
 /* ═══════════════════════════════════════════
@@ -2179,7 +2207,8 @@ hr.div {
 .sidebar.collapsed .nbg,
 .sidebar.collapsed .sb-section,
 .sidebar.collapsed .sb-online,
-.sidebar.collapsed .sb-user-info {
+.sidebar.collapsed .sb-user-info,
+.sidebar.collapsed .sb-logout-txt {
   display: none !important;
 }
 
@@ -2195,6 +2224,9 @@ hr.div {
 }
 .sidebar.collapsed .sb-user {
   padding: 10px 0;
+  justify-content: center;
+}
+.sidebar.collapsed .sb-user-main {
   justify-content: center;
 }
 .sidebar.collapsed .nav-item {

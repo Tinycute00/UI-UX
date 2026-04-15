@@ -1,11 +1,33 @@
 /* ═══ API 全局配置 ═══ */
 
+function detectApiMode() {
+  var demoFlag = null;
+  var host = '';
+
+  if (typeof window === 'undefined' || !window.location) {
+    return 'api';
+  }
+
+  demoFlag = new URLSearchParams(window.location.search).get('demo');
+  host = window.location.hostname || '';
+
+  if (demoFlag === '1') {
+    return 'mock';
+  }
+
+  if (host.indexOf('github.io') > -1) {
+    return 'mock';
+  }
+
+  return 'api';
+}
+
 /**
  * API 運作模式
- * - 'mock': 使用本地靜態資料 (預設)
+ * - 'mock': 使用本地靜態資料 / Demo Login（GitHub Pages 或 ?demo=1）
  * - 'api': 使用真實 API endpoints
  */
-export var API_MODE = 'api';
+export var API_MODE = detectApiMode();
 
 /**
  * API 基礎路徑

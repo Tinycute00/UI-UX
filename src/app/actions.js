@@ -1,5 +1,5 @@
 import { IR_DETAILS, IR_NOTES, NCR_DETAILS } from '../data/quality.js';
-import { getWorkDetailById, getSubcontractorDetailById } from '../api/index.js';
+import { getWorkDetailById, getSubcontractorDetailById, logout } from '../api/index.js';
 import { MATERIAL_DETAILS, MATERIAL_QC_DETAILS } from '../data/materials.js';
 import { BILLING_DETAILS } from '../data/finance.js';
 import { MORNING_VIEW_DETAILS } from '../data/meetings.js';
@@ -272,6 +272,9 @@ const actionHandlers = {
       actionElement,
       requireDatasetValue(actionElement, 'label'),
     );
+  },
+  'logout-user': () => {
+    logout();
   },
   'open-drawer': () => {
     openDr();

@@ -1,4 +1,5 @@
 import { initModals, toast } from '../js/modals.js';
+import { getStoredUser } from '../api/index.js';
 import { getActiveViewId, syncHomeButtonVisibility } from '../js/navigation.js';
 import { initSafety } from '../js/safety.js';
 import { initActionDispatcher } from './actions.js';
@@ -34,6 +35,29 @@ function initWelcomeToast() {
   }, 900);
 }
 
+function initUserShell() {
+  const user = getStoredUser();
+  const avatar = document.getElementById('sb-avatar');
+  const name = document.getElementById('sb-uname');
+  const role = document.getElementById('sb-urole');
+
+  if (!user) {
+    return;
+  }
+
+  if (avatar) {
+    avatar.textContent = (user.displayName || user.username || 'D').charAt(0);
+  }
+
+  if (name) {
+    name.textContent = user.displayName || user.username || 'Demo User';
+  }
+
+  if (role) {
+    role.textContent = user.roleLabel || user.role || 'Demo';
+  }
+}
+
 export function bootstrapApp() {
   initModals();
   initSafety();
@@ -41,5 +65,6 @@ export function bootstrapApp() {
   initDashboard();
   initDateDisplay();
   initResponsiveHomeButton();
+  initUserShell();
   initWelcomeToast();
 }

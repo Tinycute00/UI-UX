@@ -72,6 +72,27 @@
       margin-top: 6px;
     }
 
+    .demo-note {
+      background: rgba(200, 145, 26, 0.1);
+      border: 1px solid rgba(200, 145, 26, 0.35);
+      border-radius: var(--r);
+      color: var(--tx1);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      padding: 12px 14px;
+    }
+
+    .demo-note strong {
+      color: var(--gold-txt);
+    }
+
+    .demo-note code {
+      color: var(--gold-txt);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+    }
+
     .form-group {
       margin-bottom: 20px;
     }
@@ -155,6 +176,11 @@
     <div class="login-logo">
       <h1>大成工程 PMIS</h1>
       <p>工地管理資訊系統</p>
+    </div>
+
+    <div class="demo-note">
+      <strong>Demo Login</strong><br>
+      帳號：<code>admin</code>／密碼：<code>password123</code>
     </div>
 
     <form id="login-form" novalidate>
