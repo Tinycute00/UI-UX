@@ -9,23 +9,35 @@ function getAccessToken() {
   }
 }
 
-function handleHttpError(response) {
+function handleHttpError(response, bodyData) {
   var status = response.status;
+  var serverMessage = null;
   var errorMessage = '請求失敗';
 
-  if (status === 401) {
-    errorMessage = '登入已過期，請重新登入';
-    window.location.href = '/login.html';
-  } else if (status === 403) {
-    errorMessage = '您沒有權限執行此操作';
-  } else if (status === 404) {
-    errorMessage = '找不到請求的資料';
-  } else if (status === 500) {
-    errorMessage = '伺服器發生錯誤，請稍後再試';
-  } else if (status >= 400 && status < 500) {
-    errorMessage = '請求參數錯誤';
-  } else if (status >= 500) {
-    errorMessage = '伺服器暫時無法回應';
+  if (bodyData) {
+    serverMessage = (bodyData.error && bodyData.error.message) || bodyData.message || null;
+  }
+
+  if (serverMessage) {
+    errorMessage = serverMessage;
+    if (status === 401) {
+      window.location.href = '/login.html';
+    }
+  } else {
+    if (status === 401) {
+      errorMessage = '登入已過期，請重新登入';
+      window.location.href = '/login.html';
+    } else if (status === 403) {
+      errorMessage = '您沒有權限執行此操作';
+    } else if (status === 404) {
+      errorMessage = '找不到請求的資料';
+    } else if (status === 500) {
+      errorMessage = '伺服器發生錯誤，請稍後再試';
+    } else if (status >= 400 && status < 500) {
+      errorMessage = '請求參數錯誤';
+    } else if (status >= 500) {
+      errorMessage = '伺服器暫時無法回應';
+    }
   }
 
   toast(errorMessage, 'te');
@@ -69,7 +81,11 @@ export function apiGet(path, params) {
   })
     .then(function (response) {
       if (!response.ok) {
-        return handleHttpError(response);
+        return response.json().catch(function () {
+          return null;
+        }).then(function (bodyData) {
+          return handleHttpError(response, bodyData);
+        });
       }
       return response.json().then(function (data) {
         return { data: data, error: null };
@@ -105,7 +121,11 @@ export function apiPost(path, body) {
   })
     .then(function (response) {
       if (!response.ok) {
-        return handleHttpError(response);
+        return response.json().catch(function () {
+          return null;
+        }).then(function (bodyData) {
+          return handleHttpError(response, bodyData);
+        });
       }
       return response.json().then(function (data) {
         return { data: data, error: null };
