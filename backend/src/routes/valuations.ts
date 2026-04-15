@@ -11,17 +11,57 @@ import { authenticate } from '../plugins/jwtAuth.js';
  * DB_PENDING: Replace stub data with Prisma queries once valuations schema is migrated.
  *
  * Registered at: /api/v1/valuations
+ *
+ * CONTRACT ALIGNMENT (BE-FE004-VALUATIONS-CONTRACT-ALIGN-20260415):
+ *   Canonical status enum (per api-contracts-v1.md):
+ *     draft | pending_review | approved | rejected | paid
+ *   Legacy aliases accepted (mapped to canonical before filtering):
+ *     'pending'   → 'pending_review'   (QA / FE shorthand)
+ *     'submitted' → 'pending_review'   (old BE stub value)
  */
 
+// ─── Status alias map ─────────────────────────────────────────────────────────
+// Maps legacy / shorthand status strings to canonical values.
+// This allows QA and FE to pass 'pending' or 'submitted' without a 400.
+const STATUS_ALIAS: Record<string, string> = {
+  pending: 'pending_review',
+  submitted: 'pending_review',
+};
+
 // ─── Query schema ─────────────────────────────────────────────────────────────
+const CANONICAL_STATUSES = ['draft', 'pending_review', 'approved', 'rejected', 'paid'] as const;
+type CanonicalStatus = (typeof CANONICAL_STATUSES)[number];
+
+/**
+ * Resolve a raw status string to a canonical value.
+ * Returns the canonical value if valid (after alias resolution),
+ * or null if the input is not recognised.
+ */
+function resolveStatus(raw: string): CanonicalStatus | null {
+  const resolved = STATUS_ALIAS[raw] ?? raw;
+  if ((CANONICAL_STATUSES as readonly string[]).includes(resolved)) {
+    return resolved as CanonicalStatus;
+  }
+  return null;
+}
+
 const ValuationsQuerySchema = z.object({
   projectId: z
     .string()
     .optional()
     .transform((v) => (v ? parseInt(v, 10) : undefined)),
   status: z
-    .enum(['draft', 'submitted', 'approved', 'rejected'])
-    .optional(),
+    .string()
+    .optional()
+    .refine(
+      (v) => v === undefined || resolveStatus(v) !== null,
+      (v) => ({
+        message: `Invalid status "${v}". Accepted: ${CANONICAL_STATUSES.join(', ')} (aliases: pending, submitted)`,
+      }),
+    )
+    .transform((v): CanonicalStatus | undefined =>
+      v === undefined ? undefined : (resolveStatus(v) as CanonicalStatus),
+    ),
   page: z
     .string()
     .optional()
@@ -33,6 +73,7 @@ const ValuationsQuerySchema = z.object({
 });
 
 // ─── Stub data ────────────────────────────────────────────────────────────────
+// Status uses canonical values: draft | pending_review | approved | rejected | paid
 const STUB_VALUATIONS = [
   {
     valuationId: 1,
@@ -51,7 +92,7 @@ const STUB_VALUATIONS = [
     projectName: '台中辦公大樓新建工程',
     period: '2025-02',
     amount: 3800000,
-    status: 'submitted',
+    status: 'pending_review',   // was 'submitted' — aligned to canonical contract
     submittedAt: '2025-02-28T17:45:00Z',
     approvedAt: null,
     submittedBy: { userId: 1, username: 'pm_wang', displayName: '王專案' },
