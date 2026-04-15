@@ -23,10 +23,11 @@ describe('AuthRepositoryStub', () => {
 
   describe('findUserByUsername', () => {
     it('returns stub user for known username', async () => {
-      const user = await repo.findUserByUsername('stub_user');
+      // BE-307: stub now uses 'admin' as primary username (legacy 'stub_user' still accepted)
+      const user = await repo.findUserByUsername('admin');
       expect(user).not.toBeNull();
-      expect(user!.username).toBe('stub_user');
-      expect(user!.email).toBe('stub@example.com');
+      expect(user!.username).toBe('admin');
+      expect(user!.email).toBe('admin@pmis.local');
       expect(user!.role).toBe('admin');
       expect(user!.isActive).toBe(true);
     });
@@ -41,10 +42,11 @@ describe('AuthRepositoryStub', () => {
 
   describe('findUserByEmail', () => {
     it('returns stub user for known email', async () => {
-      const user = await repo.findUserByEmail('stub@example.com');
+      // BE-307: stub uses admin@pmis.local as primary email (legacy stub@example.com also accepted)
+      const user = await repo.findUserByEmail('admin@pmis.local');
       expect(user).not.toBeNull();
-      expect(user!.email).toBe('stub@example.com');
-      expect(user!.username).toBe('stub_user');
+      expect(user!.email).toBe('admin@pmis.local');
+      expect(user!.username).toBe('admin');
       expect(user!.role).toBe('admin');
       expect(user!.isActive).toBe(true);
     });

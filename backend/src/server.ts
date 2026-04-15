@@ -6,6 +6,9 @@ import { config } from './config.js';
 import requestIdPlugin from './plugins/requestId.js';
 import healthRoute from './routes/health.js';
 import authRoute from './routes/auth.js';
+import projectsRoute from './routes/projects.js';
+import valuationsRoute from './routes/valuations.js';
+import safetyInspectionsRoute from './routes/safety-inspections.js';
 
 /**
  * 建立並設定 Fastify 應用程式
@@ -75,6 +78,9 @@ export async function build() {
     async (v1) => {
       await v1.register(healthRoute);
       await v1.register(authRoute, { prefix: '/auth' });
+      await v1.register(projectsRoute, { prefix: '/projects' });
+      await v1.register(valuationsRoute, { prefix: '/valuations' });
+      await v1.register(safetyInspectionsRoute, { prefix: '/safety-inspections' });
     },
     { prefix: '/api/v1' },
   );
