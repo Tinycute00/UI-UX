@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>登入 — 大成工程 PMIS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #17140e;
+      --s1: #1f1b13;
+      --s2: #272318;
+      --s3: #302c1f;
+      --s4: #3a3526;
+      --bd1: #3a3322;
+      --bd2: #4a4330;
+      --gold: #c8911a;
+      --gold-lt: #dda828;
+      --gold-txt: #f0c050;
+      --red: #b84444;
+      --tx1: #ede5d5;
+      --tx2: #9a9080;
+      --tx3: #5c5445;
+      --fn: "Oswald", "Noto Sans TC", sans-serif;
+      --fs: "Source Sans 3", "Noto Sans TC", sans-serif;
+      --r: 6px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--tx1);
+      font-family: var(--fs);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: var(--s2);
+      border: 1px solid var(--bd1);
+      border-radius: var(--r);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-logo h1 {
+      font-family: var(--fn);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--gold-txt);
+      letter-spacing: 0.04em;
+      line-height: 1.2;
+    }
+
+    .login-logo p {
+      font-size: 13px;
+      color: var(--tx2);
+      margin-top: 6px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--tx2);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: var(--s1);
+      border: 1px solid var(--bd2);
+      border-radius: var(--r);
+      color: var(--tx1);
+      font-family: var(--fs);
+      font-size: 15px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--gold);
+    }
+
+    .form-group input::placeholder {
+      color: var(--tx3);
+    }
+
+    .error-msg {
+      display: none;
+      background: rgba(184, 68, 68, 0.12);
+      border: 1px solid var(--red);
+      border-radius: var(--r);
+      color: var(--red);
+      font-size: 13px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+    }
+
+    .error-msg.visible {
+      display: block;
+    }
+
+    .btn-login {
+      width: 100%;
+      background: var(--gold);
+      border: none;
+      border-radius: var(--r);
+      color: var(--bg);
+      cursor: pointer;
+      font-family: var(--fn);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 12px;
+      transition: background 0.15s;
+    }
+
+    .btn-login:hover:not(:disabled) {
+      background: var(--gold-lt);
+    }
+
+    .btn-login:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn-login.loading::after {
+      content: " …";
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card" role="main">
+    <div class="login-logo">
+      <h1>大成工程 PMIS</h1>
+      <p>工地管理資訊系統</p>
+    </div>
+
+    <form id="login-form" novalidate>
+      <div id="login-error" class="error-msg" role="alert" aria-live="polite"></div>
+
+      <div class="form-group">
+        <label for="username">帳號</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          autocomplete="username"
+          placeholder="請輸入帳號"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">密碼</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="請輸入密碼"
+          required
+        >
+      </div>
+
+      <button id="login-btn" class="btn-login" type="submit">登入</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { isAuthenticated } from './src/api/adapters/auth-adapter.js';
+    import { login } from './src/api/adapters/auth-adapter.js';
+
+    // If already authenticated, redirect to main app
+    if (isAuthenticated()) {
+      window.location.replace('/index.html');
+    }
+
+    var form = document.getElementById('login-form');
+    var errorEl = document.getElementById('login-error');
+    var btn = document.getElementById('login-btn');
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.add('visible');
+    }
+
+    function clearError() {
+      errorEl.textContent = '';
+      errorEl.classList.remove('visible');
+    }
+
+    function setLoading(loading) {
+      btn.disabled = loading;
+      if (loading) {
+        btn.classList.add('loading');
+        btn.textContent = '登入中';
+      } else {
+        btn.classList.remove('loading');
+        btn.textContent = '登入';
+      }
+    }
+
+    form.addEventListener('submit', function (e) {
+      var username;
+      var password;
+
+      e.preventDefault();
+      clearError();
+
+      username = document.getElementById('username').value.trim();
+      password = document.getElementById('password').value;
+
+      if (!username) {
+        showError('請輸入帳號');
+        document.getElementById('username').focus();
+        return;
+      }
+
+      if (!password) {
+        showError('請輸入密碼');
+        document.getElementById('password').focus();
+        return;
+      }
+
+      setLoading(true);
+
+      login(username, password)
+        .then(function () {
+          window.location.replace('/index.html');
+        })
+        .catch(function (err) {
+          setLoading(false);
+          var msg = (err && err.message) ? err.message : '帳號或密碼錯誤，請重試';
+          if (msg === 'INVALID_CREDENTIALS' || msg.includes('帳號或密碼錯誤')) {
+            showError('帳號或密碼錯誤，請重新輸入');
+          } else {
+            showError('登入失敗：' + msg);
+          }
+        });
+    });
+
+    // Allow Enter key on password field
+    document.getElementById('password').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        form.dispatchEvent(new Event('submit'));
+      }
+    });
+  </script>
+</body>
+</html>

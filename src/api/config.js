@@ -5,7 +5,7 @@
  * - 'mock': 使用本地靜態資料 (預設)
  * - 'api': 使用真實 API endpoints
  */
-export var API_MODE = 'mock';
+export var API_MODE = 'api';
 
 /**
  * API 基礎路徑
