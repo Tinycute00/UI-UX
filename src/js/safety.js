@@ -1,4 +1,6 @@
 import { toast } from './modals.js';
+import { apiPost } from '../api/client.js';
+import { API_MODE, DEFAULT_PROJECT_ID } from '../api/config.js';
 
 /* ═══ SAFETY WIZARD ═══ */
 /* ═══ 工安巡檢步驟控制 ═══ */
@@ -220,10 +222,101 @@ export function safetyCancel() {
 }
 
 export function safetySend() {
-  if (!document.getElementById('sf-confirm').checked) {
+  var confirmBox = document.getElementById('sf-confirm');
+  var inspectorName = '';
+  var user = null;
+  var today = '';
+  var step1 = null;
+  var checked = [];
+  var container = null;
+  var items = [];
+  var rows = [];
+  var i = 0;
+  var row = null;
+  var acts = null;
+  var label = null;
+  var result = '';
+  var allPass = true;
+  var body = null;
+
+  if (!confirmBox || !confirmBox.checked) {
     toast('請勾選安危確認聲明後再送出', 'tw');
     return;
   }
-  document.getElementById('safety-wizard').style.display = 'none';
-  toast('巡檢日報已送出，記錄已存檔', 'ts');
+
+  if (API_MODE === 'mock') {
+    document.getElementById('safety-wizard').style.display = 'none';
+    toast('巡檢日報已送出，記錄已存檔', 'ts');
+    return;
+  }
+
+  inspectorName = '現場工程師';
+  try {
+    user = JSON.parse(sessionStorage.getItem('pmis_user') || 'null');
+    if (user && user.displayName) {
+      inspectorName = user.displayName;
+    }
+  } catch (e) {
+    /* empty */
+  }
+
+  today = new Date().toISOString().slice(0, 10);
+
+  step1 = document.getElementById('sw-step1');
+  if (step1) {
+    checked = [];
+    step1.querySelectorAll('input[type=checkbox]:checked').forEach(function (cb) {
+      checked.push(cb.parentElement.textContent.trim());
+    });
+  }
+
+  container = document.getElementById('sf-checklist');
+  items = [];
+  allPass = true;
+  if (container) {
+    rows = container.querySelectorAll('.cl-item');
+    for (i = 0; i < rows.length; i++) {
+      row = rows[i];
+      label = row.querySelector('span');
+      acts = row.querySelector('.cl-acts');
+      result = 'pass';
+      if (acts) {
+        if (acts.querySelector('.tag.tr') || acts.querySelector('[data-mark="fail"]')) {
+          result = 'fail';
+          allPass = false;
+        }
+      }
+      items.push({
+        category: 'safety',
+        description: label ? label.textContent.trim() : '',
+        result: result,
+      });
+    }
+  }
+
+  if (items.length === 0) {
+    toast('請至少完成一項巡檢查核', 'tw');
+    return;
+  }
+
+  body = {
+    projectId: Number(DEFAULT_PROJECT_ID) || 101,
+    inspectionDate: today,
+    inspectorName: inspectorName,
+    items: items,
+    overallResult: allPass ? 'pass' : 'fail',
+  };
+
+  apiPost('/safety-inspections', body)
+    .then(function (result) {
+      if (result.error) {
+        toast('送出失敗：' + (result.error.message || '請稍後再試'), 'te');
+        return;
+      }
+      document.getElementById('safety-wizard').style.display = 'none';
+      toast('巡檢日報已送出，記錄已存檔', 'ts');
+    })
+    .catch(function () {
+      toast('送出失敗，請稍後再試', 'te');
+    });
 }
