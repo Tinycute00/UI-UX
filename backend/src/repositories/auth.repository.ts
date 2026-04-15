@@ -84,22 +84,28 @@ const STUB_SESSION_ID = BigInt(1);
  *   3. DATABASE_URL is pointed at the live DB
  */
 export class AuthRepositoryStub implements IAuthRepository {
-  // Hardcoded stub credentials — STUB only, not real data
+  // Stub credentials — bcrypt hash of 'password123' (rounds=12)
+  // Generated: bcryptjs.hash('password123', 12)
+  // Verified: bcryptjs.compare('password123', hash) === true
   private readonly stubPasswordHash =
-    '$2b$12$stubHashForTestingDoNotUseInProduction000000000000000000';
+    '$2b$12$qGEsBEvwBjRdHtaqCpTa0eTZ7wDN8nIs22T.rGrpRilpwS1IseNm.';
 
   async findUserByUsername(username: string): Promise<AuthUser | null> {
-    // DB_PENDING: SELECT * FROM auth.users WHERE username = $1
-    if (username === 'stub_user') {
-      return this._stubUser();
+    // DB_PENDING: SELECT * FROM auth.users WHERE username = $1 OR email = $1
+    // Stub accepts 'admin' (primary), 'testuser', legacy 'stub_user', and email addresses
+    if (username === 'admin' || username === 'admin@pmis.local' || username === 'stub_user') {
+      return this._stubUser('admin');
+    }
+    if (username === 'testuser' || username === 'testuser@pmis.local') {
+      return this._stubUser('testuser');
     }
     return null;
   }
 
   async findUserByEmail(email: string): Promise<AuthUser | null> {
     // DB_PENDING: SELECT * FROM auth.users WHERE email = $1
-    if (email === 'stub@example.com') {
-      return this._stubUser();
+    if (email === 'admin@pmis.local' || email === 'stub@example.com') {
+      return this._stubUser('admin');
     }
     return null;
   }
@@ -192,12 +198,17 @@ export class AuthRepositoryStub implements IAuthRepository {
 
   // ─── Private Helpers ──────────────────────────────────────────────────────
 
-  private _stubUser(): AuthUser {
+  private _stubUser(username = 'admin'): AuthUser {
+    // Resolve display name and email based on requested username
+    const displayName =
+      username === 'testuser' ? 'Test User' : username === 'stub_user' ? 'Stub User' : 'Admin User';
+    const email =
+      username === 'testuser' ? 'testuser@pmis.local' : 'admin@pmis.local';
     return {
       id: STUB_USER_ID,
-      username: 'stub_user',
-      displayName: 'Stub User', // DB_PENDING: from auth.users.display_name column
-      email: 'stub@example.com',
+      username,
+      displayName, // DB_PENDING: from auth.users.display_name column
+      email,
       passwordHash: this.stubPasswordHash,
       role: 'admin',
       isActive: true,
