@@ -1,181 +1,312 @@
-# OPS-305 — Auth Migration 執行就緒度盤點報告
+# OPS-305 Auth Migration 執行就緒度盤點報告
 
 **Date:** 2026-04-14  
-**Task:** OPS-305-AUTH-MIGRATION-EXEC-READINESS  
-**Prepared by:** DevOps  
+**Workspace:** `/home/beer8/team-workspace/UI-UX`  
+**Scope:** `auth` schema migration 上線執行就緒度評估  
 **Input sources:**
-- `docs/db-303-live-auth-migration-plan.md` (migration/grants draft)
-- `backend/prisma/schema.prisma`
-- `backend/.env.example`
-- `.github/workflows/ci.yml`
-- `.github/workflows/deploy.yml`
-- `backend/Dockerfile`
+- `docs/db-303-live-auth-migration-plan.md`（DB-303 migration/grants draft）
+- `backend/prisma/schema.prisma`（BE-305 Prisma schema）
+- `backend/.env.example`（環境變數範本）
+- `.github/workflows/ci.yml`（CI pipeline）
+- `.github/workflows/deploy.yml`（部署 pipeline）
+- `backend/Dockerfile`（Docker 建構）
 
-**Status:** ⚠️ 未就緒 — 存在多個 Blocker，目前無法安全執行 live migration
-
----
-
-## Explicit Non-Claims（禁止誤讀事項）
-
-> 本文件**不聲明** auth migration 已執行。  
-> 本文件**不聲明** `auth` schema 已存在於任何 live DB 環境。  
-> 本文件**不聲明** GRANT statements 已被套用。  
-> 本文件**不聲明** staging 決策已解決。  
-> 本文件的任務是**盤點缺口**，不是確認完成。
+**Status:** 🔴 **Not Ready** — 18 項前置條件缺失，8 個 Blocker 需解除。
 
 ---
 
-## 1. 前置條件清單
+## ⚠️ Explicit Non-Claims（不可聲明事項）
+
+1. 本文件 **不聲明** auth schema 已存在於 live DB。
+2. 本文件 **不聲明** DB-303 migration SQL 已執行。
+3. 本文件 **不聲明** 任何 GRANT 已生效或已驗證。
+4. 本文件 **不聲明** staging 環境已就緒或已通過測試。
+5. 本文件 **僅為執行就緒度盤點**，所有狀態標記基於已知事實，不做假設性推斷。
+
+---
+
+## 1. 前置條件清單（Prerequisites Checklist）
+
+### 1.1 目標資料庫連線確認
 
 | # | 前置條件 | 狀態 | 說明 |
 |---|---------|------|------|
-| P-01 | 目標 DB 連線資訊確認（host / port / dbname / SSL policy） | ❌ 缺失 | `.env.example` 只有 `postgresql://localhost:5432/tachenpmis`，為 local dev placeholder；無 staging/prod DB host |
-| P-02 | `migration_role`（DDL 執行帳號）名稱確認與 credentials 存在 | ❌ 缺失 | DB-303 使用佔位符 `<migration_role>`，實際 PG role 名稱未確認，credentials 未存在於 CI/CD secrets |
-| P-03 | `backend_service_role`（app 服務帳號）名稱確認與 credentials 存在 | ❌ 缺失 | DB-303 使用佔位符 `<backend_service_role>`，實際 PG role 名稱未確認，對應 `DATABASE_URL` 未填入 service account credentials |
-| P-04 | `project.projects` 在目標 DB 中確認存在（FK 硬性依賴） | ⚠️ 部分具備 | DB-303 引用 `docs/database-dashboard-auth-alignment.md` 作為間接佐證，但 DB-303 本身明確標注「未在此任務重新驗證」；執行前必須在目標環境直接確認 |
-| P-05 | `auth` schema 在目標 DB 中尚不存在（避免 IF NOT EXISTS 隱藏衝突） | ⚠️ 未驗證 | 歷史文件顯示 auth tables missing，但未有最新 live 查詢佐證；執行前需執行 `\dn` / `information_schema.schemata` |
-| P-06 | `MIGRATION_DATABASE_URL` secret 已在 CI/CD 環境注入（含 migration role credentials） | ❌ 缺失 | ci.yml / deploy.yml 無任何 DB secret 引用；GitHub Actions Secrets 從未設定 |
-| P-07 | `DATABASE_URL` secret（service account）已在 CI/CD 環境注入 | ❌ 缺失 | 同上；目前 backend 測試跑無 DB（未 provision test DB container） |
-| P-08 | `prisma migrate deploy` 步驟已加入 deploy pipeline | ❌ 缺失 | deploy.yml 只部署 frontend 靜態頁至 GitHub Pages，無任何 backend deployment / Prisma migration 步驟 |
-| P-09 | `prisma/migrations/` 目錄存在（migration history 已初始化） | ❌ 缺失 | 目錄完全不存在；`prisma migrate dev` 從未執行過；無法執行 `prisma migrate deploy` |
-| P-10 | Migration 前 DB snapshot / backup 就緒 | ❌ 缺失 | 無 backup step 在任何 pipeline 中；無 pg_dump / snapshot 策略文件 |
-| P-11 | Staging 環境優先試跑計畫（不可直接跑 production） | ❌ 缺失 | 無 staging 環境定義；無 docker-compose 本地 DB stack；deploy.yml 僅有 production target（GitHub Pages） |
-| P-12 | `docker-compose.yml` 或等效本地 DB stack（開發/驗證用） | ❌ 缺失 | 無 docker-compose.yml；本地開發無法完整起 postgres + migrate + backend stack |
-| P-13 | `auth.user_project_roles` FK 策略確認（立即啟用 vs. deferred） | ⚠️ 待決策 | DB-303 Section 2.2 與 schema.prisma 均標注此 FK 為 DB_PENDING；必須在 DDL 執行前做出明確決策 |
-| P-14 | `auth.users.updated_at` trigger 策略確認（DB trigger vs. Prisma-managed） | ⚠️ 待決策 | DB-303 Section 2.2 標注需要決策；若有非 Prisma writer 則必須加 trigger |
+| 1.1.1 | 目標 DB host / port / dbname 已確認 | ❌ | `.env.example` 僅有 `postgresql://localhost:5432/tachenpmis` 本地開發佔位符，無實際 production host、port、dbname 資訊 |
+| 1.1.2 | SSL 連線設定已確認 | ❌ | 尚未定義是否需要 SSL（`?ssl=true` / `?sslmode=require`），production 通常需要 |
+| 1.1.3 | 連線可達性驗證已完成 | ❌ | 無任何人員確認過可從部署環境連線至目標 DB |
+| 1.1.4 | 連線 credential（非 root）可用於 migration | ❌ | 未確認 migration role 的 host-based auth 或 password 機制 |
+
+### 1.2 Role / Credentials 確認
+
+| # | 前置條件 | 狀態 | 說明 |
+|---|---------|------|------|
+| 1.2.1 | `<migration_role>` 實際名稱已確認 | ❌ | DB-303 grants draft 使用佔位符 `<migration_role>`，尚未替換為 production role name |
+| 1.2.2 | `<backend_service_role>` 實際名稱已確認 | ❌ | DB-303 grants draft 使用佔位符 `<backend_service_role>`，尚未替換 |
+| 1.2.3 | migration role credentials 已安全儲存 | ❌ | 無 `MIGRATION_DATABASE_URL` 或 `POSTGRES_USER` / `POSTGRES_PASSWORD` 環境變數定義 |
+| 1.2.4 | backend service role credentials 已安全儲存 | ❌ | `.env.example` 的 `DATABASE_URL` 為本地開發佔位符，無 production credential |
+| 1.2.5 | Role 權限已驗證（migration role 需 CREATE SCHEMA + CREATE TABLE；backend service role 需 USAGE + CRUD） | ❌ | 未在任何環境驗證過 |
+
+### 1.3 Schema 依賴確認
+
+| # | 前置條件 | 狀態 | 說明 |
+|---|---------|------|------|
+| 1.3.1 | `project.projects` 在目標 DB 中已存在 | ⚠️ | DB-303 引用此前 live alignment evidence 確認 `project.projects` 存在，但 **DB-303 明確聲明未在此任務重新驗證** |
+| 1.3.2 | `project.projects.project_id` 欄位型別為 `BIGINT` | ⚠️ | 同上，來自過往 evidence，未在本次重新驗證 |
+| 1.3.3 | `auth` schema 在目標 DB 中尚不存在（避免 `IF NOT EXISTS` 隱藏衝突） | ⚠️ | DB-303 引用 dashboard alignment report 指出 auth tables missing，但未重新驗證目標 DB 是否已有殘留物件 |
+| 1.3.4 | Prisma `multiSchema` preview feature 與目標 DB PG 版本相容 | ❌ | Prisma `multiSchema` 為 preview feature，未在目標 PG 版本驗證過 |
+
+### 1.4 CI/CD Pipeline 就緒
+
+| # | 前置條件 | 狀態 | 說明 |
+|---|---------|------|------|
+| 1.4.1 | `prisma migrate deploy` 步驟已加入 deploy pipeline | ❌ | `deploy.yml` 僅部署 frontend 至 GitHub Pages，無任何 backend deployment 或 DB migration 步驟 |
+| 1.4.2 | `DATABASE_URL` / `MIGRATION_DATABASE_URL` secrets 已注入 CI/CD 環境 | ❌ | CI/CD 無任何 DB 相關 secret 定義（無 `secrets.DATABASE_URL` 等） |
+| 1.4.3 | Migration 前 DB backup/snapshot step 已存在 | ❌ | CI/CD 中無任何備份機制（無 `pg_dump`、無 cloud snapshot trigger） |
+| 1.4.4 | Staging / production 環境分離機制已建立 | ❌ | 僅有 `github-pages` environment，無 staging / production DB 環境分離 |
+| 1.4.5 | Rollback trigger / automation 已建立 | ❌ | 無任何 rollback pipeline 或手動 rollback trigger（無 `workflow_dispatch` rollback job） |
+| 1.4.6 | CI 已包含 backend test 步驟 | ✅ | `ci.yml` 的 `backend` job 有 `npm test` 和 `npm run build` |
+
+### 1.5 Docker / Infrastructure
+
+| # | 前置條件 | 狀態 | 說明 |
+|---|---------|------|------|
+| 1.5.1 | `docker-compose.yml` 可拉起完整 stack（postgres + backend + migration init） | ❌ | 專案根目錄及 `backend/` 中均無 `docker-compose.yml` |
+| 1.5.2 | Migration container 或 init script 定義 | ❌ | 無 migration container / init-migration script |
+| 1.5.3 | Test DB container 定義 | ❌ | 無 test DB container，CI 中的 backend test 可能使用 Vitest mock 而非真實 DB |
+| 1.5.4 | Backend Dockerfile 含 `prisma generate` + `prisma migrate deploy` | ❌ | `backend/Dockerfile` 為 multi-stage build（node:20-alpine），但未包含 `prisma generate` 或 `prisma migrate deploy` 步驟 |
+
+### 1.6 Prisma Migration 狀態
+
+| # | 前置條件 | 狀態 | 說明 |
+|---|---------|------|------|
+| 1.6.1 | `prisma/migrations/` 目錄存在且包含 baseline migration | ❌ | 目錄不存在，`prisma migrate dev` 或 `prisma migrate diff` 從未執行 |
+| 1.6.2 | `_prisma_migrations` tracking table 機制已在目標 DB 就位 | ❌ | 從未執行過任何 Prisma migration |
+| 1.6.3 | Prisma schema 與 DDL draft 一致性已驗證 | ⚠️ | 整體一致，但 `user_project_roles.project` FK 在 Prisma 中仍為 comment out，DDL draft 則包含此 FK。需決策是否首次 migration 就啟用 |
+
+### 1.7 安全 / Secrets
+
+| # | 前置條件 | 狀態 | 說明 |
+|---|---------|------|------|
+| 1.7.1 | `JWT_SECRET` 已使用 production-grade 強隨機值 | ❌ | `.env.example` 內為 `dev-secret-key-at-least-32-characters-long!` 佔位符，非 production 值 |
+| 1.7.2 | DB credentials 已存入 secrets manager（GitHub Secrets / Vault 等） | ❌ | 無證據顯示已設定任何 production secrets |
+| 1.7.3 | `CORS_ORIGIN` 已設定為 production 域名 | ❌ | 當前為 `*`（允許所有來源），不適用於 production |
 
 ---
 
-## 2. Blocker 清單
+## 2. Blocker 清單（Migration 無法執行的根本原因）
 
-以下 blocker 按嚴重度排序。**任何一個 CRITICAL blocker 未解除，即無法安全執行 live migration。**
+按嚴重度排序。**任何一個 CRITICAL blocker 未解除，即無法安全執行 live migration。**
 
 ### 🔴 CRITICAL — 必須解除才能執行
 
-| # | Blocker | 影響 |
-|---|---------|------|
-| B-01 | **無 `prisma/migrations/` 目錄** — Prisma migration history 從未初始化 | `prisma migrate deploy` 無法執行；需先在開發環境跑 `prisma migrate dev --name init_auth_schema` 生成 migration file，commit 後才能部署 |
-| B-02 | **目標 DB 連線資訊缺失** — 無 staging/prod DB host / credentials | 無論何種方式執行 migration，都需要知道連接到哪個 PostgreSQL instance |
-| B-03 | **`<migration_role>` 和 `<backend_service_role>` 名稱與 credentials 未確定** | Grants SQL 無法執行；`DATABASE_URL` 無法注入；pipeline 無法構建 |
-| B-04 | **`project.projects` FK 依賴未在目標 DB 中直接驗證** | `auth.user_project_roles` DDL 含 `REFERENCES project.projects(project_id) ON DELETE CASCADE`；若 `project.projects` 不存在，migration 直接失敗；若採 deferred FK 需修改 DDL |
-| B-05 | **deploy pipeline 無 backend DB migration job** | 即使 DDL 準備好，也沒有自動化路徑把 migration 套用到目標環境 |
+| # | Blocker | 影響 | 說明 |
+|---|---------|------|------|
+| B-01 | **無 production DB 連線資訊** | 無法連線目標 DB，所有後續步驟無法開始 | host / port / dbname / SSL 設定均未知，`DATABASE_URL` 為本地佔位符 |
+| B-02 | **無 migration role 與 backend service role 名稱及 credentials** | DDL 的 GRANT 語句無法填入實際值，權限管理無法設定 | DB-303 使用 `<migration_role>` 和 `<backend_service_role>` 佔位符 |
+| B-03 | **無 CI/CD DB migration 步驟** | 即使 DDL 正確，也沒有自動化路徑可執行 migration | `deploy.yml` 僅部署 frontend，無 backend deployment / DB migration job |
+| B-04 | **`project.projects` FK 依賴未在目標 DB 重新驗證** | DDL 中 `auth.user_project_roles.project_id` 硬性 REFERENCES `project.projects(project_id)`，若目標 DB 中 project schema 不存在，migration 會直接失敗 | DB-303 引用過往 evidence 但明確聲明未重新驗證 |
+| B-05 | **`prisma/migrations/` 目錄不存在** | Prisma 無法以 `prisma migrate deploy` 執行 structured migration；需先生成 baseline | 從未執行 `prisma migrate dev` |
 
-### 🟡 HIGH — 強烈建議解除後才執行
+### 🟠 HIGH — 強烈建議解除後才執行
 
-| # | Blocker | 影響 |
-|---|---------|------|
-| B-06 | **無 staging 環境** — 無法在 production 前驗證 migration 行為 | 直接跑 prod 的 migration 風險極高；無法做遷移驗收 |
-| B-07 | **無 migration 前 DB backup 機制** | 如 migration 失敗需要 rollback，若無 backup 則資料風險嚴重 |
-| B-08 | **無 docker-compose.yml** — 無法在本地完整起 DB stack | 開發者無法在本地跑 `prisma migrate dev` 驗證 DDL 正確性 |
+| # | Blocker | 影響 | 說明 |
+|---|---------|------|------|
+| B-06 | **無 docker-compose 或 infrastructure 定義** | 無法本地端到端驗證 migration；無法快速 rollback 測試 | 缺少 postgres container、migration container、test DB 等 |
+| B-07 | **無 DB backup/snapshot 機制** | Migration 失敗時無法回復至執行前狀態 | CI/CD 無 backup step，也無手動 DB snapshot SOP |
+| B-08 | **無 staging 環境** | 無法在 production 前驗證 migration 行為；直接跑 prod 風險極高 | 僅有 `github-pages` environment，無 staging DB |
 
-### 🟠 MEDIUM — 可在首次 migration 後跟進
+### 🟡 MEDIUM — 可在首次 migration 後跟進，但建議提前收斂
 
-| # | Blocker | 影響 |
-|---|---------|------|
-| B-09 | **`auth.user_project_roles` FK 策略未決定** | 若保留 FK，需確認 project schema 版本穩定；若 deferred，需修改 DDL 移除 `REFERENCES` |
-| B-10 | **`updated_at` trigger 策略未決定** | 非阻塞，但影響 data integrity 若未來有非 Prisma writer |
+| # | Blocker | 影響 | 說明 |
+|---|---------|------|------|
+| B-09 | **Prisma schema FK 差異未收斂** | Prisma 中 `user_project_roles.project` relation 被 comment out，DDL draft 則包含此 FK。若不統一，Prisma generate 與實際 DB 將不一致 | 需決策：首次 migration 是否啟用此 FK |
+| B-10 | **`updated_at` trigger 策略未決定** | Prisma `@updatedAt` 可處理 Prisma-managed writes，但若有非 Prisma writer 將 stale data | DB-303 Section 2.2 標注需決策 |
 
 ---
 
 ## 3. Rollback / 風險控制策略
 
-### 3.1 DDL 回滾順序（來自 DB-303 Section 7，DevOps 補充執行細節）
+### 3.1 DB-303 Section 7 Rollback Plan（直接引用）
 
-**執行前提：** 回滾**只能在確認 live data 尚未依賴新 auth objects 的情況下執行**。
+Rollback 順序為 creation 的逆向操作：
+
+1. **Revoke grants** from `<backend_service_role>`
+2. **Drop** `auth.user_project_roles`
+3. **Drop** `auth.audit_login_attempts`
+4. **Drop** `auth.sessions`
+5. **Drop** `auth.users`
+6. **Drop enum type** `auth."UserRole"`（需在 dependent objects 移除後執行）
+7. **Optionally drop schema `auth`**（僅當 schema 為空且無其他物件依賴時）
+
+> ⚠️ Rollback 必須在確認無 live data 依賴新 auth 物件後方可執行。
+
+### 3.2 Ops 層 Rollback 執行細節與補充
+
+#### 3.2.1 Rollback SQL 腳本（基於 DB-303 Section 7，加上 idempotent 防護）
 
 ```sql
--- Step 1: 撤銷 grants（先切斷 service account 存取）
+-- ================================================================
+-- Rollback Script for auth schema migration (OPS-305)
+-- Execute ONLY after confirming no live data depends on auth objects
+-- All statements use IF EXISTS to be idempotent
+-- ================================================================
+
+-- Step 1: 切斷 service account 存取（revoke grants）
 REVOKE ALL ON ALL TABLES IN SCHEMA auth FROM <backend_service_role>;
 REVOKE USAGE ON SCHEMA auth FROM <backend_service_role>;
+REVOKE USAGE, SELECT ON ALL SEQUENCES IN SCHEMA auth FROM <backend_service_role>;
 
--- Step 2: 刪除 auth.user_project_roles（因為有 FK 到 auth.users）
+-- Step 2-5: 依 FK 依賴順序 drop tables（reverse of creation）
 DROP TABLE IF EXISTS auth.user_project_roles CASCADE;
-
--- Step 3: 刪除 audit 表
 DROP TABLE IF EXISTS auth.audit_login_attempts CASCADE;
-
--- Step 4: 刪除 sessions 表（有 FK 到 auth.users）
 DROP TABLE IF EXISTS auth.sessions CASCADE;
-
--- Step 5: 刪除 users 表（主表，最後刪）
 DROP TABLE IF EXISTS auth.users CASCADE;
 
--- Step 6: 刪除 enum（依賴 objects 已清除後）
+-- Step 6: Drop enum type（所有 dependent columns 已清除）
 DROP TYPE IF EXISTS auth."UserRole";
 
--- Step 7: 可選 — 只在 schema 完全空時才 drop
+-- Step 7: Optionally drop schema（確認為空後才執行）
 -- DROP SCHEMA IF EXISTS auth;
 ```
 
-### 3.2 Prisma Migration 回滾（pipeline 層）
+#### 3.2.2 Prisma 層 Rollback
 
-- Prisma 無內建 `migrate rollback`，需手動執行上述 DDL 或引入自訂 down migration
-- **建議**：採用 `prisma migrate dev` 建立 migration 時，同時準備 `undo_XXX.sql` 並納入版本控制
-- **建議**：pipeline 應在 migration 前呼叫 `pg_dump` 建立 snapshot，保留至少 24 小時
+| 項目 | 說明 |
+|------|------|
+| `prisma migrate resolve` | 若使用 `prisma migrate deploy`，rollback 需執行 `prisma migrate resolve --rolled-back <migration_name>` 並手動執行上述 rollback SQL |
+| 自訂 down migration | 建議在 `prisma/migrations/` 中為每個 migration 建立 `undo_XXX.sql` 並納入版本控制 |
+| Pipeline 回滾 | 建議新增 `workflow_dispatch` rollback job，可一鍵觸發 rollback SQL |
+
+#### 3.2.3 Backup 策略
+
+| 項目 | 說明 |
+|------|------|
+| ⚠️ 目前狀態 | CI/CD 無任何 DB backup 步驟，無 `pg_dump`，無 cloud snapshot |
+| 建議 | Migration 前執行 `pg_dump`（目標 DB 全量或僅 auth schema），或觸發 cloud provider snapshot |
+| 保留期 | 至少保留 24 小時，建議 7 天 |
+| 還原測試 | 需至少一次從 backup 成功還原的測試紀錄 |
+
+#### 3.2.4 觸發時機
+
+| 情境 | 行動 |
+|------|------|
+| Migration DDL 執行後驗證失敗（table 缺失、FK 不通、grants 未生效） | 立即執行 rollback SQL |
+| Backend service 啟動後 auth API health check 失敗 | 評估是否需 rollback 或 hotfix |
+| 安全事件（credential 洩漏等） | Rollback 並輪替 secrets |
 
 ### 3.3 風險控制矩陣
 
-| 風險 | 可能性 | 影響 | 緩解措施 |
+| 風險 | 可能性 | 影響 | 控制策略 |
 |------|--------|------|---------|
-| FK 依賴失敗（project.projects 不存在） | 中 | 高（migration 中止） | 執行前驗證；或改為 deferred FK |
-| Role 衝突（role 名稱已存在但 privileges 不同） | 低 | 中 | `DO $$ BEGIN IF NOT EXISTS ... END $$` 防衛性 SQL |
-| Service account 權限不足（migration role 缺少 SUPERUSER 或 schema CREATE） | 中 | 高（migration 失敗） | 預先用 `\du` 確認 role 屬性 |
-| `prisma migrate deploy` 在 prod 前無 staging 驗證 | 高（目前無 staging） | 嚴重 | 先建 staging 環境 |
-| 資料遺失（rollback 時已有資料） | 低（初次 migration，無資料） | 嚴重 | migration 前必備 backup |
+| `project.projects` 不存在導致 FK 失敗 | 中 | 🔴 Migration 整體失敗 | 執行前驗證 `SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema='project' AND table_name='projects')`；或改用 deferred FK |
+| Role name 佔位符未替換 | 高 | 🔴 GRANT 全部失敗 | 執行前由 DBA 確認並替換所有 `<...>` 佔位符 |
+| SSL 連線未設定 | 中 | 🟠 應用層連線失敗 | 在 `DATABASE_URL` 加入 `?sslmode=require` 並測試 |
+| Backend service 權限過大 | 低 | 🟠 安全風險 | DB-303 Section 5.4 已限制不 grant superuser；建議執行後以 `\dp` 驗證 |
+| `updated_at` 無 trigger 導致 stale data | 低 | 🟡 資料正確性 | Prisma `@updatedAt` 可處理 app writes，需確認是否有非 Prisma writer |
+| Staging 與 production schema 不一致 | 中 | 🟠 行為差異 | 首次 migration 需在 staging 先跑完整 DDL 並驗證 |
+| Service account 權限不足（migration role 缺少 CREATE SCHEMA） | 中 | 🔴 Migration 失敗 | 預先用 `\du` 確認 role 屬性 |
 
 ---
 
 ## 4. Ops Handoff 清單（PM 排程用）
 
-以下清單按優先順序排列，格式為：`[優先度] 任務 → 負責角色 → 預估複雜度`
+以下為 PM 可直接拿來排程的下一步行動清單，按優先順序排列。
 
-### Phase 1：解除 CRITICAL Blockers（必須在 migration 前完成）
+### Priority 1 — 🔴 Blocker 解除（必須先完成才能進入 staging 測試）
 
-| 優先 | 任務 | 負責角色 | 複雜度 | 備注 |
-|------|------|---------|--------|------|
-| P1-01 | 建立 `docker-compose.yml`（postgres + backend migration container） | DevOps | 小 | 解除 B-08，為本地驗證提供基礎 |
-| P1-02 | 在本地執行 `prisma migrate dev --name init_auth_schema`，生成 `prisma/migrations/` 並 commit | Backend + DevOps | 小 | 解除 B-01；需先有 P1-01 的 local DB |
-| P1-03 | 確認 staging/prod DB 連線資訊（host / port / dbname / SSL），提供給 DevOps | PM / DBA | 無技術作業 | 解除 B-02 |
-| P1-04 | 確認 `migration_role` 和 `backend_service_role` 的實際 PG role 名稱與 credentials | DBA / Backend | 小 | 解除 B-03；需 DBA 提供或建立 PG roles |
-| P1-05 | 在 CI/CD（GitHub Actions）注入 `DATABASE_URL` 和 `MIGRATION_DATABASE_URL` Secrets | DevOps | 小 | 解除 B-03；依賴 P1-04 |
-| P1-06 | 在目標 DB 直接驗證 `project.projects` 存在（`SELECT 1 FROM project.projects LIMIT 1`） | DevOps / DBA | 小 | 解除 B-04 |
-| P1-07 | 決策：`auth.user_project_roles` FK 採立即啟用還是 deferred | PM + Backend + DBA | 設計決策 | 影響 DDL 最終版本；解除 B-09 |
-| P1-08 | 替換 DB-303 grants SQL 中的 `<migration_role>` 和 `<backend_service_role>` 佔位符 | DevOps + DBA | 小 | 依賴 P1-04 |
+| # | 行動項目 | 負責角色 | 預估複雜度 | 前置依賴 | 產出物 |
+|---|---------|----------|-----------|---------|-------|
+| H-01 | 取得 production DB 連線資訊（host / port / dbname / SSL 設定 / root credential） | DevOps / DBA | 低 | 無 | 可連線的 `DATABASE_URL` |
+| H-02 | 確認 / 建立 migration role 與 backend service role（名稱、密碼、權限邊界） | DBA | 中 | H-01 | 兩組 role credentials + 權限規格文件 |
+| H-03 | 填入 DB-303 DDL grants 佔位符（替換 `<backend_service_role>` 和 `<migration_role>` 為實際值） | Backend | 低 | H-02 | 可執行的 migration SQL |
+| H-04 | 驗證 `project.projects` 在目標 DB 中存在且 `project_id` 型別為 `BIGINT` | DBA | 低 | H-01 | SQL 查詢結果確認 |
+| H-05 | 建立 `docker-compose.yml`（postgres + backend + migration init container） | DevOps | 中 | 無 | 可本地 `docker-compose up` 的完整 stack |
+| H-06 | 新增 GitHub Secrets：`DATABASE_URL`、`MIGRATION_DATABASE_URL`、`JWT_SECRET`（production 值） | DevOps | 低 | H-01, H-02 | Secrets 已注入 CI/CD |
 
-### Phase 2：建立 Staging 環境與 Pipeline（強烈建議先於 production migration）
+### Priority 2 — 🟠 Pipeline / Infrastructure 建立
 
-| 優先 | 任務 | 負責角色 | 複雜度 | 備注 |
-|------|------|---------|--------|------|
-| P2-01 | 建立 staging PostgreSQL 環境（可使用 Docker 或 cloud managed DB） | DevOps | 中 | 解除 B-06 |
-| P2-02 | 新增 `.github/workflows/migrate.yml`（含 backup → migrate → verify 三步驟） | DevOps | 中 | 解除 B-05；涵蓋 `pg_dump` + `prisma migrate deploy` + 驗收 query |
-| P2-03 | 在 staging 環境執行完整 migration 試跑，驗收 Section 6 acceptance criteria | DevOps + Backend | 中 | 包含：schema exists check + FK check + grant test |
-| P2-04 | 執行 staging rollback 演練（確認回滾 SQL 可逆） | DevOps | 小 | 建立回滾信心 |
+| # | 行動項目 | 負責角色 | 預估複雜度 | 前置依賴 | 產出物 |
+|---|---------|----------|-----------|---------|-------|
+| H-07 | 建立 `prisma/migrations/` baseline（執行 `prisma migrate dev --name init_auth_schema`） | Backend | 中 | H-05（需 local DB） | 可版控的 migration 目錄 |
+| H-08 | 更新 `deploy.yml` 加入 backend deployment + `prisma migrate deploy` 步驟 | DevOps | 中 | H-06, H-07 | 含 DB migration 的部署 pipeline |
+| H-09 | 新增 `prisma migrate deploy` 前的 DB backup step（`pg_dump` 或 cloud snapshot） | DevOps | 中 | H-08 | 自動化 backup 機制 |
+| H-10 | 建立 staging 環境（獨立 DB instance + 獨立 deploy workflow） | DevOps | 高 | H-05, H-06 | staging 環境可跑完整 migration |
+| H-11 | 新增 rollback workflow（`workflow_dispatch` trigger，執行 rollback SQL） | DevOps | 中 | H-08, H-09 | 可觸發的 rollback pipeline |
+| H-12 | 更新 `backend/Dockerfile` 加入 `prisma generate` + `prisma migrate deploy` entrypoint | Backend | 中 | H-07 | 可自動 migrate 的 Docker image |
 
-### Phase 3：Production Migration（所有前置條件解除後）
+### Priority 3 — 🟡 收斂 / 驗證
 
-| 優先 | 任務 | 負責角色 | 複雜度 | 備注 |
-|------|------|---------|--------|------|
-| P3-01 | Production DB snapshot / pg_dump | DevOps / DBA | 小 | 必須在 migration 前執行 |
-| P3-02 | 執行 production migration（`prisma migrate deploy`）| DevOps | 小 | 透過 pipeline 執行，非手動 |
-| P3-03 | 執行 DB-303 Section 6 驗收條件（`information_schema` 驗證 + GRANT 驗證） | DevOps + Backend | 小 | |
-| P3-04 | 通知 Backend 啟用 Prisma client wiring（`DATABASE_URL` 指向 production） | DevOps → Backend | 小 | migration 成功後 handoff |
+| # | 行動項目 | 負責角色 | 預估複雜度 | 前置依賴 | 產出物 |
+|---|---------|----------|-----------|---------|-------|
+| H-13 | 決策：`user_project_roles.project` FK 首次 migration 是否啟用 | Backend + DBA | 低 | H-04 | 統一的 Prisma schema + DDL |
+| H-14 | 決策：`auth.users.updated_at` 是否需要 DB-side trigger | Backend | 低 | 無 | Prisma schema 最終版本 |
+| H-15 | 決策：`assigned_by` FK 是否需指向 auth.users（目前為 nullable BigInt） | Backend | 低 | 無 | Schema 確認或 deferred 決策記錄 |
+| H-16 | Staging 端到端 migration 測試（執行 DDL → 驗證 schema → 啟動 backend → health check） | Backend + DevOps | 中 | H-10, H-13, H-14 | staging 測試通過報告 |
+| H-17 | 驗證 GRANT：backend service role 僅能存取預期 tables（`\dp` 或 `information_schema` 查詢） | DBA | 低 | H-16 | 權限驗證報告 |
+| H-18 | Production `JWT_SECRET` 更新為強隨機值 | DevOps / Security | 低 | H-06 | production secret 已輪替 |
+| H-19 | `CORS_ORIGIN` 設定為 production 域名 | DevOps | 低 | 無 | `.env` 更新 |
+
+### Priority 4 — 🟢 上線
+
+| # | 行動項目 | 負責角色 | 預估複雜度 | 前置依賴 | 產出物 |
+|---|---------|----------|-----------|---------|-------|
+| H-20 | Production DB backup / snapshot | DBA | 低 | H-01 | 可還原的 DB 備份 |
+| H-21 | Production migration 執行（依照 DB-303 Section 3 順序） | DBA + DevOps | 中 | H-20, H-16, H-17 | Migration 完成 + 驗證通過 |
+| H-22 | Production backend deployment（含 Prisma client generate + migrate deploy） | DevOps | 中 | H-21 | Backend 正常啟動 |
+| H-23 | Smoke test：`/api/v1/health` + auth endpoint | Backend + QA | 低 | H-22 | API 正常回應確認 |
 
 ---
 
-## 5. 執行就緒度摘要
+## 5. 前置條件狀態摘要
 
-| 層面 | 就緒度 | 說明 |
-|------|--------|------|
-| DDL 設計 | ✅ 就緒 | DB-303 提供完整 DDL draft，與 BE-305 Prisma 對齊 |
-| Grants 設計 | ⚠️ 部分就緒 | 設計完整，但佔位符未替換為實際 role names |
-| Prisma Migration Files | ❌ 未就緒 | `prisma/migrations/` 不存在 |
-| DB 連線 / Secrets | ❌ 未就緒 | 無任何 staging/prod credentials |
-| Deploy Pipeline | ❌ 未就緒 | 無 backend deployment / migration job |
-| Staging 環境 | ❌ 未就緒 | 不存在 |
-| Rollback 計畫 | ✅ 就緒（設計層） | DB-303 Section 7 已定義；需 ops 層演練確認 |
-| FK 依賴驗證 | ⚠️ 未驗證 | `project.projects` 需在目標 DB 直接確認 |
+```
+✅ 已具備：1 項
+⚠️ 部分具備：4 項
+❌ 缺失：18 項
 
-**整體判定：🔴 未就緒 — 至少需完成 Phase 1（P1-01 ~ P1-08）才能進入 staging 試跑。**
+✅ CI backend test/build step (ci.yml)
+
+⚠️ project.projects 存在於 live DB（過往 evidence，未重新驗證）
+⚠️ project.projects.project_id 型別為 BIGINT（過往 evidence，未重新驗證）
+⚠️ auth schema 不存在於 live DB（過往 evidence，未重新驗證）
+⚠️ Prisma schema 與 DDL draft 整體一致（user_project_roles FK 差異待收斂）
+
+❌ Production DB 連線資訊
+❌ Migration role / backend service role 名稱與 credentials
+❌ MIGRATION_DATABASE_URL / secrets 在 CI/CD
+❌ prisma migrate deploy pipeline step
+❌ DB backup/snapshot 機制
+❌ Staging 環境
+❌ docker-compose.yml
+❌ prisma/migrations/ 目錄
+❌ Rollback pipeline / trigger
+❌ Production JWT_SECRET
+❌ Production CORS_ORIGIN
+❌ Prisma schema FK 差異收斂
+❌ Role 權限驗證
+❌ DB-side updated_at trigger 決策
+❌ assigned_by FK 決策
+❌ SSL 連線設定
+❌ Backend Dockerfile migration 步驟
+```
+
+**整體判定：🔴 未就緒 — 至少需完成 Priority 1（H-01 ~ H-06）才能進入 staging 試跑。**
+
+---
+
+## 6. 參考文件
+
+| 文件 | 說明 |
+|------|------|
+| `docs/db-303-live-auth-migration-plan.md` | DDL / Grants draft（本報告主要引用，Section 7 rollback plan） |
+| `backend/prisma/schema.prisma` | BE-305 Prisma schema 定義 |
+| `backend/.env.example` | 環境變數範本 |
+| `.github/workflows/ci.yml` | CI pipeline 定義 |
+| `.github/workflows/deploy.yml` | Frontend 部署 pipeline |
+| `backend/Dockerfile` | Backend Docker 建構定義 |
+| `docs/db-302-auth-unblock-report.md` | 前期 auth unblock 報告 |
+| `docs/database-dashboard-auth-alignment.md` | Dashboard auth alignment 報告 |
+| `docs/auth-schema-architecture.md` | Auth schema 架構文件 |
 
 ---
 

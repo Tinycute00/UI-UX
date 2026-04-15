@@ -1,12 +1,46 @@
 <!-- ══════ DASHBOARD ══════ -->
 <div id="v-dashboard" class="view active">
 
+  <div id="dash-empty" class="state-empty" style="display:none" aria-hidden="true">
+    <div class="state-icon">📋</div>
+    <div class="state-title">尚無工程資料</div>
+    <div class="state-desc">目前沒有可顯示的工程進度資料</div>
+    <button class="btn bg btn-sm" data-action="reload-dashboard">
+      <span class="ic s14"><svg><use href="#ic-refresh"/></svg></span> 重新載入
+    </button>
+  </div>
+
+  <div id="dash-loading" class="state-loading" style="display:none" aria-hidden="true" aria-busy="true">
+    <div class="g5">
+      <div class="kpi-skel shimmer"></div>
+      <div class="kpi-skel shimmer"></div>
+      <div class="kpi-skel shimmer"></div>
+      <div class="kpi-skel shimmer"></div>
+      <div class="kpi-skel shimmer"></div>
+    </div>
+    <div class="g73">
+      <div class="skel-card shimmer" style="height:280px"></div>
+      <div class="skel-card shimmer" style="height:280px"></div>
+    </div>
+  </div>
+
+  <div id="dash-error" class="state-error" style="display:none" aria-hidden="true">
+    <div class="state-icon">⚠️</div>
+    <div class="state-title">資料載入失敗</div>
+    <div class="state-desc" id="dash-error-msg">無法連線至伺服器，請稍後再試</div>
+    <div class="state-code" id="dash-error-code"></div>
+    <button class="btn ba btn-sm" data-action="retry-dashboard">
+      <span class="ic s14"><svg><use href="#ic-refresh"/></svg></span> 重試
+    </button>
+  </div>
+
+  <div id="dash-content">
   <div class="g5">
     <div class="kpi clickable" style="--kc:var(--gold)" data-action="dashboard-nav" data-view="daily" data-label="施工日報" title="查看施工日報">
       <div class="kpi-icon"><span class="ic s20"><svg><use href="#ic-chart"/></svg></span></div>
-      <div class="kpi-val">68.3<span style="font-size:15px">%</span></div>
+      <div class="kpi-val" id="dash-overall-actual">68.3<span style="font-size:15px">%</span></div>
       <div class="kpi-label">工程總體進度</div>
-      <div class="kpi-sub"><span class="up">超前計劃 3.2%</span></div>
+      <div class="kpi-sub"><span class="up" id="dash-overall-status">超前計劃 3.2%</span></div>
       <div class="kpi-hint"><span class="ic s10"><svg><use href="#ic-chev-r"/></svg></span>施工日報</div>
     </div>
     <div class="kpi clickable" style="--kc:var(--green)" data-action="dashboard-nav" data-view="ir" data-label="查驗資料 (IR)" title="查看查驗資料">
@@ -46,7 +80,10 @@
       <div class="card mb0">
         <div class="ct"><span class="bar"></span>S-CURVE 工程進度曲線</div>
         <div class="sc-wrap">
-          <svg viewBox="0 0 520 150" preserveAspectRatio="none">
+          <div class="spinner-wrap" id="sc-spinner" style="display:none" aria-hidden="true">
+            <div class="spinner"></div>
+          </div>
+          <svg id="sc-curve" viewBox="0 0 520 150" preserveAspectRatio="none">
             <defs>
               <linearGradient id="gb" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#4A7BAA" stop-opacity=".25"/>
@@ -126,18 +163,18 @@
             <div class="flex fxc mb8 gap8">
               <span style="display:inline-block;width:8px;height:2px;border-radius:1px;background:#4A7BAA;margin-top:3px;flex-shrink:0"></span>
               <span style="font-size:11px;flex:1">計畫進度（整體）</span>
-              <span class="fm-font" style="font-size:10px;color:#4A7BAA;font-weight:600">65.1%</span>
+              <span class="fm-font" style="font-size:10px;color:#4A7BAA;font-weight:600" id="dash-plan-pct-text">65.1%</span>
             </div>
-            <div class="pb"><div class="pf pbl" style="width:65.1%;opacity:.7"></div></div>
+            <div class="pb"><div class="pf pbl" id="dash-plan-pct-fill" style="width:65.1%;opacity:.7"></div></div>
           </div>
           <!-- 實際進度 -->
           <div>
             <div class="flex fxc mb8 gap8">
               <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0"></span>
               <span style="font-size:11px;flex:1">實際進度（整體）</span>
-              <span class="fm-font" style="font-size:10px;color:var(--gold-txt);font-weight:600">68.3% <span style="color:var(--green);font-size:9px">▲ +3.2%</span></span>
+              <span class="fm-font" style="font-size:10px;color:var(--gold-txt);font-weight:600"><span id="dash-actual-pct-text">68.3%</span> <span id="dash-variance-badge" style="color:var(--green);font-size:9px">▲ +3.2%</span></span>
             </div>
-            <div class="pb"><div class="pf pg" style="width:68.3%"></div></div>
+            <div class="pb"><div class="pf pg" id="dash-actual-pct-fill" style="width:68.3%"></div></div>
           </div>
           <!-- 請款% -->
           <hr class="div" style="margin:2px 0">
@@ -158,12 +195,12 @@
         <div class="tw">
           <table>
             <thead><tr><th>分包商</th><th>工項</th><th>出工</th><th>計劃</th><th>狀態</th><th></th></tr></thead>
-            <tbody>
-              <tr><td class="tc1">誠實營造</td><td>結構鋼筋</td><td class="tcm">45 人</td><td class="tcm">45 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="honest"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-              <tr><td class="tc1">王子水電</td><td>機電管路</td><td class="tcm">12 人</td><td class="tcm">18 人</td><td><span class="tag ta">人力不足</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="prince"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-              <tr><td class="tc1">大地模板</td><td>模板工程</td><td class="tcm">31 人</td><td class="tcm">30 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="earthform"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-              <tr><td class="tc1">永達混凝土</td><td>混凝土供料</td><td class="tcm">15 人</td><td class="tcm">15 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="yongda"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
-              <tr><td class="tc1">建新帷幕</td><td>外牆帷幕</td><td class="tcm">0 人</td><td class="tcm">0 人</td><td><span class="tag tx">未進場</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="curtain"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+            <tbody id="subcontractors-tbody">
+              <tr><td class="tc1">誠實營造</td><td>結構鋼筋</td><td class="tcm">45 人</td><td class="tcm">45 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="sub-chengshi"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+              <tr><td class="tc1">王子水電</td><td>機電管路</td><td class="tcm">12 人</td><td class="tcm">18 人</td><td><span class="tag ta">人力不足</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="sub-wangzi"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+              <tr><td class="tc1">大地模板</td><td>模板工程</td><td class="tcm">31 人</td><td class="tcm">30 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="sub-dadi"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+              <tr><td class="tc1">永達混凝土</td><td>混凝土供料</td><td class="tcm">15 人</td><td class="tcm">15 人</td><td><span class="tag tg">正常</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="sub-yongda"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
+              <tr><td class="tc1">建新帷幕</td><td>外牆帷幕</td><td class="tcm">0 人</td><td class="tcm">0 人</td><td><span class="tag tx">未進場</span></td><td><button class="btn bg btn-sm" data-action="open-subcontractor-detail" data-sub-id="sub-jianxin"><span class="ic s12"><svg><use href="#ic-eye"/></svg></span> 查看</button></td></tr>
             </tbody>
           </table>
         </div>
@@ -215,8 +252,8 @@
         <div class="cl-item" data-action="toggle-checklist"><div class="cl-box"></div><span class="cl-txt">第五期估驗請款準備</span><span class="tag to" style="margin-left:auto">本週</span></div>
         <div class="cl-item" data-action="toggle-checklist"><div class="cl-box"></div><span class="cl-txt">NCR-085 改善逾期——立即處理</span><span class="tag tr" style="margin-left:auto">逾期</span></div>
         <div class="cl-item" data-action="toggle-checklist"><div class="cl-box"></div><span class="cl-txt">帷幕廠商施工計畫書審查</span></div>
-        <div class="cl-item" data-action="toggle-checklist"><div class="cl-box"></div><span class="cl-txt">新進人員工安教育訓練</span></div>
-      </div>
+      <div class="cl-item" data-action="toggle-checklist"><div class="cl-box"></div><span class="cl-txt">新進人員工安教育訓練</span></div>
     </div>
+  </div>
   </div>
 </div><!-- /dashboard -->

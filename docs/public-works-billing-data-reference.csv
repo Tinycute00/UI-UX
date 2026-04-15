@@ -1,0 +1,139 @@
+﻿section,field,source,source_name,status,notes,value
+說明,目的,workspace docs,billing reference,info,整理公共工程估驗計價資料供對照與澄清,
+說明,範圍,workspace docs,billing reference,info,估驗請款/契約/預付款/物價調整/待澄清欄位,
+說明,已知核心 schema,verified docs,backend-task-board/system-inventory/api-contracts,verified,project / contract / vendor / valuation / finance / audit,
+說明,目前已確認有資料的業務主線,conversation,user statement,verified,公共工程估驗計價,
+說明,生成時間,generated,hermes,info,2026-04-14T22:21:05,
+靜態Billing樣本,key,src/data/finance.js,BILLING_DETAILS,verified,period=1; range=11/01–11/30; pct=18.5%; paid=12/22,billing-1
+靜態Billing樣本,period,src/data/finance.js,BILLING_DETAILS,verified,billing period,1
+靜態Billing樣本,date_range,src/data/finance.js,BILLING_DETAILS,verified,billing date range,11/01–11/30
+靜態Billing樣本,pct,src/data/finance.js,BILLING_DETAILS,verified,completion pct,18.5%
+靜態Billing樣本,applied,src/data/finance.js,BILLING_DETAILS,verified,applied amount,"$45,200,000"
+靜態Billing樣本,approved,src/data/finance.js,BILLING_DETAILS,verified,approved amount,"$45,200,000"
+靜態Billing樣本,paid,src/data/finance.js,BILLING_DETAILS,verified,paid date,12/22
+靜態Billing樣本,key,src/data/finance.js,BILLING_DETAILS,verified,period=2; range=12/01–12/31; pct=35.0%; paid=01/20,billing-2
+靜態Billing樣本,period,src/data/finance.js,BILLING_DETAILS,verified,billing period,2
+靜態Billing樣本,date_range,src/data/finance.js,BILLING_DETAILS,verified,billing date range,12/01–12/31
+靜態Billing樣本,pct,src/data/finance.js,BILLING_DETAILS,verified,completion pct,35.0%
+靜態Billing樣本,applied,src/data/finance.js,BILLING_DETAILS,verified,applied amount,"$58,400,000"
+靜態Billing樣本,approved,src/data/finance.js,BILLING_DETAILS,verified,approved amount,"$58,400,000"
+靜態Billing樣本,paid,src/data/finance.js,BILLING_DETAILS,verified,paid date,01/20
+靜態Billing樣本,key,src/data/finance.js,BILLING_DETAILS,verified,period=3; range=01/01–01/31; pct=48.2%; paid=02/18,billing-3
+靜態Billing樣本,period,src/data/finance.js,BILLING_DETAILS,verified,billing period,3
+靜態Billing樣本,date_range,src/data/finance.js,BILLING_DETAILS,verified,billing date range,01/01–01/31
+靜態Billing樣本,pct,src/data/finance.js,BILLING_DETAILS,verified,completion pct,48.2%
+靜態Billing樣本,applied,src/data/finance.js,BILLING_DETAILS,verified,applied amount,"$65,800,000"
+靜態Billing樣本,approved,src/data/finance.js,BILLING_DETAILS,verified,approved amount,"$64,200,000"
+靜態Billing樣本,paid,src/data/finance.js,BILLING_DETAILS,verified,paid date,02/18
+靜態Billing樣本,key,src/data/finance.js,BILLING_DETAILS,verified,period=4; range=02/01–02/28; pct=58.5%; paid=03/15,billing-4
+靜態Billing樣本,period,src/data/finance.js,BILLING_DETAILS,verified,billing period,4
+靜態Billing樣本,date_range,src/data/finance.js,BILLING_DETAILS,verified,billing date range,02/01–02/28
+靜態Billing樣本,pct,src/data/finance.js,BILLING_DETAILS,verified,completion pct,58.5%
+靜態Billing樣本,applied,src/data/finance.js,BILLING_DETAILS,verified,applied amount,"$72,500,000"
+靜態Billing樣本,approved,src/data/finance.js,BILLING_DETAILS,verified,approved amount,"$70,800,000"
+靜態Billing樣本,paid,src/data/finance.js,BILLING_DETAILS,verified,paid date,03/15
+估驗總表欄位,projectId,API /api/v1/projects/:projectId/valuations,GetValuationsResponseDTO,defined,project ID,
+估驗總表欄位,id,valuation_headers,valuation.valuation_headers,defined,valuation id,
+估驗總表欄位,valuationNo,valuation_headers,valuation.valuation_headers,defined,valuation number,
+估驗總表欄位,period,valuation_headers,valuation.valuation_headers,defined,valuation period,
+估驗總表欄位,vendorId,valuation_headers / vendor.vendors,valuation + vendor,defined,vendor id,
+估驗總表欄位,vendorName,vendor.vendors,vendor.vendors,defined,vendor name,
+估驗總表欄位,status,valuation_headers,valuation.valuation_headers,defined,draft/pending_review/approved/rejected/paid,
+估驗總表欄位,valuationDate,valuation_headers,valuation.valuation_headers,defined,valuation date,
+估驗總表欄位,currentPeriodAmount,valuation_headers/details,valuation + details,defined,current period gross amount,
+估驗總表欄位,cumulativeAmount,valuation_headers/details,valuation + details,defined,cumulative gross amount,
+估驗總表欄位,advancePaymentRecovery,finance.advance_payment_recoveries,finance,defined,recovery amount,
+估驗總表欄位,retentionAmount,valuation/finance,valuation + finance,defined,retention amount,
+估驗總表欄位,netPayableAmount,valuation/finance,valuation + finance,defined,net payable,
+估驗總表欄位,createdAt,valuation_headers,valuation.valuation_headers,defined,created at,
+估驗總表欄位,updatedAt,valuation_headers,valuation.valuation_headers,defined,updated at,
+估驗總表欄位,summary.totalCount,API summary,GetValuationsResponseDTO,defined,count,
+估驗總表欄位,summary.totalCurrentPeriodAmount,API summary,GetValuationsResponseDTO,defined,current total,
+估驗總表欄位,summary.totalCumulativeAmount,API summary,GetValuationsResponseDTO,defined,cumulative total,
+估驗明細欄位,id,valuation_details,valuation.valuation_details,defined,detail id,
+估驗明細欄位,itemCode,contract_items / valuation_details,contract + valuation,defined,item code,
+估驗明細欄位,itemName,contract_items / valuation_details,contract + valuation,defined,item name,
+估驗明細欄位,unit,contract_items / valuation_details,contract + valuation,defined,unit,
+估驗明細欄位,contractUnitPrice,contract_items,contract.contract_items,defined,contract unit price,
+估驗明細欄位,currentQuantity,valuation_details,valuation.valuation_details,defined,current qty,
+估驗明細欄位,currentAmount,valuation_details,valuation.valuation_details,defined,current amount,
+估驗明細欄位,cumulativeQuantity,valuation_details,valuation.valuation_details,defined,cumulative qty,
+估驗明細欄位,cumulativeAmount,valuation_details,valuation.valuation_details,defined,cumulative amount,
+估驗明細欄位,amountSummary.currentPeriodAmount,valuation_headers/details,valuation,defined,current period amount ex tax,
+估驗明細欄位,amountSummary.vatAmount,valuation_headers/details,valuation,defined,vat,
+估驗明細欄位,amountSummary.currentPeriodAmountWithTax,valuation_headers/details,valuation,defined,gross with tax,
+估驗明細欄位,amountSummary.advancePaymentRecovery,finance.advance_payment_recoveries,finance,defined,recovery,
+估驗明細欄位,amountSummary.retentionAmount,valuation/finance,valuation+finance,defined,retention,
+估驗明細欄位,amountSummary.deductions,valuation/finance,valuation+finance,defined,deductions,
+估驗明細欄位,amountSummary.netPayableAmount,valuation/finance,valuation+finance,defined,net payable,
+估驗明細欄位,reviews[].reviewer,valuation_reviews,valuation.valuation_reviews,defined,reviewer,
+估驗明細欄位,reviews[].decision,valuation_reviews,valuation.valuation_reviews,defined,decision,
+估驗明細欄位,reviews[].comments,valuation_reviews,valuation.valuation_reviews,defined,comments,
+估驗明細欄位,reviews[].reviewedAt,valuation_reviews,valuation.valuation_reviews,defined,reviewed at,
+契約與基準欄位,project.projects.project_code,project.projects,project.projects,verified,project code,
+契約與基準欄位,project.projects.project_name,project.projects,project.projects,verified,project name,
+契約與基準欄位,contract_headers.contract_no,contract.contract_headers,contract.contract_headers,verified,contract no,
+契約與基準欄位,contract_headers.contract_amount_original,contract.contract_headers,contract.contract_headers,verified,original contract amount,
+契約與基準欄位,contract_headers.contract_amount_current,contract.contract_headers,contract.contract_headers,verified,current contract amount,
+契約與基準欄位,contract_items.item_code,contract.contract_items,contract.contract_items,verified,item code,
+契約與基準欄位,contract_items.item_name,contract.contract_items,contract.contract_items,verified,item name,
+契約與基準欄位,contract_items.unit,contract.contract_items,contract.contract_items,verified,unit,
+契約與基準欄位,contract_items.unit_price,contract.contract_items,contract.contract_items,verified,unit price,
+契約與基準欄位,contract_items.contract_quantity_original,contract.contract_items,contract.contract_items,verified,original qty,
+契約與基準欄位,contract_items.contract_amount_original,contract.contract_items,contract.contract_items,verified,original amount,
+契約與基準欄位,contract_items.contract_quantity_current,contract.contract_items,contract.contract_items,verified,current qty,
+契約與基準欄位,contract_items.contract_amount_current,contract.contract_items,contract.contract_items,verified,current amount,
+契約與基準欄位,progress_baselines.baseline_quantity,project.progress_measurement_baselines,project.progress_measurement_baselines,verified,baseline qty,
+契約與基準欄位,progress_baselines.baseline_amount,project.progress_measurement_baselines,project.progress_measurement_baselines,verified,baseline amount,
+契約與基準欄位,progress_baselines.weight_percent,project.progress_measurement_baselines,project.progress_measurement_baselines,verified,weight percent,
+契約與基準欄位,vendor_code,vendor.vendors,vendor.vendors,verified,vendor code,
+契約與基準欄位,vendor_name,vendor.vendors,vendor.vendors,verified,vendor name,
+契約與基準欄位,tax_id,vendor.vendors,vendor.vendors,verified,tax id,
+預付款與調整,advancePayments.id,finance.advance_payments,finance.advance_payments,defined,payment id,
+預付款與調整,advancePayments.paymentNo,finance.advance_payments,finance.advance_payments,defined,payment no,
+預付款與調整,advancePayments.vendorId,finance.advance_payments,finance.advance_payments,defined,vendor id,
+預付款與調整,advancePayments.vendorName,vendor.vendors,vendor.vendors,defined,vendor name,
+預付款與調整,advancePayments.type,finance.advance_payments,finance.advance_payments,defined,material/equipment/other,
+預付款與調整,advancePayments.amount,finance.advance_payments,finance.advance_payments,defined,advance amount,
+預付款與調整,advancePayments.recoveredAmount,finance.advance_payment_recoveries,finance.advance_payment_recoveries,defined,recovered amount,
+預付款與調整,advancePayments.remainingAmount,finance.vw_advance_payment_balance,finance.vw_advance_payment_balance,defined,remaining amount,
+預付款與調整,advancePayments.recoveryRate,finance.advance_payments,finance.advance_payments,defined,recovery rate,
+預付款與調整,advancePayments.status,finance.advance_payments,finance.advance_payments,defined,active/fully_recovered/cancelled,
+預付款與調整,advancePayments.paymentDate,finance.advance_payments,finance.advance_payments,defined,payment date,
+預付款與調整,advancePayments.estimatedRecoveryCompletionDate,finance.advance_payments,finance.advance_payments,defined,estimated recovery date,
+預付款與調整,advancePayments.notes,finance.advance_payments,finance.advance_payments,defined,notes,
+預付款與調整,priceAdjustments.id,valuation.price_adjustment_*,valuation price adjustment,defined,adjustment id,
+預付款與調整,priceAdjustments.adjustmentNo,valuation.price_adjustment_*,valuation price adjustment,defined,adjustment no,
+預付款與調整,priceAdjustments.type,valuation.price_adjustment_*,valuation price adjustment,defined,adjustment type,
+預付款與調整,priceAdjustments.itemName,valuation.price_adjustment_*,valuation price adjustment,defined,item name,
+預付款與調整,priceAdjustments.basePrice,valuation.price_adjustment_*,valuation price adjustment,defined,base price,
+預付款與調整,priceAdjustments.currentPrice,valuation.price_adjustment_*,valuation price adjustment,defined,current price,
+預付款與調整,priceAdjustments.adjustmentFactor,valuation.price_adjustment_*,valuation price adjustment,defined,factor,
+預付款與調整,priceAdjustments.adjustmentAmount,valuation.price_adjustment_*,valuation price adjustment,defined,amount,
+預付款與調整,priceAdjustments.effectiveDate,valuation.price_adjustment_*,valuation price adjustment,defined,effective date,
+預付款與調整,priceAdjustments.description,valuation.price_adjustment_*,valuation price adjustment,defined,description,
+預付款與調整,priceAdjustments.approvalStatus,valuation.price_adjustment_*,valuation price adjustment,defined,approval status,
+待澄清欄位,總計價,user confirmation,clarification,pending,要確認是單一估驗單總計價，還是整案累計總計價,單期或全案累計
+待澄清欄位,計價項次,user confirmation,clarification,pending,要確認採用哪個欄位當項次,row/index/itemCode/period line
+待澄清欄位,總金額,user confirmation,clarification,pending,要確認顯示口徑,gross/ex-tax/tax-included
+待澄清欄位,以計算的數量,user confirmation,clarification,pending,要確認是否為計算後可請款數量,calculated quantity
+待澄清欄位,請款數量,user confirmation,clarification,pending,是否等於本期完成數量,requested quantity
+待澄清欄位,契約數量,user confirmation,clarification,pending,要用原契約還是現契約,original/current contract qty
+待澄清欄位,契約金額,user confirmation,clarification,pending,要用原契約還是現契約,original/current contract amount
+待澄清欄位,計算方式,user confirmation,clarification,pending,是否要列出公式與版本,formula detail
+待澄清欄位,本期金額(未稅),user confirmation,clarification,defined,API 已定義,currentPeriodAmount
+待澄清欄位,營業稅,user confirmation,clarification,defined,API 已定義,vatAmount
+待澄清欄位,本期金額(含稅),user confirmation,clarification,defined,API 已定義,currentPeriodAmountWithTax
+待澄清欄位,預付款扣回,user confirmation,clarification,defined,API 已定義,advancePaymentRecovery
+待澄清欄位,保留款,user confirmation,clarification,defined,API 已定義,retentionAmount
+待澄清欄位,代扣款項,user confirmation,clarification,defined,API 已定義,deductions
+待澄清欄位,實付金額,user confirmation,clarification,defined,API 已定義,netPayableAmount
+待澄清欄位,審核狀態,user confirmation,clarification,defined,API 已定義,draft/pending_review/approved/rejected/paid
+工程主檔參考,WORK_DETAILS.actual,src/data/dashboard.js,dashboard sample,context,actual progress sample,
+工程主檔參考,WORK_DETAILS.plan,src/data/dashboard.js,dashboard sample,context,plan progress sample,
+工程主檔參考,WORK_DETAILS.contract,src/data/dashboard.js,dashboard sample,context,contract amount sample,
+工程主檔參考,SUBCONTRACTOR_DETAILS.name,src/data/dashboard.js,dashboard sample,context,subcontractor name,
+工程主檔參考,SUBCONTRACTOR_DETAILS.work,src/data/dashboard.js,dashboard sample,context,work type,
+工程主檔參考,SUBCONTRACTOR_DETAILS.pct,src/data/dashboard.js,dashboard sample,context,progress pct,
+工程主檔參考,billing view -> valuation.valuation_headers,docs/system-inventory.md,system inventory,context,billing map,
+工程主檔參考,billing view -> finance.advance_payments,docs/system-inventory.md,system inventory,context,billing map,

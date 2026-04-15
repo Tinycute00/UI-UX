@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-04-14T10:51:13.321Z",
+  "environment": {
+    "baseUrl": "http://localhost:4176",
+    "viewport": "1280x800"
+  },
+  "tests": [
+    {
+      "id": "UIUX-201-1",
+      "name": "v-docs filter bar has 6 correct buttons (全部/施工計畫書/設計圖說/品管文件/工安文件/合約文件)",
+      "status": "passed",
+      "evidence": "Found 6 buttons: 全部/施工計畫書/設計圖說/品管文件/工安文件/合約文件",
+      "requiredMessage": null,
+      "actualMessage": null,
+      "notes": "Buttons match expected labels exactly"
+    },
+    {
+      "id": "EXEC-ERROR",
+      "name": "Test execution",
+      "status": "failed",
+      "evidence": "locator.click: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('#v-docs .fbar .fb').nth(1)\n    - locator resolved to <button class=\"fb\" data-filter=\"plan\" data-action=\"filter-docs\">施工計畫書</button>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is not visible\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not visible\n    - retrying click action\n      - waiting 100ms\n    56 × waiting for element to be visible, enabled and stable\n       - element is not visible\n     - retrying click action\n       - waiting 500ms\n",
+      "requiredMessage": null,
+      "actualMessage": null,
+      "notes": "Unexpected error during test execution"
+    }
+  ],
+  "codeChangesRequired": false,
+  "summary": {
+    "passed": 1,
+    "failed": 1,
+    "blocked": 0
+  }
+}

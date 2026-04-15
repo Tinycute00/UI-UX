@@ -2,6 +2,7 @@ import { initModals, toast } from '../js/modals.js';
 import { getActiveViewId, syncHomeButtonVisibility } from '../js/navigation.js';
 import { initSafety } from '../js/safety.js';
 import { initActionDispatcher } from './actions.js';
+import { initDashboard } from './dashboard-init.js';
 
 function initDateDisplay() {
   const currentDate = new Date();
@@ -37,6 +38,7 @@ export function bootstrapApp() {
   initModals();
   initSafety();
   initActionDispatcher();
+  initDashboard();
   initDateDisplay();
   initResponsiveHomeButton();
   initWelcomeToast();

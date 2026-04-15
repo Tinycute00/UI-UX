@@ -124,13 +124,86 @@ export function initSafety() {
   });
 }
 
+function validateStep1() {
+  var step1 = document.getElementById('sw-step1');
+  if (!step1) return true;
+  var checked = step1.querySelectorAll('input[type=checkbox]:checked');
+  return checked.length > 0;
+}
+
+function validateStep2() {
+  var container = document.getElementById('sf-checklist');
+  var items;
+  var i;
+  var acts;
+  var tag;
+  if (!container) return true;
+  items = container.querySelectorAll('.cl-item');
+  if (items.length === 0) return true;
+  for (i = 0; i < items.length; i++) {
+    acts = items[i].querySelector('.cl-acts');
+    if (!acts) continue;
+    tag = acts.querySelector('.tag');
+    if (!tag) return false;
+  }
+  return true;
+}
+
 export function safetyStep(n) {
-  var wiz = document.getElementById('safety-wizard');
+  var step1;
+  var checked;
+  var container;
+  var items;
+  var unMarked;
+  var acts;
+  var tag;
+  var wiz;
   var dot;
-  [1, 2, 3].forEach((i) => {
-    var panel = document.getElementById('sw-step' + i);
+  var i;
+  var panel;
+  var si;
+
+  // 進入 Step 2：驗證 Step 1（至少選一個巡檢位置 checkbox）
+  if (n === 2) {
+    step1 = document.getElementById('sw-step1');
+    if (step1) {
+      checked = step1.querySelectorAll('input[type=checkbox]:checked');
+      if (checked.length === 0) {
+        toast('請至少選擇一個巡檢位置', 'tw');
+        return;
+      }
+    }
+  }
+
+  // 進入 Step 3：驗證 Step 2（所有已列出的查核項目需已標記合格/不合格）
+  if (n === 3) {
+    container = document.getElementById('sf-checklist');
+    if (container) {
+      items = container.querySelectorAll('.cl-item');
+      if (items.length > 0) {
+        unMarked = 0;
+        for (i = 0; i < items.length; i++) {
+          acts = items[i].querySelector('.cl-acts');
+          if (acts) {
+            tag = acts.querySelector('.tag');
+            if (!tag) {
+              unMarked++;
+            }
+          }
+        }
+        if (unMarked > 0) {
+          toast('請完成所有查核項目的標記（' + unMarked + ' 項未完成）', 'tw');
+          return;
+        }
+      }
+    }
+  }
+
+  wiz = document.getElementById('safety-wizard');
+  for (i = 1; i <= 3; i++) {
+    panel = document.getElementById('sw-step' + i);
     if (panel) panel.style.display = i === n ? 'block' : 'none';
-    var si = document.getElementById('sw-s' + i);
+    si = document.getElementById('sw-s' + i);
     if (si) si.style.opacity = i <= n ? '1' : '0.4';
     if (si) {
       dot = si.querySelector('div');
@@ -138,8 +211,7 @@ export function safetyStep(n) {
         dot.style.background = i < n ? 'var(--green)' : i === n ? 'var(--gold)' : 'var(--bd2)';
       if (dot) dot.style.color = i <= n ? '#1A1200' : 'var(--tx3)';
     }
-  });
-  // Build step 2 checklist dynamically when entering step 2
+  }
   if (n === 2) safetyBuildStep2();
 }
 

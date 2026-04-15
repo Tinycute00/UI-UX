@@ -1,50 +1,26 @@
-# Ta Chen PMIS — Local Development Stack (OPS-306)
+# Ta Chen PMIS — Local Development Stack (OPS-306, revised)
 # ============================================================
 # DEV-ONLY: passwords below are for local validation ONLY.
 # DO NOT use in staging or production.
+#
+# DB: 使用現有 pmis-postgres (public_works_db)，不另起 postgres 服務
 # ============================================================
 
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: pmis_postgres_dev
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: pmis_dev
-      POSTGRES_USER: pmis
-      POSTGRES_PASSWORD: pmis_dev_pw
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./infra/init-schemas.sql:/docker-entrypoint-initdb.d/01-init-schemas.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pmis -d pmis_dev"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: pmis_backend_dev
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      DATABASE_URL: "postgresql://pmis:pmis_dev_pw@postgres:5432/pmis_dev"
+      DATABASE_URL: "postgresql://pmis_admin:***@host.docker.internal:5432/public_works_db"
       NODE_ENV: development
       PORT: "3000"
+      CORS_ORIGIN: "*"
     ports:
       - "3000:3000"
     volumes:
       - ./backend/src:/app/src:ro
-    profiles:
-      - full
-
-volumes:
-  postgres_data:
-    driver: local
