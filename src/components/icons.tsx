@@ -185,6 +185,34 @@ export const IconText = (p: IconProps) => (
   </svg>
 );
 
+export const IconEmptyBox = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 2 2 7l10 5 10-5-10-5Z" />
+    <path d="M2 17 12 22l10-5" />
+    <path d="M2 12 12 17l10-5" />
+  </svg>
+);
+
+export const IconSpinner = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 2v4" />
+    <path d="m16.2 7.8 2.9-2.9" />
+    <path d="M22 12h-4" />
+    <path d="m16.2 16.2 2.9 2.9" />
+    <path d="M12 18v4" />
+    <path d="m4.9 19.1 2.9-2.9" />
+    <path d="M2 12h4" />
+    <path d="m4.9 4.9 2.9 2.9" />
+  </svg>
+);
+
+export const IconErrorCircle = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="10" />
+    <path d="m15 9-6 6M9 9l6 6" />
+  </svg>
+);
+
 const ICON_MAP: Record<IconKey, (p: IconProps) => React.ReactElement> = {
   home: IconHome,
   morning: IconMorning,

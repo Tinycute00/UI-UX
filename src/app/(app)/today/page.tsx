@@ -1,12 +1,16 @@
+"use client";
+
+import { useTransition, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { DashboardState } from "@/components/ui/DashboardState";
+import { DashboardSkeleton } from "@/components/ui/DashboardSkeleton";
 import { SCurve, type SCurvePoint } from "@/components/charts/SCurve";
 import { NavIcon, IconBell, IconSun, IconWarning } from "@/components/icons";
 import { NAV } from "@/lib/navigation";
-
-export const metadata = { title: "今日工作" };
 
 // MOCK 資料 — 在 Supabase 接上前提供可視化。
 const MOCK_SCURVE: SCurvePoint[] = [
@@ -35,7 +39,27 @@ const REMINDERS = [
   { level: "brand", title: "明日（4/21）排定混凝土澆置", href: "/wbs" },
 ];
 
-export default function TodayPage() {
+type DashboardStatus = "loading" | "empty" | "error" | "success";
+
+/**
+ * Parse dashboard state from searchParams
+ * Only accepts valid states, defaults to "success"
+ */
+function parseDashboardState(value: string | null): DashboardStatus {
+  if (value === "loading" || value === "empty" || value === "error" || value === "success") {
+    return value;
+  }
+  return "success";
+}
+
+function TodayPageContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  // Deterministic state from URL query param
+  const status = parseDashboardState(searchParams.get("state"));
+
   const today = new Date();
   const dateLabel = today.toLocaleDateString("zh-TW", {
     year: "numeric",
@@ -46,6 +70,43 @@ export default function TodayPage() {
 
   const navByKey = new Map(NAV.map((n) => [n.iconKey, n]));
 
+  // Handle refresh/retry - simply refresh the current route
+  const handleRefresh = () => {
+    startTransition(() => {
+      router.replace("/today");
+    });
+  };
+
+  // Loading state - completely hides success content
+  if (status === "loading") {
+    return <DashboardSkeleton />;
+  }
+
+  // Empty state - completely hides success content
+  if (status === "empty") {
+    return (
+      <DashboardState
+        type="empty"
+        onAction={handleRefresh}
+        loading={isPending}
+      />
+    );
+  }
+
+  // Error state - completely hides success content
+  if (status === "error") {
+    return (
+      <DashboardState
+        type="error"
+        message="無法連線至伺服器"
+        code="ERR_NETWORK"
+        onAction={handleRefresh}
+        loading={isPending}
+      />
+    );
+  }
+
+  // Success state - existing dashboard content
   return (
     <div className="flex flex-col gap-6">
       {/* Hero：日期 + 天氣 */}
@@ -144,5 +205,13 @@ export default function TodayPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function TodayPage() {
+  return (
+    <Suspense fallback={<DashboardSkeleton />}>
+      <TodayPageContent />
+    </Suspense>
   );
 }
