@@ -58,7 +58,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 
 ```bash
 supabase db push
-# 或手動：將 supabase/migrations/0001_init.sql 內容貼到 SQL Editor
+# 或手動：依序將下列兩個檔案貼到 SQL Editor 執行
+#   supabase/migrations/0001_init.sql
+#   supabase/migrations/0002_mvp2_core.sql
 ```
 
 ### 4. 啟動開發伺服器
@@ -125,17 +127,56 @@ supabase/
 - [x] GitHub Actions CI（lint + typecheck + build）
 - [x] Supabase 完整 schema + RLS + 進度計算函式
 
-## 🔮 MVP 2 規劃
+## 🧩 MVP 2 已完成（核心 3 項）
 
-- [ ] 施工日誌完整表單（含自動彙整至 S-Curve）
-- [ ] 現場資料上傳（拍照 + GPS + EXIF + 離線佇列）
+- [x] **施工日誌** — 完整表單 + Supabase CRUD + 工項勾選自動觸發 S-Curve 重算（migration 0002 trigger）
+- [x] **現場資料上傳** — 批次上傳 + 自動壓縮（≤1.5MB）+ EXIF GPS / 拍攝時間 + 縮圖
+- [x] **工項 / 真實 S-Curve** — WBS 樹狀展開、權重與進度條、`scurve_series` RPC 計畫 vs 實際
+
+## 🔮 MVP 2+ 後續
+
 - [ ] 品管 / 職安 Checklist 自動判定
-- [ ] 工項樹狀管理與權重編輯
 - [ ] 材料驗收 + QR Code + NCR
 - [ ] PDF 電子化送審 + 電子簽章
 - [ ] 報表中心（月報 / 季報 / 竣工）
 - [ ] 通知工作流（推播 + Email）
 - [ ] 離線同步強化（IndexedDB + BackgroundSync）
+
+---
+
+## ☁️ 部署（Vercel）
+
+### 一次性設定（本機）
+
+```bash
+npm i -g vercel
+vercel login
+vercel link                  # 連結本地專案到 Vercel
+cat .vercel/project.json     # 取得 orgId / projectId
+```
+
+### GitHub Secrets
+
+Repo → Settings → Secrets and variables → Actions → 新增：
+
+| Secret | 取得方式 |
+|---|---|
+| `VERCEL_TOKEN` | <https://vercel.com/account/tokens> |
+| `VERCEL_ORG_ID` | `.vercel/project.json` 的 `orgId` |
+| `VERCEL_PROJECT_ID` | `.vercel/project.json` 的 `projectId` |
+
+### Vercel 專案環境變數
+
+Project → Settings → Environment Variables → 新增：
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### 自動部署
+
+- `push` 到 `main` 會由 `.github/workflows/deploy.yml` 自動觸發 `vercel deploy --prod`。
+- Secrets 未設定時 workflow 會安全跳過並顯示提示，不影響 CI。
+- 區域：`hnd1`（東京，亞洲延遲最低），可於 `vercel.json` 調整。
 
 ---
 

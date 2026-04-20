@@ -1,0 +1,71 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    name: Deploy (production)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Check required secrets
+        id: secrets
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_ORG_ID }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            echo "missing=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "missing=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip (secrets missing)
+        if: steps.secrets.outputs.missing == 'true'
+        run: |
+          echo "::warning::VERCEL_TOKEN / VERCEL_ORG_ID / VERCEL_PROJECT_ID secrets not set. Skipping deploy."
+          echo "設定步驟：Repo Settings → Secrets and variables → Actions → 新增上述 3 個 secrets。"
+          echo "取得方式：vercel login && vercel link && cat .vercel/project.json"
+
+      - name: Install Vercel CLI
+        if: steps.secrets.outputs.missing == 'false'
+        run: npm i -g vercel@latest
+
+      - name: Pull Vercel Environment
+        if: steps.secrets.outputs.missing == 'false'
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build (Vercel)
+        if: steps.secrets.outputs.missing == 'false'
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy (Prebuilt) → Production
+        if: steps.secrets.outputs.missing == 'false'
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "Deployed: $url"
+          echo "deploy_url=$url" >> "$GITHUB_OUTPUT"
+        id: deploy
+
+      - name: Summary
+        if: steps.secrets.outputs.missing == 'false'
+        run: |
+          echo "### Vercel Production Deploy" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- URL: ${{ steps.deploy.outputs.deploy_url }}" >> "$GITHUB_STEP_SUMMARY"
