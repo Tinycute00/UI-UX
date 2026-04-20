@@ -1,0 +1,10 @@
+backend/
+docs/
+infra/
+node_modules/
+.next/
+.git/
+.github/
+*.md
+.env*
+docker-compose.yml
