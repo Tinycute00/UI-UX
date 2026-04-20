@@ -144,39 +144,137 @@ supabase/
 
 ---
 
-## ☁️ 部署（Vercel）
+## ☁️ 部署（Vercel + GitHub Actions 自動部署）
 
-### 一次性設定（本機）
+> **為什麼 Vercel？** Next.js 15 使用 Server Components / middleware / dynamic routes，GitHub Pages（純靜態）無法支援。Vercel 是 Next.js 的原廠託管，零設定即支援 SSR、Edge、preview 環境。免費額度對本專案充裕（個人 Hobby：100GB 頻寬/月、無限部署）。
 
-```bash
-npm i -g vercel
-vercel login
-vercel link                  # 連結本地專案到 Vercel
-cat .vercel/project.json     # 取得 orgId / projectId
+### 🗺 部署流程總覽
+
+```
+本機 vercel link → GitHub Secrets 設定 → Vercel 環境變數設定 → Supabase migration → git push → 自動部署
+     (Step 1)         (Step 2-3)             (Step 4)             (Step 5)        (Step 6)
 ```
 
-### GitHub Secrets
+### Step 1：本機連結 Vercel 專案
 
-Repo → Settings → Secrets and variables → Actions → 新增：
+```bash
+# 1-1. 安裝 Vercel CLI（全域）
+npm i -g vercel
 
-| Secret | 取得方式 |
-|---|---|
-| `VERCEL_TOKEN` | <https://vercel.com/account/tokens> |
-| `VERCEL_ORG_ID` | `.vercel/project.json` 的 `orgId` |
-| `VERCEL_PROJECT_ID` | `.vercel/project.json` 的 `projectId` |
+# 1-2. 登入（瀏覽器會自動開啟 OAuth 頁面）
+vercel login
+# 選 "Continue with GitHub" → 授權 → 回 terminal 顯示 "Success!"
 
-### Vercel 專案環境變數
+# 1-3. 在專案根目錄執行 link
+cd ~/team-workspace/UI-UX
+vercel link
 
-Project → Settings → Environment Variables → 新增：
+# CLI 互動式提示依序回答：
+#   ? Set up "~/team-workspace/UI-UX"? → Y
+#   ? Which scope should contain your project? → 選你的帳號或 team
+#   ? Link to existing project? → N（首次）
+#   ? What's your project's name? → ui-ux（建議）或自訂
+#   ? In which directory is your code located? → ./ （按 Enter）
+#   （偵測到 Next.js，其他自動填好，全部按 Enter 接受）
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+# 1-4. 取得 orgId / projectId（之後會用到）
+cat .vercel/project.json
+# 輸出範例：
+# {"projectId":"prj_xxxxxxxxxxxxxxxxxxxxxxxxxx","orgId":"team_xxxxxxxxxxxxxxxx"}
+# 或個人帳號：
+# {"projectId":"prj_xxx","orgId":"xxxxxxxxxxxxxxxx"}
+```
 
-### 自動部署
+> ⚠️ `.vercel/` 資料夾已在 `.gitignore` 中，不會 commit，請妥善保留以免下次 link 又重設。
 
-- `push` 到 `main` 會由 `.github/workflows/deploy.yml` 自動觸發 `vercel deploy --prod`。
-- Secrets 未設定時 workflow 會安全跳過並顯示提示，不影響 CI。
-- 區域：`hnd1`（東京，亞洲延遲最低），可於 `vercel.json` 調整。
+### Step 2：產生 Vercel Token
+
+1. 前往 <https://vercel.com/account/tokens>
+2. 點右上 **Create Token**
+3. 填寫：
+   - **Token Name**：`github-actions-ui-ux`
+   - **Scope**：選你 link 專案時用的帳號 / team
+   - **Expiration**：`No Expiration`（或 1 year）
+4. 點 **Create Token** → **立刻複製**（頁面關掉就看不到了）
+
+### Step 3：設定 GitHub Secrets
+
+前往 <https://github.com/Tinycute00/UI-UX/settings/secrets/actions>（若 repo 非此位置請自行替換路徑）
+
+點 **New repository secret**，依序新增 **3 個 secrets**：
+
+| Secret Name | Value 來源 | 範例格式 |
+|---|---|---|
+| `VERCEL_TOKEN` | Step 2 產生的 token | `abcdef1234567890...` |
+| `VERCEL_ORG_ID` | `.vercel/project.json` 的 `orgId` | `team_xxx` 或 `xxx`（一串字） |
+| `VERCEL_PROJECT_ID` | `.vercel/project.json` 的 `projectId` | `prj_xxx` |
+
+> ✅ 新增完應在列表看到 3 個 Secret。值會被遮蔽無法再檢視，只能「Update」覆蓋。
+
+### Step 4：設定 Vercel 專案環境變數
+
+前往 <https://vercel.com/dashboard> → 選 `ui-ux` 專案 → **Settings** → **Environment Variables**
+
+依序新增 **2 個環境變數**（**Production / Preview / Development 三個 checkbox 全部勾選**）：
+
+| Key | Value | Environment |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://<your-project>.supabase.co` | 全選 |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon public key（eyJhbGciOi...） | 全選 |
+
+> 📍 **如何取得 Supabase 值**：Supabase Dashboard → 你的專案 → **Settings** → **API**
+> - URL → **Project URL**
+> - anon key → **Project API keys** → `anon` `public`（不是 `service_role`！）
+
+### Step 5：執行 Supabase Migration
+
+首次部署或 schema 變更時，到 Supabase Dashboard → **SQL Editor** → **New query**：
+
+1. 複製 `supabase/migrations/0001_init.sql` 全文 → 貼上 → **Run**（若尚未執行過）
+2. 複製 `supabase/migrations/0002_mvp2_core.sql` 全文 → 貼上 → **Run**
+
+執行成功後在 **Storage** → 應看到 `photos` bucket，**Database → Functions** 應看到 `scurve_series` 與 `recalculate_wbs_progress`。
+
+### Step 6：觸發部署
+
+```bash
+# 方式 A：已有新變更 → 直接 push
+git push origin main
+
+# 方式 B：無變更，用空 commit 觸發
+git commit --allow-empty -m "ci: trigger deploy"
+git push origin main
+```
+
+前往 <https://github.com/Tinycute00/UI-UX/actions> 觀察 **Deploy to Vercel** workflow：
+
+- ✅ 成功：進入 Vercel Dashboard → 專案頁 → **Domains** 區會看到網址（預設 `ui-ux-xxx.vercel.app`）
+- ❌ 失敗：點進 run 看哪一步錯
+  - `Checking Vercel secrets` 顯示 skip → 回 Step 3 確認 3 個 secrets 名稱完全正確
+  - `vercel pull` 失敗 → token 權限不足，重新產生 token 並更新 `VERCEL_TOKEN`
+  - `vercel build` 失敗 → 環境變數未設（回 Step 4）
+
+### 🔄 日常更新流程
+
+設定完成後，日後只需：
+```bash
+git push origin main   # 即自動部署到 production
+```
+
+- **Preview 部署**：開 PR 會自動建立 preview URL，合併前可先試玩
+- **Production 部署**：`main` branch push 即觸發
+- **區域**：`hnd1`（東京），於 `vercel.json` 調整
+- **Rollback**：Vercel Dashboard → Deployments → 選舊版 → **Promote to Production**
+
+### 🧪 自訂網域（可選）
+
+Vercel Dashboard → 專案 → **Domains** → **Add** → 輸入你的網域 → 依指示在 DNS provider 設定 CNAME → Vercel 自動簽發 SSL 憑證。
+
+### ⚠️ 安全提醒
+
+- `anon key` 公開在前端是**設計如此**（靠 Supabase RLS 保護），**不要**放 `service_role key` 到 `NEXT_PUBLIC_*` 變數
+- Vercel Token 等同帳號密碼，**不要** commit 到 repo、不要分享，定期輪替
+- `.vercel/` 已在 `.gitignore`，保持現狀
 
 ---
 
