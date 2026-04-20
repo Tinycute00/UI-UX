@@ -70,7 +70,7 @@ function TodayPageContent() {
 
   const navByKey = new Map(NAV.map((n) => [n.iconKey, n]));
 
-  // Handle refresh/retry - simply refresh the current route
+  // Handle refresh/retry - navigate to canonical /today to clear state query
   const handleRefresh = () => {
     startTransition(() => {
       router.replace("/today");
