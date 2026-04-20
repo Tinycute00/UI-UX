@@ -1,4 +1,65 @@
+# dependencies
 node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+coverage/
+
+# next.js
+.next/
+out/
+
+# production
+build/
 dist/
-.env
+
+# misc
 .DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (do not commit)
+.env
+.env*.local
+.env.production
+.env.development
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+
+# Backend (managed separately)
+backend/node_modules/
+backend/dist/
+backend/.env
+
+# Project-local temp
+.ruff_cache/
+tmp/
+test-results/
+playwright-report/
+
+# opencode/sisyphus local
+.opencode/
+.hermes/
+.sisyphus/

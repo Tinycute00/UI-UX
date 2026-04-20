@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1d4ed8"/>
+  <circle cx="256" cy="256" r="200" fill="#1e40af"/>
+  <text x="50%" y="58%" font-family="Noto Sans TC, PingFang TC, sans-serif" font-size="260" font-weight="900" text-anchor="middle" fill="#ffffff">工</text>
+</svg>
